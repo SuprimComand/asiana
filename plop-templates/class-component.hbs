@@ -1,0 +1,27 @@
+import React, { Component } from 'react';
+import { View, Text } from 'react-native';
+
+interface IExternalProps {}
+
+interface IProps extends IExternalProps {}
+
+interface IState {}
+
+class {{ pascalCase name }} extends Component<IProps, IState> {
+
+    state = {
+
+    }
+
+    render(){
+        return (
+            <View>
+                <Text>
+                    {{ pascalCase name }}
+                </Text>
+            </View>
+        );
+    }
+}
+
+export default {{ pascalCase name }};
