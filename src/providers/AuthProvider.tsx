@@ -19,7 +19,7 @@ const AuthProvider = ({ children }: PropsWithChildren<IProps>) => {
     }
     
     useEffect(() => {
-        setTimeout(handleCheckToken, 1000)
+        setTimeout(handleCheckToken, 3000)
     }, []);
 
     return children || (

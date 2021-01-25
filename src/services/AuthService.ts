@@ -41,11 +41,12 @@ export class AuthService {
             body: JSON.stringify({ code, deviceId, type: deviceType })
         });
         const data = await response.json();
+
         if (String(data.status) === '200') {
             const { refresh, token } = data;
             await AsyncStorage.setItem('refresh', refresh);
             await AsyncStorage.setItem('token', token);
-            return true;
+            return data;
         }
 
         return false;

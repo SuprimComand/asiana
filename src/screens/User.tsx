@@ -5,31 +5,28 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import Button from '../components/Button';
 import FormField from '../components/FormField';
 import HeaderProject from '../components/HeaderProject';
-import {SelecterItem} from '../components/Selecter';
-import {COLORS} from '../constants';
+import SelectButtonGroup, { Action } from '../components/SelectButtonGroup';
+import { COLORS } from '../constants';
 
 interface IExternalProps {}
 
 interface IProps extends IExternalProps {}
 
-const defaultData: SelecterItem[] = [
+const defaultData: Action[] = [
   {
     id: 0,
     label: 'Мужчина',
-    checked: true,
   },
   {
     id: 1,
     label: 'Женщина',
-    checked: false,
   },
 ];
 
 const User: FC<IProps> = () => {
   const navigation = useNavigation();
   const [editable, setEditable] = useState(true);
-  const [gender, setGender] = useState(0);
-  const [genders, setGenders] = useState<SelecterItem[]>(defaultData);
+  const [gender, setGender] = useState<Action | null>(null);
 
   const handleChangeEditable = useCallback(() => {
     setEditable(!editable);
@@ -41,24 +38,15 @@ const User: FC<IProps> = () => {
   };
 
   const handleChangeGender = useCallback(
-    (id: number | string) => {
-      setGender(Number(id));
-      setGenders(
-        genders.map((gender: SelecterItem) =>
-          gender.id === Number(id)
-            ? {...gender, checked: true}
-            : {...gender, checked: false},
-        ),
-      );
+    (gender: Action) => {
+      setGender(gender);
     },
-    [genders, gender],
+    [gender],
   );
 
   const onGoBach = useCallback(() => {
     navigation.goBack();
   }, []);
-
-  const genderValue = gender ? 'Женский' : 'Мужской';
 
   const color = editable ? COLORS.orange : COLORS.green;
   const label = editable ? 'Сохранить' : 'Изменить';
@@ -66,7 +54,7 @@ const User: FC<IProps> = () => {
   return (
     <View style={styles.container}>
       <HeaderProject
-        leftIcon={<Icon size={22} name="close" color={COLORS.darkOrange} />}
+        leftIcon={<Icon size={28} name="arrowleft" color={COLORS.darkOrange} />}
         onPressLeftAction={onGoBach}
         rightIcon={<Icon size={20} name="logout" color={COLORS.gray} />}
         content={<Text style={styles.title}>Профиль</Text>}
@@ -77,6 +65,7 @@ const User: FC<IProps> = () => {
             <View style={[styles.form, styleForm]}>
               <View style={styles.flex}>
                 <FormField
+                  type="text"
                   customTextStyle={{fontSize: 24}}
                   value="Камбаев Ахмед Русланович"
                   editable={editable}
@@ -93,29 +82,23 @@ const User: FC<IProps> = () => {
               </View>
               <View style={styles.flex}>
                 <FormField
-                  onChange={handleChangeGender}
+                  type="text"
                   editable={editable}
-                  listSelecter={genders}
-                  placeholder="Пол"
-                  type="selecter"
-                  value={genderValue}
+                  placeholder="Email"
+                  value="kambaevahmed@list.ru"
                 />
               </View>
-              <View style={styles.flex}>
+              <View style={[styles.flex, { paddingTop: 25 }]}>
+                <SelectButtonGroup onSelect={handleChangeGender} actions={defaultData} selectedAction={gender} />
+              </View>
+              {/* <View style={styles.flex}>
                 <FormField
                   editable={editable}
                   placeholder="Телефон"
                   type="number"
                   value="79898926633"
                 />
-              </View>
-              <View style={styles.flex}>
-                <FormField
-                  editable={editable}
-                  placeholder="Email"
-                  value="kambaevahmed@list.ru"
-                />
-              </View>
+              </View> */}
             </View>
           </View>
         </ScrollView>
@@ -154,9 +137,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
   },
-  flex: {
-    marginBottom: 15,
-  },
+  flex: {},
   subtitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -171,7 +152,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 30,
   },
 });
 

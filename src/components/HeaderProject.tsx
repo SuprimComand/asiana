@@ -5,16 +5,17 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 interface IExternalProps {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
-  content: React.ReactNode;
+  content?: React.ReactNode;
   onPressLeftAction?: () => void;
   onPressRightAction?: () => void;
+  customStyles?: { [key: string]: string | number };
 }
 
 interface IProps extends IExternalProps {}
 
-const HeaderProject:FC<IProps> = ({ leftIcon, rightIcon, content, onPressLeftAction, onPressRightAction }) => {
+const HeaderProject:FC<IProps> = ({ leftIcon, rightIcon, content, onPressLeftAction, onPressRightAction, customStyles }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, customStyles]}>
       <TouchableOpacity onPress={onPressLeftAction}>{leftIcon}</TouchableOpacity>
       {content}
       <TouchableOpacity onPress={onPressRightAction}>{rightIcon}</TouchableOpacity>

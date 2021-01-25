@@ -1,8 +1,10 @@
 export const COLORS = {
     orange: '#ffb000',
     darkOrange: '#E7702B',
+    lightOrange: '#FBDDA6',
     white: '#ffffff',
-    lightGray: '#e1e1e1',
+    lightGray: '#E8E8E8',
+    bgColorLight: '#F6F6F6',
     red: '#ff0000',
     transparent: 'transparent',
     gray: '#818080',

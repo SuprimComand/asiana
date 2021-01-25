@@ -15,7 +15,7 @@ interface IExternalProps {
 interface IProps extends IExternalProps {}
 
 const Button:FC<IProps> = ({ onClick, label, bgColor, color, disabled, customStyles, loading }) => {
-  const colorDisabled = disabled && COLORS.lightGray;
+  const colorDisabled = disabled && COLORS.lightOrange;
   const backgroundColor = colorDisabled || bgColor || styles.button.backgroundColor;
   const style = { backgroundColor };
 
@@ -38,14 +38,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.orange,
     width: Dimensions.get('screen').width - 40,
     padding: 10,
-    borderRadius: 16,
+    borderRadius: 25,
     justifyContent: 'center',
     height: 50
   },
   label: {
     color: COLORS.white,
     textAlign: 'center',
-    fontSize: 18
+    fontSize: 18,
+    fontWeight: 'bold'
   }
 });
 

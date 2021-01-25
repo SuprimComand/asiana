@@ -1,10 +1,13 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { View, TextInput, StyleSheet, Dimensions, Text, KeyboardAvoidingView } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/AntDesign';
 import Button from '../components/Button';
 import { COLORS } from '../constants';
 import { AuthService } from '../services/AuthService';
 import AsyncStorage from '@react-native-community/async-storage';
+import FormField from '../components/FormField';
+import HeaderProject from '../components/HeaderProject';
 
 interface IExternalProps {}
 
@@ -27,10 +30,12 @@ const SmsCodeNotification:FC<IProps> = () => {
   }
 
   useEffect(() => {
-    handleChangeTimer();
-  }, []);
+    if (timer === 60) {
+      handleChangeTimer();
+    }
+  }, [timer]);
 
-  const handleChangeNumber = useCallback(() => {
+  const onGoBack = useCallback(() => {
     navigation.navigate('Login');
   }, []);
 
@@ -41,11 +46,14 @@ const SmsCodeNotification:FC<IProps> = () => {
   const handleSendCode = useCallback(async () => {
     if (code.length === 4) {
       setLoading(true);
-      const status = await AuthService.sendCode(code);
+      const data = await AuthService.sendCode(code);
       setTimeout(() => setLoading(false), 1000)
       // TODO: fix
-      if (status || true) {
+      if (data) {
         setError(false);
+        const { refresh, token } = data;
+        await AsyncStorage.setItem('refresh', refresh);
+        await AsyncStorage.setItem('token', token);
         return navigation.navigate('Project');
       }
       setError(true);
@@ -57,7 +65,6 @@ const SmsCodeNotification:FC<IProps> = () => {
     const status = await AuthService.login({ phone: `7${phone}` });
     if (status) {
       setTimer(60);
-      handleChangeTimer();
     }
   }
 
@@ -71,14 +78,24 @@ const SmsCodeNotification:FC<IProps> = () => {
       style={styles.keyboard}
     >
       <View style={styles.container}>
+        <HeaderProject
+          customStyles={styles.header}
+          leftIcon={(
+            <Icon
+              size={32}
+              name="arrowleft"
+              color={COLORS.orange}
+            />
+          )}
+          onPressLeftAction={onGoBack}
+        />
         <View style={styles.form}>
-          <Text style={styles.label}>Авторизация по номеру</Text>
+          <Text style={styles.label}>Подтвердите код из SMS</Text>
           <View style={styles.inputBlock}>
-            <TextInput autoFocus keyboardType="number-pad" value={code} maxLength={4} onChangeText={handleChangeCode} style={[styles.input, errorStyle]} placeholder="1234" />
+            <FormField autoFocus customStyles={{...styles.formField, ...errorStyle}} onChange={handleChangeCode} mask="[0000]" keyboardType="number-pad" editable />
             {hasError && <Text style={styles.errorText}>Не верный код</Text>}
           </View>
           <Button loading={loading} disabled={disableSendButton} customStyles={styles.button} label="Подтвердить смс" onClick={handleSendCode} />
-          <Button bgColor={COLORS.lightGray} color={COLORS.gray} customStyles={styles.button} label="Изменить номер" onClick={handleChangeNumber} />
           {
             timer ? <Text style={styles.timerText}>Отправить повторно.. {timer}</Text> :
             <Button bgColor={COLORS.transparent} color={COLORS.gray} label="Отправить повторно" onClick={reSendPhone} />
@@ -90,6 +107,12 @@ const SmsCodeNotification:FC<IProps> = () => {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    paddingTop: 20
+  },
+  formField: {
+    marginBottom: 20
+  },
   timerText: {
     color: COLORS.gray,
     marginTop: 20
@@ -99,6 +122,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 20,
     width: Dimensions.get('screen').width,
+    paddingTop: 150,
   },
   label: {
     fontSize: 24,
@@ -112,10 +136,11 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
+    height: '100%',
     alignItems: 'center',
-    backgroundColor: 'white',
-    paddingTop: 100
+    paddingBottom: 50,
+    justifyContent: 'space-between',
+    backgroundColor: 'white'
   },
   errorText: {
     color: COLORS.red
@@ -124,7 +149,7 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   inputBlock: {
-    marginBottom: 30,
+    marginBottom: 20,
   },
   input: {
     borderWidth: 2,

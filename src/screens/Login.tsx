@@ -1,11 +1,11 @@
 import React, { FC, useCallback, useState } from 'react';
-import TextInputMask from 'react-native-text-input-mask';
 import { View, Text, StyleSheet, Image, Dimensions, KeyboardAvoidingView } from 'react-native';
 import { COLORS } from '../constants';
 import Button from '../components/Button';
 import { useNavigation } from '@react-navigation/native';
 import { AuthService } from '../services/AuthService';
 import AsyncStorage from '@react-native-community/async-storage';
+import FormField from '../components/FormField';
 
 interface IExternalProps {}
 
@@ -17,7 +17,7 @@ const Login:FC<IProps> = () => {
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
 
-  const handleChangeNumber = useCallback((formatted: string, value?: string) => {
+  const handleChangeNumber = useCallback((formatted: any, value?: string) => {
     setPhone(value || formatted);
   }, []);
 
@@ -44,16 +44,9 @@ const Login:FC<IProps> = () => {
     >
       <View style={styles.container}>
         <View style={styles.form}>
-          <Text style={styles.label}>Авторизация по номеру</Text>
+          <Text style={styles.label}>Введите ваш номер телефона</Text>
           <View style={styles.inputBlock}>
-            <TextInputMask
-              keyboardType="number-pad"
-              style={styles.input}
-              onChangeText={handleChangeNumber}
-              autoFocus
-              mask={"+7 ([000]) [000] [00] [00]"}
-              placeholder="+7 (999) 999 99 99"
-            />
+            <FormField autoFocus customStyles={styles.formField} onChange={handleChangeNumber} type="number" editable />
             {hasError && <Text style={styles.errorText}>Не валидный номер</Text>}
           </View>
           <Button loading={loading} disabled={disabled} label="Отправить код по смс" onClick={handleSubmit} />
@@ -65,6 +58,9 @@ const Login:FC<IProps> = () => {
 
 
 const styles = StyleSheet.create({
+  formField: {
+    marginBottom: 20
+  },
   header: {
     justifyContent: 'center',
     flexDirection: 'row',
@@ -91,13 +87,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    alignContent: 'flex-start'
+    alignContent: 'flex-start',
+    width: Dimensions.get('screen').width - 200,
+    textAlign: 'center'
   },
   container: {
     flex: 1,
     height: '100%',
     alignItems: 'center',
-    paddingTop: 100,
+    paddingTop: 150,
     paddingBottom: 50,
     justifyContent: 'center',
     backgroundColor: 'white'
@@ -107,7 +105,7 @@ const styles = StyleSheet.create({
     height: Dimensions.get('screen').width - 120,
   },
   inputBlock: {
-    marginBottom: 15,
+    marginBottom: 20,
   },
   input: {
     width: Dimensions.get('screen').width - 40,
