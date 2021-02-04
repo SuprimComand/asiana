@@ -9,17 +9,13 @@ interface IExternalProps {
 
 interface IProps extends IExternalProps {}
 
-const RadioButton:FC<IProps> = (props) => {
+const RadioButton: FC<IProps> = (props) => {
   return (
     <View style={[styles.button, props.customStyles]}>
-      {
-        props.selected ?
-          <View style={styles.selectedIndicator}/>
-          : null
-      }
+      {props.selected ? <View style={styles.selectedIndicator} /> : null}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   button: {
@@ -36,7 +32,7 @@ const styles = StyleSheet.create({
     width: 12,
     borderRadius: 6,
     backgroundColor: COLORS.green,
-  }
+  },
 });
 
 export default RadioButton;

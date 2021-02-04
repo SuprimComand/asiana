@@ -1,11 +1,17 @@
 import React, { FC } from 'react';
-import { Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import { COLORS } from '../constants';
 
 interface IExternalProps {
   color?: string;
-  bgColor?: string,
-  onClick: () => void;
+  bgColor?: string;
+  onClick?: () => void;
   customStyles?: { [key: string]: any };
   label: string;
   disabled?: boolean;
@@ -14,24 +20,41 @@ interface IExternalProps {
 
 interface IProps extends IExternalProps {}
 
-const Button:FC<IProps> = ({ onClick, label, bgColor, color, disabled, customStyles, loading }) => {
+const Button: FC<IProps> = ({
+  onClick,
+  label,
+  bgColor,
+  color,
+  disabled,
+  customStyles,
+  loading,
+}) => {
   const colorDisabled = disabled && COLORS.lightOrange;
-  const backgroundColor = colorDisabled || bgColor || styles.button.backgroundColor;
+  const backgroundColor =
+    colorDisabled || bgColor || styles.button.backgroundColor;
   const style = { backgroundColor };
 
   return (
     <TouchableOpacity
       disabled={disabled}
-      style={[styles.button, style, customStyles, { flexDirection: loading ? 'row' : 'column' }]}
-      onPress={onClick}
-    >
-      <Text style={[styles.label, { color: color || styles.label.color, marginRight: loading ? 10 : 0 }]}>
+      style={[
+        styles.button,
+        style,
+        customStyles,
+        { flexDirection: loading ? 'row' : 'column' },
+      ]}
+      onPress={onClick}>
+      <Text
+        style={[
+          styles.label,
+          { color: color || styles.label.color, marginRight: loading ? 10 : 0 },
+        ]}>
         {label}
       </Text>
-      {loading && <ActivityIndicator color={COLORS.white}/>}
+      {loading && <ActivityIndicator color={COLORS.white} />}
     </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
   button: {
@@ -40,14 +63,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 25,
     justifyContent: 'center',
-    height: 50
+    height: 50,
   },
   label: {
     color: COLORS.white,
     textAlign: 'center',
     fontSize: 18,
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
 });
 
 export default Button;

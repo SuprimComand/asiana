@@ -13,15 +13,26 @@ interface IExternalProps {
 
 interface IProps extends IExternalProps {}
 
-const HeaderProject:FC<IProps> = ({ leftIcon, rightIcon, content, onPressLeftAction, onPressRightAction, customStyles }) => {
+const HeaderProject: FC<IProps> = ({
+  leftIcon,
+  rightIcon,
+  content,
+  onPressLeftAction,
+  onPressRightAction,
+  customStyles,
+}) => {
   return (
     <View style={[styles.container, customStyles]}>
-      <TouchableOpacity onPress={onPressLeftAction}>{leftIcon}</TouchableOpacity>
+      <TouchableOpacity onPress={onPressLeftAction}>
+        {leftIcon}
+      </TouchableOpacity>
       {content}
-      <TouchableOpacity onPress={onPressRightAction}>{rightIcon}</TouchableOpacity>
+      <TouchableOpacity onPress={onPressRightAction}>
+        {rightIcon}
+      </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -29,8 +40,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
-  }
+    justifyContent: 'space-between',
+  },
 });
 
 export default HeaderProject;

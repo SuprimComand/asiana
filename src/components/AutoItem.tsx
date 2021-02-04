@@ -13,7 +13,7 @@ interface IExternalProps {
 
 interface IProps extends IExternalProps {}
 
-const AutoItem:FC<IProps> = ({ title, checked, index, onSelect, id }) => {
+const AutoItem: FC<IProps> = ({ title, checked, index, onSelect, id }) => {
   const [isSelected, setSelected] = useState(checked);
 
   const handlePress = useCallback(() => {
@@ -24,11 +24,12 @@ const AutoItem:FC<IProps> = ({ title, checked, index, onSelect, id }) => {
   }, [isSelected]);
 
   return (
-    <TouchableOpacity activeOpacity={0.8} onPress={handlePress} style={[styles.container, { borderTopWidth: index && 1 }]}>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={handlePress}
+      style={[styles.container, { borderTopWidth: index && 1 }]}>
       <View>
-        <Text style={styles.title}>
-          {title}
-        </Text>
+        <Text style={styles.title}>{title}</Text>
       </View>
       <View>
         <CheckBox
@@ -39,7 +40,7 @@ const AutoItem:FC<IProps> = ({ title, checked, index, onSelect, id }) => {
       </View>
     </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -50,15 +51,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderColor: COLORS.gray,
-    paddingVertical: 10
+    paddingVertical: 10,
   },
   checkbox: {
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   title: {
     color: COLORS.gray,
-    fontSize: 18
-  }
+    fontSize: 18,
+  },
 });
 
 export default AutoItem;

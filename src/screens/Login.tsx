@@ -1,5 +1,12 @@
 import React, { FC, useCallback, useState } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, KeyboardAvoidingView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Dimensions,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { COLORS } from '../constants';
 import Button from '../components/Button';
 import { useNavigation } from '@react-navigation/native';
@@ -11,7 +18,7 @@ interface IExternalProps {}
 
 interface IProps extends IExternalProps {}
 
-const Login:FC<IProps> = () => {
+const Login: FC<IProps> = () => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,40 +45,49 @@ const Login:FC<IProps> = () => {
   const disabled = phone.length < 10;
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={styles.keyboard}
-    >
+    <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
       <View style={styles.container}>
         <View style={styles.form}>
           <Text style={styles.label}>Введите ваш номер телефона</Text>
           <View style={styles.inputBlock}>
-            <FormField autoFocus customStyles={styles.formField} onChange={handleChangeNumber} type="number" editable />
-            {hasError && <Text style={styles.errorText}>Не валидный номер</Text>}
+            <FormField
+              autoFocus
+              customStyles={styles.formField}
+              onChange={handleChangeNumber}
+              type="number"
+              editable
+            />
+            {hasError && (
+              <Text style={styles.errorText}>Не валидный номер</Text>
+            )}
           </View>
-          <Button loading={loading} disabled={disabled} label="Отправить код по смс" onClick={handleSubmit} />
+          <Button
+            loading={loading}
+            disabled={disabled}
+            label="Отправить код по смс"
+            onClick={handleSubmit}
+          />
         </View>
       </View>
     </KeyboardAvoidingView>
   );
-}
-
+};
 
 const styles = StyleSheet.create({
   formField: {
-    marginBottom: 20
+    marginBottom: 20,
   },
   header: {
     justifyContent: 'center',
     flexDirection: 'row',
-    height: '50%'
+    height: '50%',
   },
   errorText: {
     color: COLORS.red,
   },
   title: {
     color: COLORS.black,
-    fontSize: 24
+    fontSize: 24,
   },
   form: {
     alignItems: 'center',
@@ -81,7 +97,7 @@ const styles = StyleSheet.create({
   },
   keyboard: {
     flex: 1,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
   },
   label: {
     fontSize: 24,
@@ -89,7 +105,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignContent: 'flex-start',
     width: Dimensions.get('screen').width - 200,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   container: {
     flex: 1,
@@ -98,7 +114,7 @@ const styles = StyleSheet.create({
     paddingTop: 150,
     paddingBottom: 50,
     justifyContent: 'center',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   image: {
     width: Dimensions.get('screen').width - 120,
@@ -114,8 +130,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     borderRadius: 8,
     padding: 10,
-    backgroundColor: COLORS.lightGray
-  }
+    backgroundColor: COLORS.lightGray,
+  },
 });
 
 export default Login;

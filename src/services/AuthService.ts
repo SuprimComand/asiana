@@ -7,57 +7,61 @@ const deviceId = DeviceInfo.getDeviceId();
 const deviceType = Platform.OS;
 
 type ILoginType = {
-    phone: string;
-}
+  phone: string;
+};
 
 export class AuthService {
-    static login = async ({ phone }: ILoginType) => {
-        const response = await fetch(`${URL}/auth/phone`, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify({ phone, deviceId, type: deviceType })
-        });
+  static login = async ({ phone }: ILoginType) => {
+    const response = await fetch(`${URL}/auth/phone`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({ phone, deviceId, type: deviceType }),
+    });
 
-        const data = await response.json();
+    const data = await response.json();
+    if (String(data.status) === '401') {
+      const refresh = await AsyncStorage.getItem('refresh');
+      AuthService.refreshToken(refresh || undefined);
+      return false;
+    }
+    if (String(data.status) === '200') {
+      return true;
+    }
+  };
 
-        if (String(data.status) === '401') {
-            const refresh = await AsyncStorage.getItem('refresh');
-            AuthService.refreshToken(refresh || undefined);
-            return false;
-        }
-        if (String(data.status) === '200') {
-            return true;
-        }
+  static sendCode = async (code: string) => {
+    const response = await fetch(`${URL}/auth/code`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({ code, deviceId, type: deviceType }),
+    });
+    const data = await response.json();
+
+    if (String(data.status) === '200') {
+      const { refresh, token, id } = data;
+      await AsyncStorage.setItem('refresh', refresh);
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('userId', String(id));
+      return data;
     }
 
-    static sendCode = async (code: string) => {
-        const response = await fetch(`${URL}/auth/code`, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify({ code, deviceId, type: deviceType })
-        });
-        const data = await response.json();
+    return false;
+  };
 
-        if (String(data.status) === '200') {
-            const { refresh, token } = data;
-            await AsyncStorage.setItem('refresh', refresh);
-            await AsyncStorage.setItem('token', token);
-            return data;
-        }
-
-        return false;
+  static refreshToken = async (refresh?: string) => {
+    if (!refresh) {
+      return null;
+    }
+    const response = await fetch(`${URL}/token/refresh`);
+    const data = await response.json();
+    if (data.status === 200) {
+      return data;
     }
 
-    static refreshToken = async (refresh?: string) => {
-        if (!refresh) {
-            return null;
-        }
-        const response = await fetch(`${URL}/token/refresh`);
-        const data = await response.json();
-        console.log(data);
-    }
+    return false;
+  };
 }

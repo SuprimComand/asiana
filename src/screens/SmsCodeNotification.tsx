@@ -1,5 +1,11 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, Text, KeyboardAvoidingView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Text,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Button from '../components/Button';
@@ -11,10 +17,9 @@ import HeaderProject from '../components/HeaderProject';
 
 interface IExternalProps {}
 
-interface IProps extends IExternalProps {
-}
+interface IProps extends IExternalProps {}
 
-const SmsCodeNotification:FC<IProps> = () => {
+const SmsCodeNotification: FC<IProps> = () => {
   const [code, setCode] = useState('');
   const [hasError, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,7 +32,7 @@ const SmsCodeNotification:FC<IProps> = () => {
         setTimer(--timer);
       }
     }, 1000);
-  }
+  };
 
   useEffect(() => {
     if (timer === 60) {
@@ -47,7 +52,7 @@ const SmsCodeNotification:FC<IProps> = () => {
     if (code.length === 4) {
       setLoading(true);
       const data = await AuthService.sendCode(code);
-      setTimeout(() => setLoading(false), 1000)
+      setTimeout(() => setLoading(false), 1000);
       // TODO: fix
       if (data) {
         setError(false);
@@ -66,56 +71,66 @@ const SmsCodeNotification:FC<IProps> = () => {
     if (status) {
       setTimer(60);
     }
-  }
+  };
 
   const disableSendButton = code.length < 4;
 
-  const errorStyle = hasError && { borderColor: COLORS.red }
+  const errorStyle = hasError && { borderColor: COLORS.red };
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={styles.keyboard}
-    >
+    <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
       <View style={styles.container}>
         <HeaderProject
           customStyles={styles.header}
-          leftIcon={(
-            <Icon
-              size={32}
-              name="arrowleft"
-              color={COLORS.orange}
-            />
-          )}
+          leftIcon={<Icon size={32} name="arrowleft" color={COLORS.orange} />}
           onPressLeftAction={onGoBack}
         />
         <View style={styles.form}>
           <Text style={styles.label}>Подтвердите код из SMS</Text>
           <View style={styles.inputBlock}>
-            <FormField autoFocus customStyles={{...styles.formField, ...errorStyle}} onChange={handleChangeCode} mask="[0000]" keyboardType="number-pad" editable />
+            <FormField
+              autoFocus
+              customStyles={{ ...styles.formField, ...errorStyle }}
+              onChange={handleChangeCode}
+              mask="[0000]"
+              keyboardType="number-pad"
+              editable
+            />
             {hasError && <Text style={styles.errorText}>Не верный код</Text>}
           </View>
-          <Button loading={loading} disabled={disableSendButton} customStyles={styles.button} label="Подтвердить смс" onClick={handleSendCode} />
-          {
-            timer ? <Text style={styles.timerText}>Отправить повторно.. {timer}</Text> :
-            <Button bgColor={COLORS.transparent} color={COLORS.gray} label="Отправить повторно" onClick={reSendPhone} />
-          }
+          <Button
+            loading={loading}
+            disabled={disableSendButton}
+            customStyles={styles.button}
+            label="Подтвердить смс"
+            onClick={handleSendCode}
+          />
+          {timer ? (
+            <Text style={styles.timerText}>Отправить повторно.. {timer}</Text>
+          ) : (
+            <Button
+              bgColor={COLORS.transparent}
+              color={COLORS.gray}
+              label="Отправить повторно"
+              onClick={reSendPhone}
+            />
+          )}
         </View>
       </View>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 20
+    paddingTop: 20,
   },
   formField: {
-    marginBottom: 20
+    marginBottom: 20,
   },
   timerText: {
     color: COLORS.gray,
-    marginTop: 20
+    marginTop: 20,
   },
   form: {
     alignItems: 'center',
@@ -128,11 +143,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    alignContent: 'flex-start'
+    alignContent: 'flex-start',
   },
   keyboard: {
     flex: 1,
-    backgroundColor: COLORS.white
+    backgroundColor: COLORS.white,
   },
   container: {
     flex: 1,
@@ -140,13 +155,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 50,
     justifyContent: 'space-between',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   errorText: {
-    color: COLORS.red
+    color: COLORS.red,
   },
   button: {
-    marginBottom: 10
+    marginBottom: 10,
   },
   inputBlock: {
     marginBottom: 20,
@@ -157,8 +172,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.lightGray,
     width: Dimensions.get('screen').width - 40,
     fontSize: 20,
-    marginBottom: 5
-  }
+    marginBottom: 5,
+  },
 });
 
 export default SmsCodeNotification;

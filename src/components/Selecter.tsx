@@ -16,16 +16,16 @@ interface IExternalProps {
 
 interface IProps extends IExternalProps {}
 
-const Selecter:FC<IProps> = ({ list, onChange }) => {
+const Selecter: FC<IProps> = ({ list, onChange }) => {
   const handleChange = (id: number | string) => () => {
     if (!onChange) {
       return;
     }
     onChange(id);
-  }
+  };
 
   const renderItems = useCallback(() => {
-    return list.map(item => (
+    return list.map((item) => (
       <View key={item.id}>
         <TouchableOpacity style={styles.button} onPress={handleChange(item.id)}>
           <View>
@@ -37,24 +37,20 @@ const Selecter:FC<IProps> = ({ list, onChange }) => {
     ));
   }, [list]);
 
-  return (
-    <View style={styles.container}>
-      {renderItems()}
-    </View>
-  );
-}
+  return <View style={styles.container}>{renderItems()}</View>;
+};
 
 const styles = StyleSheet.create({
   container: {
-    width: Dimensions.get('screen').width - 40
+    width: Dimensions.get('screen').width - 40,
   },
   button: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    paddingVertical: 5
-  }
+    paddingVertical: 5,
+  },
 });
 
 export default Selecter;

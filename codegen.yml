@@ -1,0 +1,15 @@
+overwrite: true
+schema: 'https://app.asianaauto.ru/playground'
+documents: 'src/graph/**/*.ts'
+config:
+  namingConvention:
+    default: change-case#pascalCase
+    enumValues: change-case#upperCase
+generates:
+  src/typings/graphql.tsx:
+    config:
+      withHooks: true
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-apollo'

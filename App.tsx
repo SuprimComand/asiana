@@ -9,8 +9,12 @@
  */
 
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import StackNavigation from './src/navigations/stackNavigation';
+import configureApolloo from './src/configureApollo';
+import { ApolloProvider } from '@apollo/client';
+
+export const client = configureApolloo();
 
 class App extends React.Component {
   componentDidCatch(err: any) {
@@ -19,9 +23,11 @@ class App extends React.Component {
 
   render() {
     return (
-      <NavigationContainer>
-        <StackNavigation />
-      </NavigationContainer>
+      <ApolloProvider client={client}>
+        <NavigationContainer>
+          <StackNavigation />
+        </NavigationContainer>
+      </ApolloProvider>
     );
   }
 }

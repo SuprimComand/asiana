@@ -7,11 +7,13 @@ interface IExternalProps {}
 
 interface IProps extends IExternalProps {}
 
-const Starter:FC<IProps> = () => {
+const Starter: FC<IProps> = () => {
   return (
     <AuthProvider>
       <View style={styles.container}>
-        <ImageBackground style={styles.image} source={require('../assets/logotype-bg.png')}>
+        <ImageBackground
+          style={styles.image}
+          source={require('../assets/logotype-bg.png')}>
           <View style={styles.content}>
             <Loader type="black" label="Loading.." />
           </View>
@@ -19,7 +21,7 @@ const Starter:FC<IProps> = () => {
       </View>
     </AuthProvider>
   );
-}
+};
 
 const styles = StyleSheet.create({
   content: {
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
   },
   loader: {
     width: 30,
-    height: 30
+    height: 30,
   },
   image: {
     height: '100%',
@@ -38,7 +40,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
 });
 
