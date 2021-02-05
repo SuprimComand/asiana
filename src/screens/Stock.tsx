@@ -1,14 +1,15 @@
+import { useQuery } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback } from 'react';
 import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Button from '../components/Button';
-import { IStockType } from '../components/CardStock';
+import ErrorBoundry from '../components/ErrorBoundry';
 import HeaderProject from '../components/HeaderProject';
 import Loader from '../components/Loader';
 import { COLORS } from '../constants';
-import { DATA_STOCKS } from './Stocks';
+import { GET_ACTION } from '../graph/queries/getAction';
 
 interface IExternalProps {
   route: any; // TODO: fix this
@@ -17,40 +18,49 @@ interface IExternalProps {
 interface IProps extends IExternalProps {}
 
 const Stock: FC<IProps> = ({ route }) => {
-  const [stock, setStock] = useState<IStockType | null>(null);
   const navigation = useNavigation();
-
   const { stockId } = route.params;
+  const { data, error, loading } = useQuery(GET_ACTION, {
+    variables: {
+      id: stockId,
+    },
+  });
 
   const onGoBack = useCallback(() => {
     navigation.goBack();
   }, []);
 
-  useEffect(() => {
-    const findStock = DATA_STOCKS.find((item) => item.id === stockId);
-    setStock(findStock || null);
-  }, [stockId]);
-
   const renderContent = useCallback(() => {
-    if (!stock) {
-      return <Loader />;
+    if (loading) {
+      return (
+        <View style={styles.containerLoading}>
+          <Loader size={50} />
+        </View>
+      );
+    }
+
+    if (error) {
+      return <ErrorBoundry title="Ошибка загрузки" />;
     }
 
     return (
       <View style={styles.content}>
         <ScrollView>
           <View>
-            <Image style={styles.image} source={stock.image} />
+            <Image
+              style={styles.image}
+              source={{ uri: String(data.action.image) }}
+            />
             <View style={styles.dataContent}>
-              <Text style={styles.stockTitle}>{stock.title}</Text>
-              <Text style={styles.text}>{stock.content}</Text>
+              <Text style={styles.stockTitle}>{data.action.title}</Text>
+              <Text style={styles.text}>{data.action.body}</Text>
             </View>
           </View>
         </ScrollView>
-        <Button label="Записаться в СТО" />
+        {Boolean(data.action.button) && <Button label="Записаться в СТО" />}
       </View>
     );
-  }, [stock]);
+  }, [data, loading, error]);
 
   return (
     <View style={styles.container}>
@@ -65,6 +75,11 @@ const Stock: FC<IProps> = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  containerLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   dataContent: {
     paddingHorizontal: 10,
     paddingTop: 20,
@@ -95,6 +110,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: Dimensions.get('screen').width,
+    minHeight: 300,
   },
 });
 

@@ -11,7 +11,7 @@ import { COLORS } from '../constants';
 
 export interface IStockType {
   title: string;
-  content: string;
+  body: string;
   image: ImageSourcePropType;
   id: number;
 }
@@ -25,7 +25,7 @@ interface IProps extends IExternalProps {}
 
 const CardStock: FC<IProps> = ({
   title,
-  content,
+  body,
   image,
   id,
   onPress,
@@ -43,10 +43,10 @@ const CardStock: FC<IProps> = ({
       onPress={handleClick}
       activeOpacity={0.8}>
       <View style={styles.container}>
-        <Image style={styles.image} source={image} />
+        <Image style={styles.image} source={{ uri: String(image) }} />
         <View style={styles.content}>
           <Text style={styles.title}>{title}</Text>
-          <Text>{content}</Text>
+          <Text>{body}</Text>
         </View>
       </View>
     </TouchableOpacity>

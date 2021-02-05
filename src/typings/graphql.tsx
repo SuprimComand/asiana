@@ -21,6 +21,12 @@ export type Scalars = {
    * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
    */
   Date: any;
+  /**
+   * The `DateTime` scalar type represents a DateTime
+   * value as specified by
+   * [iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+   */
+  DateTime: any;
 };
 
 export type Query = {
@@ -31,6 +37,8 @@ export type Query = {
   addresses?: Maybe<Array<Maybe<AddressType>>>;
   cars?: Maybe<Array<Maybe<CarType>>>;
   profileCars?: Maybe<Array<Maybe<ProfileCarType>>>;
+  action?: Maybe<ActionType>;
+  actions?: Maybe<Array<Maybe<ActionType>>>;
 };
 
 export type QueryProfileArgs = {
@@ -47,6 +55,10 @@ export type QueryAddressArgs = {
 
 export type QueryProfileCarsArgs = {
   profileId?: Maybe<Scalars['Int']>;
+};
+
+export type QueryActionArgs = {
+  id?: Maybe<Scalars['Int']>;
 };
 
 export type ProfileType = {
@@ -88,6 +100,19 @@ export type CarType = {
   model: Scalars['String'];
   complectation: Scalars['String'];
   profilecarSet: Array<ProfileCarType>;
+};
+
+export type ActionType = {
+  __typename?: 'ActionType';
+  id: Scalars['ID'];
+  date: Scalars['DateTime'];
+  title: Scalars['String'];
+  image?: Maybe<Scalars['String']>;
+  teaser?: Maybe<Scalars['String']>;
+  body?: Maybe<Scalars['String']>;
+  button: Scalars['Int'];
+  sort: Scalars['Int'];
+  status: Scalars['Int'];
 };
 
 export type Mutation = {
@@ -197,6 +222,19 @@ export type DeleteProfileCar = {
   profileCar?: Maybe<ProfileCarType>;
 };
 
+export type ActionFragment = { __typename?: 'ActionType' } & Pick<
+  ActionType,
+  | 'id'
+  | 'date'
+  | 'title'
+  | 'image'
+  | 'teaser'
+  | 'body'
+  | 'button'
+  | 'sort'
+  | 'status'
+>;
+
 export type AddressFragment = { __typename?: 'AddressType' } & Pick<
   AddressType,
   'id' | 'type' | 'address' | 'workTime' | 'phone' | 'coordinates'
@@ -294,6 +332,20 @@ export type UpdateProfileCarMutation = { __typename?: 'Mutation' } & {
   >;
 };
 
+export type ActionQueryVariables = Exact<{
+  id?: Maybe<Scalars['Int']>;
+}>;
+
+export type ActionQuery = { __typename?: 'Query' } & {
+  action?: Maybe<{ __typename?: 'ActionType' } & ActionFragment>;
+};
+
+export type ActionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type ActionsQuery = { __typename?: 'Query' } & {
+  actions?: Maybe<Array<Maybe<{ __typename?: 'ActionType' } & ActionFragment>>>;
+};
+
 export type AddressesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AddressesQuery = { __typename?: 'Query' } & {
@@ -322,6 +374,19 @@ export type ProfilesQuery = { __typename?: 'Query' } & {
   >;
 };
 
+export const ActionFragmentDoc = gql`
+  fragment action on ActionType {
+    id
+    date
+    title
+    image
+    teaser
+    body
+    button
+    sort
+    status
+  }
+`;
 export const CarFragmentDoc = gql`
   fragment car on CarType {
     id
@@ -552,6 +617,102 @@ export type UpdateProfileCarMutationResult = Apollo.MutationResult<UpdateProfile
 export type UpdateProfileCarMutationOptions = Apollo.BaseMutationOptions<
   UpdateProfileCarMutation,
   UpdateProfileCarMutationVariables
+>;
+export const ActionDocument = gql`
+  query action($id: Int) {
+    action(id: $id) {
+      ...action
+    }
+  }
+  ${ActionFragmentDoc}
+`;
+
+/**
+ * __useActionQuery__
+ *
+ * To run a query within a React component, call `useActionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useActionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useActionQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useActionQuery(
+  baseOptions?: Apollo.QueryHookOptions<ActionQuery, ActionQueryVariables>,
+) {
+  return Apollo.useQuery<ActionQuery, ActionQueryVariables>(
+    ActionDocument,
+    baseOptions,
+  );
+}
+export function useActionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<ActionQuery, ActionQueryVariables>,
+) {
+  return Apollo.useLazyQuery<ActionQuery, ActionQueryVariables>(
+    ActionDocument,
+    baseOptions,
+  );
+}
+export type ActionQueryHookResult = ReturnType<typeof useActionQuery>;
+export type ActionLazyQueryHookResult = ReturnType<typeof useActionLazyQuery>;
+export type ActionQueryResult = Apollo.QueryResult<
+  ActionQuery,
+  ActionQueryVariables
+>;
+export const ActionsDocument = gql`
+  query actions {
+    actions {
+      ...action
+    }
+  }
+  ${ActionFragmentDoc}
+`;
+
+/**
+ * __useActionsQuery__
+ *
+ * To run a query within a React component, call `useActionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useActionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useActionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useActionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<ActionsQuery, ActionsQueryVariables>,
+) {
+  return Apollo.useQuery<ActionsQuery, ActionsQueryVariables>(
+    ActionsDocument,
+    baseOptions,
+  );
+}
+export function useActionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ActionsQuery,
+    ActionsQueryVariables
+  >,
+) {
+  return Apollo.useLazyQuery<ActionsQuery, ActionsQueryVariables>(
+    ActionsDocument,
+    baseOptions,
+  );
+}
+export type ActionsQueryHookResult = ReturnType<typeof useActionsQuery>;
+export type ActionsLazyQueryHookResult = ReturnType<typeof useActionsLazyQuery>;
+export type ActionsQueryResult = Apollo.QueryResult<
+  ActionsQuery,
+  ActionsQueryVariables
 >;
 export const AddressesDocument = gql`
   query addresses {

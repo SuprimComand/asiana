@@ -98,8 +98,12 @@ const Main: FC<IProps> = () => {
   );
 
   const renderActiveCard = useCallback(() => {
-    if (profileCarLoading || !activeProfileCar) {
+    if (profileCarLoading) {
       return <Image style={styles.loadingRow} source={loadingCard} />;
+    }
+
+    if (!activeProfileCar) {
+      return <Text style={styles.title}>Нет данных</Text>;
     }
 
     return (

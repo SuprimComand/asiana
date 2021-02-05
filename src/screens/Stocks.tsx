@@ -1,28 +1,31 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import HeaderProject from '../components/HeaderProject';
 import { COLORS } from '../constants';
 import Input from '../components/Input';
 import CardStock from '../components/CardStock';
-import stockImage from '../assets/stock-image.png';
 import { FlatList } from 'react-native-gesture-handler';
-
-export const DATA_STOCKS = Array.from({ length: 5 }).map((_, index) => ({
-  id: index,
-  title: `${index} Правильный шиномонтаж`,
-  content: `Предлагаем на выбор два варианта данного спецпредложения: Шиномонтаж 4-х колес с балансировкой, проверкой углов установки колёс + сезонное хранение колёс)– 3700 руб. Шиномонтаж 4-х колес с балансировкой + сезонное хранение колёс + скидка 50% на проверку и регулировку углов установки колёс (по предварительной записи) – 3000 руб. `,
-  image: stockImage,
-}));
+import { useQuery } from '@apollo/client';
+import { GET_ACTIONS } from '../graph/queries/getActions';
+import Loader from '../components/Loader';
+import { ActionType } from '../typings/graphql';
 
 interface IExternalProps {}
 
 interface IProps extends IExternalProps {}
 
 const Stocks: FC<IProps> = () => {
-  const [items, setItems] = useState(DATA_STOCKS);
   const navigation = useNavigation();
+  const { data, loading } = useQuery(GET_ACTIONS);
+  const [items, setItems] = useState<ActionType[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      setItems(data.actions);
+    }
+  }, [data]);
 
   const onGoBack = useCallback(() => {
     navigation.goBack();
@@ -32,26 +35,37 @@ const Stocks: FC<IProps> = () => {
     navigation.navigate('StockDetails', { stockId: id });
   }, []);
 
-  const renderCard = useCallback(({ item }) => {
-    return (
-      <CardStock
-        onPress={handleSelectStock}
-        customStyles={styles.card}
-        {...item}
-      />
-    );
-  }, []);
-
-  const handleSearch = useCallback(
-    (value: string) => {
-      setItems(
-        DATA_STOCKS.filter((item) =>
-          item.title.toLowerCase().includes(value.toLowerCase()),
-        ),
+  const renderCard = useCallback(
+    ({ item }) => {
+      return (
+        <CardStock
+          onPress={handleSelectStock}
+          customStyles={styles.card}
+          {...item}
+        />
       );
     },
     [items],
   );
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      setItems(
+        data?.actions.filter((item: ActionType) =>
+          item.title.toLowerCase().includes(value.toLowerCase()),
+        ) || items,
+      );
+    },
+    [items],
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.containerLoading}>
+        <Loader size={50} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -70,7 +84,7 @@ const Stocks: FC<IProps> = () => {
           <FlatList
             data={items}
             renderItem={renderCard}
-            keyExtractor={(item) => String(item.id)}
+            keyExtractor={(item: ActionType) => String(item.id)}
           />
         </ScrollView>
       </View>
@@ -79,6 +93,11 @@ const Stocks: FC<IProps> = () => {
 };
 
 const styles = StyleSheet.create({
+  containerLoading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   card: {
     marginBottom: 20,
   },
