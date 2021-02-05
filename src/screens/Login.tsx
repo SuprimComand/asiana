@@ -57,7 +57,7 @@ const Login: FC<IProps> = () => {
               type="number"
               editable
             />
-            {hasError && (
+            {Boolean(hasError) && (
               <Text style={styles.errorText}>Не валидный номер</Text>
             )}
           </View>

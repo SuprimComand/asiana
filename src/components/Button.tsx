@@ -51,7 +51,7 @@ const Button: FC<IProps> = ({
         ]}>
         {label}
       </Text>
-      {loading && <ActivityIndicator color={COLORS.white} />}
+      {Boolean(loading) && <ActivityIndicator color={COLORS.white} />}
     </TouchableOpacity>
   );
 };

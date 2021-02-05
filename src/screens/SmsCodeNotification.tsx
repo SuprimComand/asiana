@@ -96,7 +96,9 @@ const SmsCodeNotification: FC<IProps> = () => {
               keyboardType="number-pad"
               editable
             />
-            {hasError && <Text style={styles.errorText}>Не верный код</Text>}
+            {Boolean(hasError) && (
+              <Text style={styles.errorText}>Не верный код</Text>
+            )}
           </View>
           <Button
             loading={loading}

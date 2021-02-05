@@ -13,15 +13,26 @@ import { NavigationContainer } from '@react-navigation/native';
 import StackNavigation from './src/navigations/stackNavigation';
 import configureApolloo from './src/configureApollo';
 import { ApolloProvider } from '@apollo/client';
+import ErrorBoundry from './src/components/ErrorBoundry';
 
 export const client = configureApolloo();
 
 class App extends React.Component {
+  state = {
+    error: null,
+  };
+
   componentDidCatch(err: any) {
-    console.log('err', err);
+    this.setState({ error: JSON.stringify(err) });
   }
 
   render() {
+    const { error } = this.state;
+
+    if (error) {
+      return <ErrorBoundry title={String(error)} />;
+    }
+
     return (
       <ApolloProvider client={client}>
         <NavigationContainer>

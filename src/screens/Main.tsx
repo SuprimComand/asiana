@@ -24,6 +24,7 @@ import Loader from '../components/Loader';
 import { CarType, ProfileCarType } from '../typings/graphql';
 import CarItem from '../components/CarItem';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
+import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 
 interface IExternalProps {}
 
@@ -33,10 +34,15 @@ const Main: FC<IProps> = () => {
   const [isOpenModal, setOpenModal] = useState(false);
   const navigation = useNavigation();
   const [profileId] = useAsyncStorage('profileId');
+  const [userId] = useAsyncStorage('userId');
   const [isOpenList, setOpenList] = useState(false);
   const { data, loading, refetch } = useQuery(GET_PROFILE_CAR, {
     variables: { profileId: Number(profileId) },
     skip: !profileId,
+  });
+  const { data: user, loading: userLoading } = useQuery(GET_USER_PROFILES, {
+    variables: { userId: Number(userId) },
+    skip: !userId,
   });
 
   const [
@@ -81,20 +87,25 @@ const Main: FC<IProps> = () => {
     navigation.navigate('HistoryMaintenance');
   }, []);
 
-  const handleChangeActiveCar = useCallback((id: CarType['id']) => {
-    updateProfileCar({
-      variables: {
-        id,
-        input: {
-          active: 1,
-        },
-      },
-    });
-  }, []);
+  const handleChangeActiveCar = useCallback(
+    (id: ProfileCarType['id']) => {
+      return () => {
+        updateProfileCar({
+          variables: {
+            id,
+            input: {
+              active: 1,
+            },
+          },
+        });
+      };
+    },
+    [updateProfileCar, profileCar],
+  );
 
   const renderAutoCard = useCallback(
     ({ item }) => {
-      return <CarItem {...item.car} onPress={handleChangeActiveCar} />;
+      return <CarItem {...item.car} onPress={handleChangeActiveCar(item.id)} />;
     },
     [data, isOpenList],
   );
@@ -105,16 +116,22 @@ const Main: FC<IProps> = () => {
     }
 
     if (!activeProfileCar) {
-      return <Text style={styles.title}>Нет данных</Text>;
+      return (
+        <View>
+          <Text style={styles.title}>Нет данных</Text>
+        </View>
+      );
     }
 
     return (
-      <>
-        <Text style={styles.title}>{activeProfileCar?.car.model}</Text>
+      <View>
+        <Text style={styles.title}>
+          {activeProfileCar?.car.model} {activeProfileCar?.car.brand}
+        </Text>
         <Text style={styles.subTitle}>
           {activeProfileCar?.car.complectation}
         </Text>
-      </>
+      </View>
     );
   }, [profileCarLoading, activeProfileCar, profileCar]);
 
@@ -125,7 +142,7 @@ const Main: FC<IProps> = () => {
     [setOpenList, isOpenList],
   );
 
-  if (loading) {
+  if (loading || userLoading) {
     return (
       <View style={styles.containerLoading}>
         <Loader size={50} />
@@ -159,7 +176,7 @@ const Main: FC<IProps> = () => {
           <TouchableOpacity onPress={handleOpenModal}>
             <Card>{renderActiveCard()}</Card>
           </TouchableOpacity>
-          {isOpenList && (
+          {Boolean(isOpenList) && (
             <FlatList
               data={withoutActiveProfileCar}
               renderItem={renderAutoCard}
@@ -175,12 +192,16 @@ const Main: FC<IProps> = () => {
           </View>
           <Card>
             <View style={styles.cardHeader}>
-              <Text style={styles.fontBold}>Дальновосточный 49</Text>
+              <Text style={styles.fontBold}>{user?.profiles[0]?.address}</Text>
               <Text style={styles.subTitle}>14:30 14.01.2021</Text>
             </View>
             <View style={styles.dataContent}>
-              <Text style={styles.title}>Kia Optima</Text>
-              <Text style={styles.subTitle}>1.4 Turbo 160 л.с</Text>
+              <Text style={styles.title}>
+                {activeProfileCar?.car.model} {activeProfileCar?.car.brand}
+              </Text>
+              <Text style={styles.subTitle}>
+                {activeProfileCar?.car.complectation}
+              </Text>
             </View>
             <Text>Замера заднего амортизатора</Text>
           </Card>

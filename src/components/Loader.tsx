@@ -20,7 +20,7 @@ const Loader: FC<IProps> = ({ type, label, size }) => {
   return (
     <View style={styles.container}>
       <Image style={[styles.loader, style]} source={loaderBlack || loader} />
-      {label && <Text style={[styles.title, { color }]}>{label}</Text>}
+      {Boolean(label) && <Text style={[styles.title, { color }]}>{label}</Text>}
     </View>
   );
 };
