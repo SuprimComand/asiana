@@ -49,6 +49,7 @@ const AddAuto: FC<IProps> = () => {
           source: 'app',
         },
       },
+      refetchQueries: ['profileCars'],
     });
   }, [car, profileId]);
 
