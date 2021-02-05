@@ -152,7 +152,7 @@ const Main: FC<IProps> = () => {
 
   const arrowIcon = isOpenList ? 'arrowdown' : 'arrowright';
   const address = user?.profiles?.length
-    ? user?.profiles[0].address.address
+    ? user?.profiles[0].address?.address
     : '';
 
   return (
