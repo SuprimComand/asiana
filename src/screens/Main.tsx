@@ -126,7 +126,7 @@ const Main: FC<IProps> = () => {
     return (
       <View>
         <Text style={styles.title}>
-          {activeProfileCar?.car.model} {activeProfileCar?.car.brand}
+          {`${activeProfileCar?.car.model} ${activeProfileCar?.car.brand}`}
         </Text>
         <Text style={styles.subTitle}>
           {activeProfileCar?.car.complectation}
@@ -151,7 +151,9 @@ const Main: FC<IProps> = () => {
   }
 
   const arrowIcon = isOpenList ? 'arrowdown' : 'arrowright';
-  const address = user?.profiles?.length ? user?.profiles[0].address : '';
+  const address = user?.profiles?.length
+    ? user?.profiles[0].address.address
+    : '';
 
   return (
     <View style={styles.container}>
@@ -198,7 +200,7 @@ const Main: FC<IProps> = () => {
             </View>
             <View style={styles.dataContent}>
               <Text style={styles.title}>
-                {activeProfileCar?.car.model} {activeProfileCar?.car.brand}
+                {`${activeProfileCar?.car.model} ${activeProfileCar?.car.brand}`}
               </Text>
               <Text style={styles.subTitle}>
                 {activeProfileCar?.car.complectation}

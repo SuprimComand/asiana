@@ -23,7 +23,7 @@ class App extends React.Component {
   };
 
   componentDidCatch(err: any) {
-    this.setState({ error: JSON.stringify(err) });
+    this.setState({ error: JSON.stringify(err.message) });
   }
 
   render() {
