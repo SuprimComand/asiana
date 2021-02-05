@@ -49,7 +49,7 @@ const Button: FC<IProps> = ({
           styles.label,
           { color: color || styles.label.color, marginRight: loading ? 10 : 0 },
         ]}>
-        {label}
+        {String(label)}
       </Text>
       {Boolean(loading) && <ActivityIndicator color={COLORS.white} />}
     </TouchableOpacity>

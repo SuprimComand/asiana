@@ -151,6 +151,7 @@ const Main: FC<IProps> = () => {
   }
 
   const arrowIcon = isOpenList ? 'arrowdown' : 'arrowright';
+  const address = user?.profiles?.length ? user?.profiles[0].address : '';
 
   return (
     <View style={styles.container}>
@@ -192,7 +193,7 @@ const Main: FC<IProps> = () => {
           </View>
           <Card>
             <View style={styles.cardHeader}>
-              <Text style={styles.fontBold}>{user?.profiles[0]?.address}</Text>
+              <Text style={styles.fontBold}>{address}</Text>
               <Text style={styles.subTitle}>14:30 14.01.2021</Text>
             </View>
             <View style={styles.dataContent}>
