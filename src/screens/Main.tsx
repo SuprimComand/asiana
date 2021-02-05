@@ -58,8 +58,10 @@ const Main: FC<IProps> = () => {
   }, []);
 
   const handleOpenModal = useCallback(() => {
-    setOpenModal(true);
-  }, []);
+    if (activeProfileCar) {
+      setOpenModal(true);
+    }
+  }, [activeProfileCar]);
 
   const handleCloseModal = useCallback(() => {
     setOpenModal(false);
@@ -114,7 +116,7 @@ const Main: FC<IProps> = () => {
         </Text>
       </>
     );
-  }, [profileCarLoading, activeProfileCar]);
+  }, [profileCarLoading, activeProfileCar, profileCar]);
 
   const handleChangeOpenList = useCallback(
     (status: boolean) => {
