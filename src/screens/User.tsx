@@ -113,6 +113,7 @@ const User: FC<IProps> = () => {
           profileId: id,
           userId: Number(userId),
           addressId: selectedAddress,
+          gender,
         },
       },
     });
