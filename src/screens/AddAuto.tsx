@@ -12,6 +12,7 @@ import { CREATE_PROFILE_CAR } from '../graph/mutations/createProfileCar';
 import { CarMock } from '../typings/car';
 import { CarType } from '../typings/graphql';
 import Loader from '../components/Loader';
+import ErrorBoundry from '../components/ErrorBoundry';
 
 interface IExternalProps {}
 
@@ -22,7 +23,7 @@ const AddAuto: FC<IProps> = () => {
   const [profileId] = useAsyncStorage('profileId');
   const [
     createCarRequest,
-    { data: createCar, loading: createCarLoading },
+    { data: createCar, loading: createCarLoading, error },
   ] = useMutation(CREATE_PROFILE_CAR, {
     refetchQueries: ['profileCars'],
   });
@@ -66,6 +67,12 @@ const AddAuto: FC<IProps> = () => {
       <View style={styles.containerLoading}>
         <Loader size={50} />
       </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorBoundry title={`Ошибка добавления ${JSON.stringify(error)}`} />
     );
   }
 
