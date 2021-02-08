@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Roboto-Regular',
     color: COLORS.lightGray,
+    flexDirection: 'row',
   },
   pickerStyle: {
     width: '100%',

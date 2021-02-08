@@ -7,6 +7,7 @@ export const USER_PROFILE = gql`
     name
     email
     birthday
+    gender
     address {
       ...address
     }

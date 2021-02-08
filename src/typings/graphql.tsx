@@ -280,7 +280,7 @@ export type CarFragment = { __typename?: 'CarType' } & Pick<
 
 export type ProfileFragment = { __typename?: 'ProfileType' } & Pick<
   ProfileType,
-  'id' | 'name' | 'email' | 'birthday'
+  'id' | 'name' | 'email' | 'birthday' | 'gender'
 > & { address?: Maybe<{ __typename?: 'AddressType' } & AddressFragment> };
 
 export type ProfileCarFragment = { __typename?: 'ProfileCarType' } & Pick<
@@ -439,6 +439,7 @@ export const ProfileFragmentDoc = gql`
     name
     email
     birthday
+    gender
     address {
       ...address
     }

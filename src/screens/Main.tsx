@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import HeaderProject from '../components/HeaderProject';
 import UserSvg from '../assets/icons/User';
@@ -110,7 +111,7 @@ const Main: FC<IProps> = () => {
     [data, isOpenList],
   );
 
-  const renderActiveCard = useCallback(() => {
+  const renderActiveCard = () => {
     if (profileCarLoading) {
       return <Image style={styles.loadingRow} source={loadingCard} />;
     }
@@ -126,14 +127,14 @@ const Main: FC<IProps> = () => {
     return (
       <View>
         <Text style={styles.title}>
-          {`${activeProfileCar?.car.model} ${activeProfileCar?.car.brand}`}
+          {`${activeProfileCar?.car.brand} ${activeProfileCar?.car.model}`}
         </Text>
         <Text style={styles.subTitle}>
-          {activeProfileCar?.car.complectation}
+          {activeProfileCar?.car.complectation || 'Нет комплектации'}
         </Text>
       </View>
     );
-  }, [profileCarLoading, activeProfileCar, profileCar]);
+  };
 
   const handleChangeOpenList = useCallback(
     (status: boolean) => {
@@ -152,7 +153,7 @@ const Main: FC<IProps> = () => {
 
   const arrowIcon = isOpenList ? 'arrowdown' : 'arrowright';
   const address = user?.profiles?.length
-    ? user?.profiles[0].address?.address
+    ? user?.profiles[0].address?.address || 'Нет данных'
     : '';
 
   return (
@@ -163,53 +164,55 @@ const Main: FC<IProps> = () => {
         onPressLeftAction={handleLeftActionClick}
         content={<Image source={logo} />}
       />
-      <View style={styles.content}>
-        <View style={styles.cardBlock}>
-          <View style={styles.cardHeader}>
-            <TouchableOpacity
-              onPress={handleChangeOpenList(!isOpenList)}
-              style={styles.flex}>
-              <Text style={styles.cardTitle}>Мои авто</Text>
-              <Icon color={COLORS.darkOrange} size={20} name={arrowIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleClickAddAuto}>
-              <Icon color={COLORS.darkOrange} size={20} name="plus" />
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity onPress={handleOpenModal}>
-            <Card>{renderActiveCard()}</Card>
-          </TouchableOpacity>
-          {Boolean(isOpenList) && (
-            <FlatList
-              data={withoutActiveProfileCar}
-              renderItem={renderAutoCard}
-            />
-          )}
-        </View>
-        <View>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Запись ев СТО</Text>
-            <TouchableOpacity>
-              <Icon color={COLORS.darkOrange} size={20} name="plus" />
-            </TouchableOpacity>
-          </View>
-          <Card>
+      <ScrollView>
+        <View style={styles.content}>
+          <View style={styles.cardBlock}>
             <View style={styles.cardHeader}>
-              <Text style={styles.fontBold}>{address}</Text>
-              <Text style={styles.subTitle}>14:30 14.01.2021</Text>
+              <TouchableOpacity
+                onPress={handleChangeOpenList(!isOpenList)}
+                style={styles.flex}>
+                <Text style={styles.cardTitle}>Мои авто</Text>
+                <Icon color={COLORS.darkOrange} size={20} name={arrowIcon} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleClickAddAuto}>
+                <Icon color={COLORS.darkOrange} size={20} name="plus" />
+              </TouchableOpacity>
             </View>
-            <View style={styles.dataContent}>
-              <Text style={styles.title}>
-                {`${activeProfileCar?.car.model} ${activeProfileCar?.car.brand}`}
-              </Text>
-              <Text style={styles.subTitle}>
-                {activeProfileCar?.car.complectation}
-              </Text>
+            <TouchableOpacity onPress={handleOpenModal}>
+              <Card>{renderActiveCard()}</Card>
+            </TouchableOpacity>
+            {Boolean(isOpenList) && (
+              <FlatList
+                data={withoutActiveProfileCar}
+                renderItem={renderAutoCard}
+              />
+            )}
+          </View>
+          <View>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Запись в СТО</Text>
+              <TouchableOpacity>
+                <Icon color={COLORS.darkOrange} size={20} name="plus" />
+              </TouchableOpacity>
             </View>
-            <Text>Замера заднего амортизатора</Text>
-          </Card>
+            <Card>
+              <View style={styles.cardHeader}>
+                <Text style={styles.fontBold}>{address}</Text>
+                <Text style={styles.subTitle}>14:30 14.01.2021</Text>
+              </View>
+              <View style={styles.dataContent}>
+                <Text style={styles.title}>
+                  {`${activeProfileCar?.car.brand} ${activeProfileCar?.car.model}`}
+                </Text>
+                <Text style={styles.subTitle}>
+                  {activeProfileCar?.car.complectation || 'Нет комплектации'}
+                </Text>
+              </View>
+              <Text>Замера заднего амортизатора</Text>
+            </Card>
+          </View>
         </View>
-      </View>
+      </ScrollView>
       <Modal onCancel={handleCloseModal} isVisible={isOpenModal}>
         <TouchableOpacity
           onPress={handleClickEntrySto}
@@ -273,6 +276,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
     marginBottom: 5,
   },
   container: {

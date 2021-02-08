@@ -69,11 +69,13 @@ const User: FC<IProps> = () => {
       return [];
     }
 
-    return addresses.map((item: AddressType) => ({
-      ...item,
-      label: item.address,
-      value: String(item.id),
-    }));
+    return addresses
+      .map((item: AddressType) => ({
+        ...item,
+        label: item.address,
+        value: String(item.id),
+      }))
+      .filter((item) => item.type === 'СТО');
   }, [addresses]);
 
   useEffect(() => {
@@ -104,8 +106,7 @@ const User: FC<IProps> = () => {
   }, [data]);
 
   const handleSubmit = useCallback(() => {
-    const { id, address, __typename, ...restUser } = user;
-
+    const { id, address, __typename, birthday, ...restUser } = user;
     createUserRequest({
       variables: {
         input: {
@@ -114,11 +115,12 @@ const User: FC<IProps> = () => {
           userId: Number(userId),
           addressId: selectedAddress,
           gender,
+          birthday: birthday.replace(/\./g, '-'),
         },
       },
     });
     setEditable(false);
-  }, [user, selectedAddress]);
+  }, [user, selectedAddress, gender]);
 
   const handleChangeEditable = useCallback(() => {
     if (editable) {
@@ -214,6 +216,15 @@ const User: FC<IProps> = () => {
     return <ErrorBoundry title={title} />;
   }
 
+  let birthday = null;
+  if (!editable && user.birthday) {
+    if (user.birthday.includes('-')) {
+      birthday = user.birthday.split('-').reverse().join('.');
+    } else {
+      birthday = user.birthday.split('.').reverse().join('.');
+    }
+  }
+
   return (
     <View style={styles.container}>
       <HeaderProject
@@ -251,7 +262,7 @@ const User: FC<IProps> = () => {
                   editable={editable}
                   placeholder="Date"
                   type="date"
-                  value={user.birthday}
+                  value={!editable ? birthday : user.birthday}
                   onChange={handleChangeForm('birthday')}
                 />
               </View>
