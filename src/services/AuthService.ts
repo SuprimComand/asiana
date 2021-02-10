@@ -52,6 +52,15 @@ export class AuthService {
     return false;
   };
 
+  static logout = async (callback?: () => void) => {
+    await AsyncStorage.setItem('token', '');
+    await AsyncStorage.setItem('userId', '');
+    await AsyncStorage.setItem('refresh', '');
+    if (callback) {
+      callback();
+    }
+  };
+
   static refreshToken = async (refresh?: string) => {
     if (!refresh) {
       return null;

@@ -6,7 +6,10 @@ import SmsCodeNotification from '../screens/SmsCodeNotification';
 import AddAuto from '../screens/AddAuto';
 import Stock from '../screens/Stock';
 import HistoryMaintenance from '../screens/HistoryMaintenance';
+import AutoService from '../screens/AutoService';
 import TabNavigation from './tabNavigation';
+import AutoShop from '../screens/AutoShop';
+import AutoShow from '../screens/AutoShow';
 
 const Stack = createStackNavigator();
 
@@ -26,6 +29,9 @@ function StackNavigation() {
       <Stack.Screen name="AddAuto" component={AddAuto} />
       <Stack.Screen name="StockDetails" component={Stock} />
       <Stack.Screen name="HistoryMaintenance" component={HistoryMaintenance} />
+      <Stack.Screen name="AutoService" component={AutoService} />
+      <Stack.Screen name="AutoShop" component={AutoShop} />
+      <Stack.Screen name="AutoShow" component={AutoShow} />
     </Stack.Navigator>
   );
 }

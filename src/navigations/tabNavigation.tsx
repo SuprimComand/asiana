@@ -16,10 +16,12 @@ import User from '../screens/User';
 import Main from '../screens/Main';
 import EtrySto from '../screens/EntrySto';
 import Stocks from '../screens/Stocks';
+import Contacts from '../screens/Contacts';
 import { useAsyncStorage } from '../hooks/asyncStorage';
 import { useQuery } from '@apollo/client';
 import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 import Loader from '../components/Loader';
+import Feedback from '../screens/Feedback';
 import { StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -69,6 +71,14 @@ const TabNavigation = () => {
             iconName = 'pay-circle-o1';
           }
 
+          if (route.name === 'Feedback') {
+            iconName = 'message1';
+          }
+
+          if (route.name === 'Contacts') {
+            iconName = 'contacts';
+          }
+
           return <Icon name={iconName} size={size} color={color} />;
         },
       })}
@@ -81,9 +91,11 @@ const TabNavigation = () => {
       }}
       sceneContainerStyle={{ borderColor: COLORS.gray, borderTopWidth: 2 }}>
       <Tab.Screen name="Main" component={Main} />
+      <Tab.Screen name="Feedback" component={Feedback} />
       <Tab.Screen name="EntrySto" component={EtrySto} />
       <Tab.Screen name="User" component={User} />
       <Tab.Screen name="Stocks" component={Stocks} />
+      <Tab.Screen name="Contacts" component={Contacts} />
     </Tab.Navigator>
   );
 };

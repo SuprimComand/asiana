@@ -53,6 +53,11 @@ export type QueryAddressArgs = {
   id?: Maybe<Scalars['Int']>;
 };
 
+export type QueryAddressesArgs = {
+  addressType?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
+};
+
 export type QueryProfileCarsArgs = {
   profileId?: Maybe<Scalars['Int']>;
 };
@@ -77,8 +82,10 @@ export type AddressType = {
   id: Scalars['ID'];
   type: Scalars['String'];
   address: Scalars['String'];
+  city: Scalars['String'];
   workTime: Scalars['String'];
   phone: Scalars['String'];
+  email?: Maybe<Scalars['String']>;
   coordinates: Scalars['String'];
   profileSet: Array<ProfileType>;
 };
@@ -118,19 +125,15 @@ export type ActionType = {
 export type Mutation = {
   __typename?: 'Mutation';
   createProfile?: Maybe<CreateProfile>;
-  createAddress?: Maybe<CreateAddress>;
   updateProfile?: Maybe<UpdateProfile>;
   createProfileCar?: Maybe<CreateProfileCar>;
   updateProfileCar?: Maybe<UpdateProfileCar>;
   deleteProfileCar?: Maybe<DeleteProfileCar>;
+  createReview?: Maybe<CreateReview>;
 };
 
 export type MutationCreateProfileArgs = {
   input: ProfileInput;
-};
-
-export type MutationCreateAddressArgs = {
-  input: AddressInput;
 };
 
 export type MutationUpdateProfileArgs = {
@@ -151,6 +154,10 @@ export type MutationDeleteProfileCarArgs = {
   id: Scalars['String'];
 };
 
+export type MutationCreateReviewArgs = {
+  input: ReviewInput;
+};
+
 export type CreateProfile = {
   __typename?: 'CreateProfile';
   ok?: Maybe<Scalars['Boolean']>;
@@ -165,20 +172,6 @@ export type ProfileInput = {
   birthday?: Maybe<Scalars['Date']>;
   gender?: Maybe<Scalars['Int']>;
   profileId?: Maybe<Scalars['String']>;
-};
-
-export type CreateAddress = {
-  __typename?: 'CreateAddress';
-  ok?: Maybe<Scalars['Boolean']>;
-  address?: Maybe<AddressType>;
-};
-
-export type AddressInput = {
-  type?: Maybe<Scalars['String']>;
-  address?: Maybe<Scalars['String']>;
-  workTime?: Maybe<Scalars['String']>;
-  phone?: Maybe<Scalars['String']>;
-  coordinates?: Maybe<Scalars['String']>;
 };
 
 export type UpdateProfile = {
@@ -220,6 +213,18 @@ export type DeleteProfileCar = {
   __typename?: 'DeleteProfileCar';
   ok?: Maybe<Scalars['Boolean']>;
   profileCar?: Maybe<ProfileCarType>;
+};
+
+export type CreateReview = {
+  __typename?: 'CreateReview';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
+export type ReviewInput = {
+  userId?: Maybe<Scalars['Int']>;
+  rating?: Maybe<Scalars['Int']>;
+  date?: Maybe<Scalars['DateTime']>;
+  comment?: Maybe<Scalars['String']>;
 };
 
 export type ActionFragment = { __typename?: 'ActionType' } & Pick<
@@ -305,6 +310,16 @@ export type CreateProfileCarMutation = { __typename?: 'Mutation' } & {
   >;
 };
 
+export type ReviewMutationVariables = Exact<{
+  input: ReviewInput;
+}>;
+
+export type ReviewMutation = { __typename?: 'Mutation' } & {
+  createReview?: Maybe<
+    { __typename?: 'CreateReview' } & Pick<CreateReview, 'ok'>
+  >;
+};
+
 export type CreateProfileMutationVariables = Exact<{
   input: ProfileInput;
 }>;
@@ -346,7 +361,10 @@ export type ActionsQuery = { __typename?: 'Query' } & {
   actions?: Maybe<Array<Maybe<{ __typename?: 'ActionType' } & ActionFragment>>>;
 };
 
-export type AddressesQueryVariables = Exact<{ [key: string]: never }>;
+export type AddressesQueryVariables = Exact<{
+  addressType?: Maybe<Scalars['String']>;
+  city?: Maybe<Scalars['String']>;
+}>;
 
 export type AddressesQuery = { __typename?: 'Query' } & {
   addresses?: Maybe<
@@ -513,6 +531,52 @@ export type CreateProfileCarMutationResult = Apollo.MutationResult<CreateProfile
 export type CreateProfileCarMutationOptions = Apollo.BaseMutationOptions<
   CreateProfileCarMutation,
   CreateProfileCarMutationVariables
+>;
+export const ReviewDocument = gql`
+  mutation review($input: ReviewInput!) {
+    createReview(input: $input) {
+      ok
+    }
+  }
+`;
+export type ReviewMutationFn = Apollo.MutationFunction<
+  ReviewMutation,
+  ReviewMutationVariables
+>;
+
+/**
+ * __useReviewMutation__
+ *
+ * To run a mutation, you first call `useReviewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReviewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [reviewMutation, { data, loading, error }] = useReviewMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useReviewMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ReviewMutation,
+    ReviewMutationVariables
+  >,
+) {
+  return Apollo.useMutation<ReviewMutation, ReviewMutationVariables>(
+    ReviewDocument,
+    baseOptions,
+  );
+}
+export type ReviewMutationHookResult = ReturnType<typeof useReviewMutation>;
+export type ReviewMutationResult = Apollo.MutationResult<ReviewMutation>;
+export type ReviewMutationOptions = Apollo.BaseMutationOptions<
+  ReviewMutation,
+  ReviewMutationVariables
 >;
 export const CreateProfileDocument = gql`
   mutation createProfile($input: ProfileInput!) {
@@ -716,8 +780,8 @@ export type ActionsQueryResult = Apollo.QueryResult<
   ActionsQueryVariables
 >;
 export const AddressesDocument = gql`
-  query addresses {
-    addresses {
+  query addresses($addressType: String, $city: String) {
+    addresses(addressType: $addressType, city: $city) {
       ...address
     }
   }
@@ -736,6 +800,8 @@ export const AddressesDocument = gql`
  * @example
  * const { data, loading, error } = useAddressesQuery({
  *   variables: {
+ *      addressType: // value for 'addressType'
+ *      city: // value for 'city'
  *   },
  * });
  */

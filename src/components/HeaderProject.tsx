@@ -23,11 +23,11 @@ const HeaderProject: FC<IProps> = ({
 }) => {
   return (
     <View style={[styles.container, customStyles]}>
-      <TouchableOpacity onPress={onPressLeftAction}>
+      <TouchableOpacity style={styles.button} onPress={onPressLeftAction}>
         {leftIcon}
       </TouchableOpacity>
-      {content}
-      <TouchableOpacity onPress={onPressRightAction}>
+      <View style={styles.content}>{content}</View>
+      <TouchableOpacity style={styles.button} onPress={onPressRightAction}>
         {rightIcon}
       </TouchableOpacity>
     </View>
@@ -35,6 +35,13 @@ const HeaderProject: FC<IProps> = ({
 };
 
 const styles = StyleSheet.create({
+  button: {
+    width: 30,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+  },
   container: {
     width: Dimensions.get('screen').width,
     paddingHorizontal: 15,

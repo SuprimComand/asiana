@@ -119,7 +119,7 @@ const Main: FC<IProps> = () => {
     if (!activeProfileCar) {
       return (
         <View>
-          <Text style={styles.title}>Нет данных</Text>
+          <Text style={styles.title}>{JSON.stringify(activeProfileCar)}</Text>
         </View>
       );
     }

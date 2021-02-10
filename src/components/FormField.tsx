@@ -1,5 +1,12 @@
 import React, { FC, useCallback } from 'react';
-import { Text, StyleSheet, Dimensions, View, TextInput } from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  Dimensions,
+  View,
+  TextInput,
+  ColorValue,
+} from 'react-native';
 import * as ReactNative from 'react-native';
 import TextInputMask from 'react-native-text-input-mask';
 import DatePicker from 'react-native-datepicker';
@@ -20,6 +27,9 @@ interface IExternalProps {
   keyboardType?: ReactNative.KeyboardTypeOptions;
   maxLength?: number;
   mask?: string;
+  multiline?: boolean;
+  numberOfLines?: number;
+  underlineColorAndroid?: ColorValue;
 }
 
 interface IProps extends IExternalProps {}
@@ -46,7 +56,7 @@ const FormField: FC<IProps> = ({
       return (
         <TextInputMask
           keyboardType="number-pad"
-          style={styles.input}
+          style={[styles.input, styles.inputField]}
           value={String(value || '')}
           onChangeText={handleChange}
           mask={'+7 ([000]) [000] [00] [00]'}
@@ -60,7 +70,7 @@ const FormField: FC<IProps> = ({
     if (type === 'date') {
       return (
         <DatePicker
-          style={styles.input}
+          style={[styles.input, styles.inputField]}
           date={value}
           mode="date"
           androidMode="spinner"
@@ -115,7 +125,7 @@ const FormField: FC<IProps> = ({
 
     return (
       <TextInputMask
-        style={styles.input}
+        style={[styles.input, styles.inputField]}
         value={String(value || '')}
         onChangeText={handleChange}
         autoFocus={autoFocus}
@@ -146,14 +156,18 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   field: {},
+  inputField: {
+    maxHeight: 50,
+  },
   input: {
     width: Dimensions.get('screen').width - 40,
-    height: 50,
+    minHeight: 50,
     fontSize: 18,
     marginBottom: 5,
     borderRadius: 8,
     padding: 10,
     backgroundColor: COLORS.bgColorLight,
+    textAlignVertical: 'top',
     borderWidth: 1,
     borderColor: COLORS.lightGray,
     paddingLeft: 20,

@@ -24,6 +24,7 @@ import { CREATE_USER_PROFILE } from '../graph/mutations/createUser';
 import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 import { GET_ADDRESSES } from '../graph/queries/getAddresses';
 import { AddressType, ProfileType } from '../typings/graphql';
+import { AuthService } from '../services/AuthService';
 
 interface IExternalProps {}
 
@@ -225,11 +226,20 @@ const User: FC<IProps> = () => {
     }
   }
 
+  const callbackLogout = () => {
+    navigation.navigate('Login');
+  };
+
+  const handleLogout = () => {
+    AuthService.logout(callbackLogout);
+  };
+
   return (
     <View style={styles.container}>
       <HeaderProject
         leftIcon={<Icon size={28} name="arrowleft" color={COLORS.darkOrange} />}
         onPressLeftAction={onGoBach}
+        onPressRightAction={handleLogout}
         rightIcon={<Icon size={20} name="logout" color={COLORS.gray} />}
         content={<Text style={styles.title}>Профиль</Text>}
       />

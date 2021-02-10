@@ -13,6 +13,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import StackNavigation from './src/navigations/stackNavigation';
 import configureApolloo from './src/configureApollo';
 import { ApolloProvider } from '@apollo/client';
+import { NotifierWrapper } from 'react-native-notifier';
 import ErrorBoundry from './src/components/ErrorBoundry';
 
 export const client = configureApolloo();
@@ -35,9 +36,11 @@ class App extends React.Component {
 
     return (
       <ApolloProvider client={client}>
-        <NavigationContainer>
-          <StackNavigation />
-        </NavigationContainer>
+        <NotifierWrapper>
+          <NavigationContainer>
+            <StackNavigation />
+          </NavigationContainer>
+        </NotifierWrapper>
       </ApolloProvider>
     );
   }

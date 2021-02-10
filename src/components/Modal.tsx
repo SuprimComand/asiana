@@ -8,6 +8,8 @@ interface IExternalProps {
   onCancel?: () => void;
   isVisible: boolean;
   swipeDirection?: 'down' | 'up';
+  defaultHeight?: string | number;
+  onSwipeComplete?: () => void;
 }
 
 interface IProps extends IExternalProps {}
@@ -17,9 +19,11 @@ const ModalComponent: FC<IProps> = ({
   isVisible,
   swipeDirection,
   children,
+  defaultHeight,
 }) => {
   const deviceWidth = Dimensions.get('window').width;
   const deviceHeight = Dimensions.get('window').height;
+  const style = { height: defaultHeight };
 
   return (
     <Modal
@@ -30,7 +34,7 @@ const ModalComponent: FC<IProps> = ({
       isVisible={isVisible}
       style={styles.modal}
       customBackdrop={<View style={styles.customBackdrop} />}>
-      <View style={styles.content}>
+      <View style={[styles.content, style]}>
         <View style={styles.header}>
           <Image source={handle} />
         </View>
