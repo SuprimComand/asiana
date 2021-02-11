@@ -12,4 +12,5 @@ export const COLORS = {
   black: '#161616',
   green: '#5DB075',
   bgModal: 'rgba(0,0,0, .8)',
+  primary: '#7070fa',
 };

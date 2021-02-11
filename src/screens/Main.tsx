@@ -26,6 +26,7 @@ import { CarType, ProfileCarType } from '../typings/graphql';
 import CarItem from '../components/CarItem';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
 import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
+import AsyncStorage from '@react-native-community/async-storage';
 
 interface IExternalProps {}
 
@@ -91,6 +92,7 @@ const Main: FC<IProps> = () => {
   const handleChangeActiveCar = useCallback(
     (id: ProfileCarType['id']) => {
       return () => {
+        AsyncStorage.setItem('carId', id);
         updateProfileCar({
           variables: {
             id,

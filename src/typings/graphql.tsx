@@ -75,6 +75,7 @@ export type ProfileType = {
   address?: Maybe<AddressType>;
   gender?: Maybe<Scalars['Int']>;
   profilecarSet: Array<ProfileCarType>;
+  requeststoSet: Array<RequestStoType>;
 };
 
 export type AddressType = {
@@ -88,6 +89,27 @@ export type AddressType = {
   email?: Maybe<Scalars['String']>;
   coordinates: Scalars['String'];
   profileSet: Array<ProfileType>;
+  requeststoSet: Array<RequestStoType>;
+};
+
+export type RequestStoType = {
+  __typename?: 'RequestStoType';
+  id: Scalars['ID'];
+  profile: ProfileType;
+  car: CarType;
+  date: Scalars['DateTime'];
+  workKind: Scalars['String'];
+  address: AddressType;
+};
+
+export type CarType = {
+  __typename?: 'CarType';
+  id: Scalars['ID'];
+  brand: Scalars['String'];
+  model: Scalars['String'];
+  complectation: Scalars['String'];
+  profilecarSet: Array<ProfileCarType>;
+  requeststoSet: Array<RequestStoType>;
 };
 
 export type ProfileCarType = {
@@ -98,15 +120,6 @@ export type ProfileCarType = {
   date: Scalars['Date'];
   source: Scalars['String'];
   active: Scalars['Int'];
-};
-
-export type CarType = {
-  __typename?: 'CarType';
-  id: Scalars['ID'];
-  brand: Scalars['String'];
-  model: Scalars['String'];
-  complectation: Scalars['String'];
-  profilecarSet: Array<ProfileCarType>;
 };
 
 export type ActionType = {
@@ -130,6 +143,7 @@ export type Mutation = {
   updateProfileCar?: Maybe<UpdateProfileCar>;
   deleteProfileCar?: Maybe<DeleteProfileCar>;
   createReview?: Maybe<CreateReview>;
+  createRequest?: Maybe<CreateRequestSto>;
 };
 
 export type MutationCreateProfileArgs = {
@@ -156,6 +170,10 @@ export type MutationDeleteProfileCarArgs = {
 
 export type MutationCreateReviewArgs = {
   input: ReviewInput;
+};
+
+export type MutationCreateRequestArgs = {
+  input: RequestStoInput;
 };
 
 export type CreateProfile = {
@@ -225,6 +243,20 @@ export type ReviewInput = {
   rating?: Maybe<Scalars['Int']>;
   date?: Maybe<Scalars['DateTime']>;
   comment?: Maybe<Scalars['String']>;
+};
+
+export type CreateRequestSto = {
+  __typename?: 'CreateRequestSto';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
+export type RequestStoInput = {
+  userId?: Maybe<Scalars['Int']>;
+  profileId?: Maybe<Scalars['Int']>;
+  carId?: Maybe<Scalars['Int']>;
+  date?: Maybe<Scalars['DateTime']>;
+  workKind?: Maybe<Scalars['String']>;
+  addressId?: Maybe<Scalars['Int']>;
 };
 
 export type ActionFragment = { __typename?: 'ActionType' } & Pick<
@@ -307,6 +339,16 @@ export type CreateProfileCarMutation = { __typename?: 'Mutation' } & {
           { __typename?: 'ProfileCarType' } & ProfileCarFragment
         >;
       }
+  >;
+};
+
+export type CreateRequestMutationVariables = Exact<{
+  input: RequestStoInput;
+}>;
+
+export type CreateRequestMutation = { __typename?: 'Mutation' } & {
+  createRequest?: Maybe<
+    { __typename?: 'CreateRequestSto' } & Pick<CreateRequestSto, 'ok'>
   >;
 };
 
@@ -531,6 +573,54 @@ export type CreateProfileCarMutationResult = Apollo.MutationResult<CreateProfile
 export type CreateProfileCarMutationOptions = Apollo.BaseMutationOptions<
   CreateProfileCarMutation,
   CreateProfileCarMutationVariables
+>;
+export const CreateRequestDocument = gql`
+  mutation createRequest($input: RequestStoInput!) {
+    createRequest(input: $input) {
+      ok
+    }
+  }
+`;
+export type CreateRequestMutationFn = Apollo.MutationFunction<
+  CreateRequestMutation,
+  CreateRequestMutationVariables
+>;
+
+/**
+ * __useCreateRequestMutation__
+ *
+ * To run a mutation, you first call `useCreateRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createRequestMutation, { data, loading, error }] = useCreateRequestMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateRequestMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateRequestMutation,
+    CreateRequestMutationVariables
+  >,
+) {
+  return Apollo.useMutation<
+    CreateRequestMutation,
+    CreateRequestMutationVariables
+  >(CreateRequestDocument, baseOptions);
+}
+export type CreateRequestMutationHookResult = ReturnType<
+  typeof useCreateRequestMutation
+>;
+export type CreateRequestMutationResult = Apollo.MutationResult<CreateRequestMutation>;
+export type CreateRequestMutationOptions = Apollo.BaseMutationOptions<
+  CreateRequestMutation,
+  CreateRequestMutationVariables
 >;
 export const ReviewDocument = gql`
   mutation review($input: ReviewInput!) {

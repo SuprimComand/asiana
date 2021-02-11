@@ -1,8 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { FC, useCallback, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  PermissionsAndroid,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import HeaderProject from '../components/HeaderProject';
 import { COLORS } from '../constants';
 import Modal from '../components/Modal';
@@ -10,6 +16,10 @@ import iconMarker from '../assets/autoshow.png';
 import { GET_ADDRESSES } from '../graph/queries/getAddresses';
 import { useQuery } from '@apollo/client';
 import { AddressType } from '../typings/graphql';
+import navigator from '@react-native-community/geolocation';
+import { NotifierRoot } from 'react-native-notifier';
+import Geolocation from 'react-native-geolocation-service';
+import AddressModalContent from '../components/AddressModalContent';
 
 interface IExternalProps {}
 
@@ -17,6 +27,9 @@ interface IProps extends IExternalProps {}
 
 const AutoShow: FC<IProps> = () => {
   const navigation = useNavigation();
+  const [address, setAddress] = useState<AddressType | null>(null);
+  const [toDrawCoordinates, setDrawCoordinates] = useState(false);
+  const [currentPosition, setCurrentPosition] = useState<any>(null);
   const [isOpenModal, setOpenModal] = useState<boolean>(false);
   const { data: addressesData } = useQuery(GET_ADDRESSES, {
     variables: {
@@ -24,6 +37,52 @@ const AutoShow: FC<IProps> = () => {
     },
   });
   const addresses: AddressType[] = addressesData?.addresses || [];
+  const notifier = useRef<any>(null);
+
+  const requestPermissions = async () => {
+    if (Platform.OS === 'ios') {
+      const auth = await Geolocation.requestAuthorization('whenInUse');
+      if (auth === 'granted') {
+        console.log(auth);
+      }
+    }
+
+    if (Platform.OS === 'android') {
+      await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+      if ('granted' === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log(PermissionsAndroid.RESULTS.GRANTED);
+      }
+    }
+  };
+
+  const getCurrentPosition = useCallback(() => {
+    requestPermissions().then(() => {
+      navigator.getCurrentPosition(
+        (position) => {
+          setCurrentPosition(position.coords);
+        },
+        (err) => {
+          if (err.PERMISSION_DENIED === 1) {
+            notifier.current?.showNotification({
+              title: 'Нет доступа к геолокации',
+            });
+            return;
+          }
+        },
+      );
+    });
+  }, []);
+
+  useEffect(() => {
+    getCurrentPosition();
+  }, [getCurrentPosition]);
+
+  const handleClickDrawCoordinates = useCallback(() => {
+    setDrawCoordinates(true);
+    handleCancel();
+  }, [setDrawCoordinates]);
 
   const onGoBach = useCallback(() => {
     navigation.goBack();
@@ -37,13 +96,23 @@ const AutoShow: FC<IProps> = () => {
     setOpenModal(false);
   }, []);
 
+  const handleSelectAddress = useCallback(
+    (address: AddressType) => {
+      return () => {
+        setAddress(address);
+        handleClickMarker();
+      };
+    },
+    [address],
+  );
+
   const renderMarkers = useCallback(() => {
     return addresses.map((item) => {
       const coordinates = item.coordinates.split(',');
       return (
         <Marker
           key={item.id}
-          onPress={handleClickMarker}
+          onPress={handleSelectAddress(item)}
           image={iconMarker}
           coordinate={{
             latitude: Number(coordinates[0]),
@@ -54,8 +123,18 @@ const AutoShow: FC<IProps> = () => {
     });
   }, [addresses]);
 
+  const addressCoordinates = address?.coordinates.split(',') || [];
+
+  const handleSubmit = useCallback(() => {
+    if (!address) {
+      return;
+    }
+    navigation.navigate('EntrySto', { addressId: address?.id });
+  }, [address]);
+
   return (
     <View style={styles.container}>
+      <NotifierRoot ref={notifier} />
       <HeaderProject
         leftIcon={<Icon size={28} name="arrowleft" color={COLORS.darkOrange} />}
         onPressLeftAction={onGoBach}
@@ -65,19 +144,40 @@ const AutoShow: FC<IProps> = () => {
         <MapView
           style={styles.map}
           region={{
-            latitude: 59,
-            longitude: 30,
-            latitudeDelta: 3,
-            longitudeDelta: 2,
+            latitude: 60,
+            longitude: 30.4,
+            latitudeDelta: 0,
+            longitudeDelta: 0.6,
           }}>
           {renderMarkers()}
+          {currentPosition && toDrawCoordinates && (
+            <Polyline
+              strokeWidth={6}
+              strokeColor={COLORS.primary}
+              coordinates={[
+                {
+                  latitude: currentPosition.latitude,
+                  longitude: currentPosition.longitude,
+                },
+                {
+                  latitude: Number(addressCoordinates[0]) || 0,
+                  longitude: Number(addressCoordinates[1]) || 0,
+                },
+              ]}
+            />
+          )}
         </MapView>
       </View>
       <Modal
         defaultHeight="70%"
         isVisible={isOpenModal}
-        onCancel={handleCancel}
-      />
+        onCancel={handleCancel}>
+        <AddressModalContent
+          onPressSend={handleClickDrawCoordinates}
+          address={address}
+          onSubmit={handleSubmit}
+        />
+      </Modal>
     </View>
   );
 };
