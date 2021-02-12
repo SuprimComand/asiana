@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-import { USER_PROFILE } from './profile';
 
 export const ADDRESS: any = gql`
   fragment address on AddressType {

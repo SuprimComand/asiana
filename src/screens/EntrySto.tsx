@@ -18,10 +18,11 @@ import { useAsyncStorage } from '../hooks/asyncStorage';
 import { useMutation, useQuery } from '@apollo/client';
 import { CREATE_REQUEST_STO } from '../graph/mutations/createRequestSto';
 import { NotifierRoot } from 'react-native-notifier';
-import { AddressType, CarType } from '../typings/graphql';
+import { AddressType, ProfileCarType } from '../typings/graphql';
 import { GET_ADDRESSES } from '../graph/queries/getAddresses';
 import { GET_PROFILE_CAR } from '../graph/queries/getProfileCar';
 import Loader from '../components/Loader';
+import { ProfileCarMock } from '../typings/profileCarMock';
 
 interface IExternalProps {
   route: any;
@@ -31,13 +32,13 @@ interface IProps extends IExternalProps {}
 
 const EntrySto: FC<IProps> = ({ route }) => {
   const navigation = useNavigation();
-  const { addressId } = route.params;
-  const [address, setAddress] = useState<AddressType['id']>(addressId || 0);
+  const [address, setAddress] = useState<AddressType['id']>(
+    route?.params?.addressId || 0,
+  );
   const [userId] = useAsyncStorage('userId');
   const [profileId] = useAsyncStorage('profileId');
-  const [carId] = useAsyncStorage('carId');
   const [date, setDate] = useState('');
-  const [workTime, setWorkTime] = useState('');
+  const [workKind, setWorkKind] = useState('');
   const [
     createRequest,
     { loading: loadingCreateRequest, data: createSto },
@@ -48,7 +49,9 @@ const EntrySto: FC<IProps> = ({ route }) => {
   });
   const { data: addressesData } = useQuery(GET_ADDRESSES);
   const addresses: AddressType[] = addressesData?.addresses || [];
-  const car: CarType = cars.find((car: CarType) => car.id === carId);
+  const carsArr = cars?.profileCars || [];
+  const car =
+    carsArr.find((car: ProfileCarType) => car.active)?.car || ProfileCarMock;
   const notifier = useRef<any>(null);
 
   useEffect(() => {
@@ -56,6 +59,14 @@ const EntrySto: FC<IProps> = ({ route }) => {
       navigation.navigate('Main');
     }
   }, [createSto]);
+
+  useEffect(() => {
+    if (route?.params?.addressId) {
+      setAddress(route?.params?.addressId);
+    } else if (addresses.length && !address) {
+      setAddress(addresses[0].id);
+    }
+  }, [route, addresses]);
 
   const onGoBack = useCallback(() => {
     navigation.goBack();
@@ -92,7 +103,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
         title: 'Не выбран адрес',
       });
     }
-    if (!carId) {
+    if (!car.id) {
       notifier.current?.showNotification({
         title: 'Не выбран автомобиль',
       });
@@ -103,11 +114,12 @@ const EntrySto: FC<IProps> = ({ route }) => {
           userId,
           profileId,
           addressId: address,
-          carId,
+          carId: car.id,
           date,
-          workTime,
+          workKind,
         },
       },
+      refetchQueries: ['requestSto'],
     });
   };
 
@@ -131,7 +143,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
         <View>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
-              {car.brand} {car.model}
+              {car.brand || 'Нет авто'} {car.model}
             </Text>
             <Text style={styles.subTitle}>
               {car.complectation || 'Нет комплектации'}
@@ -149,8 +161,8 @@ const EntrySto: FC<IProps> = ({ route }) => {
             type="text"
             placeholder="Укажите вид работ"
             editable
-            onChange={setWorkTime}
-            value={workTime}
+            onChange={setWorkKind}
+            value={workKind}
           />
           <Dropdown
             onSelect={handleSelectAddress}

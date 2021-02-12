@@ -42,18 +42,12 @@ const AutoShow: FC<IProps> = () => {
   const requestPermissions = async () => {
     if (Platform.OS === 'ios') {
       const auth = await Geolocation.requestAuthorization('whenInUse');
-      if (auth === 'granted') {
-        console.log(auth);
-      }
     }
 
     if (Platform.OS === 'android') {
       await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
       );
-      if ('granted' === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log(PermissionsAndroid.RESULTS.GRANTED);
-      }
     }
   };
 

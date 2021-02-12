@@ -39,6 +39,7 @@ export type Query = {
   profileCars?: Maybe<Array<Maybe<ProfileCarType>>>;
   action?: Maybe<ActionType>;
   actions?: Maybe<Array<Maybe<ActionType>>>;
+  requestSto?: Maybe<Array<Maybe<RequestStoType>>>;
 };
 
 export type QueryProfileArgs = {
@@ -64,6 +65,11 @@ export type QueryProfileCarsArgs = {
 
 export type QueryActionArgs = {
   id?: Maybe<Scalars['Int']>;
+};
+
+export type QueryRequestStoArgs = {
+  userId?: Maybe<Scalars['Int']>;
+  profileId?: Maybe<Scalars['Int']>;
 };
 
 export type ProfileType = {
@@ -328,6 +334,15 @@ export type ProfileCarFragment = { __typename?: 'ProfileCarType' } & Pick<
     profile: { __typename?: 'ProfileType' } & ProfileFragment;
   };
 
+export type RequestStoFragment = { __typename?: 'RequestStoType' } & Pick<
+  RequestStoType,
+  'id' | 'date' | 'workKind'
+> & {
+    profile: { __typename?: 'ProfileType' } & ProfileFragment;
+    car: { __typename?: 'CarType' } & CarFragment;
+    address: { __typename?: 'AddressType' } & AddressFragment;
+  };
+
 export type CreateProfileCarMutationVariables = Exact<{
   input: ProfileCarInput;
 }>;
@@ -434,6 +449,14 @@ export type ProfilesQuery = { __typename?: 'Query' } & {
   >;
 };
 
+export type RequestStoQueryVariables = Exact<{ [key: string]: never }>;
+
+export type RequestStoQuery = { __typename?: 'Query' } & {
+  requestSto?: Maybe<
+    Array<Maybe<{ __typename?: 'RequestStoType' } & RequestStoFragment>>
+  >;
+};
+
 export const ActionFragmentDoc = gql`
   fragment action on ActionType {
     id
@@ -521,6 +544,25 @@ export const ProfileCarFragmentDoc = gql`
   }
   ${CarFragmentDoc}
   ${ProfileFragmentDoc}
+`;
+export const RequestStoFragmentDoc = gql`
+  fragment requestSto on RequestStoType {
+    id
+    profile {
+      ...profile
+    }
+    car {
+      ...car
+    }
+    date
+    workKind
+    address {
+      ...address
+    }
+  }
+  ${ProfileFragmentDoc}
+  ${CarFragmentDoc}
+  ${AddressFragmentDoc}
 `;
 export const CreateProfileCarDocument = gql`
   mutation createProfileCar($input: ProfileCarInput!) {
@@ -1031,4 +1073,58 @@ export type ProfilesLazyQueryHookResult = ReturnType<
 export type ProfilesQueryResult = Apollo.QueryResult<
   ProfilesQuery,
   ProfilesQueryVariables
+>;
+export const RequestStoDocument = gql`
+  query requestSto {
+    requestSto {
+      ...requestSto
+    }
+  }
+  ${RequestStoFragmentDoc}
+`;
+
+/**
+ * __useRequestStoQuery__
+ *
+ * To run a query within a React component, call `useRequestStoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useRequestStoQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useRequestStoQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useRequestStoQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    RequestStoQuery,
+    RequestStoQueryVariables
+  >,
+) {
+  return Apollo.useQuery<RequestStoQuery, RequestStoQueryVariables>(
+    RequestStoDocument,
+    baseOptions,
+  );
+}
+export function useRequestStoLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    RequestStoQuery,
+    RequestStoQueryVariables
+  >,
+) {
+  return Apollo.useLazyQuery<RequestStoQuery, RequestStoQueryVariables>(
+    RequestStoDocument,
+    baseOptions,
+  );
+}
+export type RequestStoQueryHookResult = ReturnType<typeof useRequestStoQuery>;
+export type RequestStoLazyQueryHookResult = ReturnType<
+  typeof useRequestStoLazyQuery
+>;
+export type RequestStoQueryResult = Apollo.QueryResult<
+  RequestStoQuery,
+  RequestStoQueryVariables
 >;

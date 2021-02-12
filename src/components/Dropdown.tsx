@@ -35,7 +35,7 @@ const Dropdown: FC<IProps> = ({ list, onSelect, selectedValue }) => {
           itemStyle={styles.itemStyle}
           mode="dropdown"
           style={styles.pickerStyle}
-          selectedValue={selected}
+          selectedValue={selectedValue || selected}
           onValueChange={handleSelect}>
           {list.map((item) => (
             <Picker.Item

@@ -22,11 +22,12 @@ import { useMutation, useQuery } from '@apollo/client';
 import { useAsyncStorage } from '../hooks/asyncStorage';
 import { GET_PROFILE_CAR } from '../graph/queries/getProfileCar';
 import Loader from '../components/Loader';
-import { CarType, ProfileCarType } from '../typings/graphql';
+import { CarType, ProfileCarType, RequestStoType } from '../typings/graphql';
 import CarItem from '../components/CarItem';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
 import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 import AsyncStorage from '@react-native-community/async-storage';
+import { GET_REQUEST_STO } from '../graph/queries/getRequestSto';
 
 interface IExternalProps {}
 
@@ -42,15 +43,20 @@ const Main: FC<IProps> = () => {
     variables: { profileId: Number(profileId) },
     skip: !profileId,
   });
-  const { data: user, loading: userLoading } = useQuery(GET_USER_PROFILES, {
-    variables: { userId: Number(userId) },
-    skip: !userId,
-  });
+  const { data: requestStoData, loading: requestStoLoading } = useQuery(
+    GET_REQUEST_STO,
+    {
+      variables: { userId: Number(userId), profileId: Number(profileId) },
+      skip: !userId || !profileId,
+    },
+  );
 
+  const requestStoList = requestStoData?.requestSto || [];
   const [
     updateProfileCar,
     { loading: profileCarLoading, data: profileCar },
   ] = useMutation(UPDATE_PROFILE_CAR);
+
   const profileCars: ProfileCarType[] = data?.profileCars || [];
   const activeProfileCar = profileCars.find((car) => Boolean(car.active));
   const withoutActiveProfileCar = profileCars.filter((car) => !car.active);
@@ -100,6 +106,7 @@ const Main: FC<IProps> = () => {
               active: 1,
             },
           },
+          refetchQueries: ['profileCars'],
         });
       };
     },
@@ -112,6 +119,51 @@ const Main: FC<IProps> = () => {
     },
     [data, isOpenList],
   );
+
+  const handleClickAddSto = useCallback(() => {
+    navigation.navigate('EntrySto');
+  }, []);
+
+  const renderRequestSto = useCallback(() => {
+    return requestStoList.map((requestSto: RequestStoType, index: number) => {
+      const first = index === 0;
+      return (
+        <View style={styles.requestStoCard} key={requestSto.id}>
+          <View style={styles.cardHeader}>
+            {first && (
+              <>
+                <Text style={styles.cardTitle}>Запись в СТО</Text>
+                <TouchableOpacity onPress={handleClickAddSto}>
+                  <Icon color={COLORS.darkOrange} size={20} name="plus" />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+          <Card>
+            <View style={styles.cardHeader}>
+              <Text style={styles.fontBold}>
+                {requestSto?.address.address || 'Нет адреса'}
+              </Text>
+              <Text style={styles.subTitle}>
+                {requestSto?.workKind || 'Нет рабочего времени'}
+              </Text>
+            </View>
+            <View style={styles.dataContent}>
+              <Text style={styles.title}>
+                {`${requestSto?.car.brand || 'Нет автомобиля'} ${
+                  requestSto?.car.model || ''
+                }`}
+              </Text>
+              <Text style={styles.subTitle}>
+                {requestSto?.car.complectation || 'Нет комплектации'}
+              </Text>
+            </View>
+            <Text>{requestSto?.workKind}</Text>
+          </Card>
+        </View>
+      );
+    });
+  }, [requestStoList]);
 
   const renderActiveCard = () => {
     if (profileCarLoading) {
@@ -129,7 +181,9 @@ const Main: FC<IProps> = () => {
     return (
       <View>
         <Text style={styles.title}>
-          {`${activeProfileCar?.car.brand} ${activeProfileCar?.car.model}`}
+          {`${activeProfileCar?.car.brand || 'Нет данных'} ${
+            activeProfileCar?.car.model || ''
+          }`}
         </Text>
         <Text style={styles.subTitle}>
           {activeProfileCar?.car.complectation || 'Нет комплектации'}
@@ -145,7 +199,7 @@ const Main: FC<IProps> = () => {
     [setOpenList, isOpenList],
   );
 
-  if (loading || userLoading) {
+  if (loading || requestStoLoading) {
     return (
       <View style={styles.containerLoading}>
         <Loader size={50} />
@@ -154,9 +208,6 @@ const Main: FC<IProps> = () => {
   }
 
   const arrowIcon = isOpenList ? 'arrowdown' : 'arrowright';
-  const address = user?.profiles?.length
-    ? user?.profiles[0].address?.address || 'Нет данных'
-    : '';
 
   return (
     <View style={styles.container}>
@@ -190,29 +241,7 @@ const Main: FC<IProps> = () => {
               />
             )}
           </View>
-          <View>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Запись в СТО</Text>
-              <TouchableOpacity>
-                <Icon color={COLORS.darkOrange} size={20} name="plus" />
-              </TouchableOpacity>
-            </View>
-            <Card>
-              <View style={styles.cardHeader}>
-                <Text style={styles.fontBold}>{address}</Text>
-                <Text style={styles.subTitle}>14:30 14.01.2021</Text>
-              </View>
-              <View style={styles.dataContent}>
-                <Text style={styles.title}>
-                  {`${activeProfileCar?.car.brand} ${activeProfileCar?.car.model}`}
-                </Text>
-                <Text style={styles.subTitle}>
-                  {activeProfileCar?.car.complectation || 'Нет комплектации'}
-                </Text>
-              </View>
-              <Text>Замера заднего амортизатора</Text>
-            </Card>
-          </View>
+          {renderRequestSto()}
         </View>
       </ScrollView>
       <Modal onCancel={handleCloseModal} isVisible={isOpenModal}>
@@ -240,6 +269,9 @@ const Main: FC<IProps> = () => {
 };
 
 const styles = StyleSheet.create({
+  requestStoCard: {
+    marginBottom: 10,
+  },
   containerLoading: {
     flex: 1,
     justifyContent: 'center',
