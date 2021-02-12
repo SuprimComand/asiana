@@ -22,12 +22,12 @@ import { useMutation, useQuery } from '@apollo/client';
 import { useAsyncStorage } from '../hooks/asyncStorage';
 import { GET_PROFILE_CAR } from '../graph/queries/getProfileCar';
 import Loader from '../components/Loader';
-import { CarType, ProfileCarType, RequestStoType } from '../typings/graphql';
+import { ProfileCarType, RequestStoType } from '../typings/graphql';
 import CarItem from '../components/CarItem';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
-import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 import AsyncStorage from '@react-native-community/async-storage';
 import { GET_REQUEST_STO } from '../graph/queries/getRequestSto';
+import moment from 'moment';
 
 interface IExternalProps {}
 
@@ -145,7 +145,9 @@ const Main: FC<IProps> = () => {
                 {requestSto?.address.address || 'Нет адреса'}
               </Text>
               <Text style={styles.subTitle}>
-                {requestSto?.workKind || 'Нет рабочего времени'}
+                {requestSto?.date
+                  ? moment(requestSto?.date).format('hh:mm DD.MM.YYYY')
+                  : 'Нет рабочего времени'}
               </Text>
             </View>
             <View style={styles.dataContent}>
@@ -163,20 +165,13 @@ const Main: FC<IProps> = () => {
         </View>
       );
     });
-  }, [requestStoList]);
+  }, [requestStoList, userId]);
 
-  const renderActiveCard = () => {
+  const renderActiveCard = useCallback(() => {
     if (profileCarLoading) {
       return <Image style={styles.loadingRow} source={loadingCard} />;
     }
-
-    if (!activeProfileCar) {
-      return (
-        <View>
-          <Text style={styles.title}>{JSON.stringify(activeProfileCar)}</Text>
-        </View>
-      );
-    }
+    console.log(activeProfileCar, 'activeProfileCar');
 
     return (
       <View>
@@ -190,7 +185,7 @@ const Main: FC<IProps> = () => {
         </Text>
       </View>
     );
-  };
+  }, [activeProfileCar, userId]);
 
   const handleChangeOpenList = useCallback(
     (status: boolean) => {
@@ -199,7 +194,7 @@ const Main: FC<IProps> = () => {
     [setOpenList, isOpenList],
   );
 
-  if (loading || requestStoLoading) {
+  if (loading || requestStoLoading || !userId) {
     return (
       <View style={styles.containerLoading}>
         <Loader size={50} />

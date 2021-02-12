@@ -167,6 +167,7 @@ const AutoShop: FC<IProps> = () => {
         isVisible={isOpenModal}
         onCancel={handleCancel}>
         <AddressModalContent
+          hideButton
           onPressSend={handleClickDrawCoordinates}
           address={address}
           onSubmit={handleSubmit}

@@ -41,7 +41,7 @@ const AutoService: FC<IProps> = () => {
 
   const requestPermissions = async () => {
     if (Platform.OS === 'ios') {
-      const auth = await Geolocation.requestAuthorization('whenInUse');
+      Geolocation.requestAuthorization('whenInUse');
     }
 
     if (Platform.OS === 'android') {

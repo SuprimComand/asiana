@@ -8,6 +8,7 @@ interface IExternalProps {
   address?: AddressType | null;
   onPressSend?: () => void;
   onSubmit?: (address?: AddressType | null) => void;
+  hideButton?: boolean;
 }
 
 interface IProps extends IExternalProps {}
@@ -16,6 +17,7 @@ const AddressModalContent: FC<IProps> = ({
   address,
   onPressSend,
   onSubmit,
+  hideButton,
 }) => {
   return (
     <View style={styles.modal}>
@@ -46,7 +48,7 @@ const AddressModalContent: FC<IProps> = ({
           </View>
         </View>
       </View>
-      <Button onClick={onSubmit} label="Записаться в СТО" />
+      \{!hideButton && <Button onClick={onSubmit} label="Записаться в СТО" />}
     </View>
   );
 };
