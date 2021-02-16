@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import Button from '../components/Button';
 import Dropdown from '../components/Dropdown';
 import FormField from '../components/FormField';

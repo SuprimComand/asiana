@@ -35,7 +35,8 @@ static void InitializeFlipper(UIApplication *application) {
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"asiana"
                                             initialProperties:nil];
-
+  UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+  center.delegate = self;
   rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -44,6 +45,26 @@ static void InitializeFlipper(UIApplication *application) {
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   return YES;
+}
+
+ - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+ NSMutableDictionary* userInfoCopy = [userInfo mutableCopy];
+ userInfoCopy[@"userHasInteracted"] = @YES;
+
+ [RCTPushNotificationManager didReceiveRemoteNotification:[NSDictionary dictionaryWithDictionary:userInfoCopy] fetchCompletionHandler:^(UIBackgroundFetchResult result) {
+ if ([userInfoCopy[@"userHasInteracted"] boolValue] == YES) {
+ return;
+ }
+ completionHandler(result);
+ }];
+}
+
+ - (void)userNotificationCenter:(UNUserNotificationCenter* )center willPresentNotification:(UNNotification* )notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler {
+ [RCTPushNotificationManager didReceiveRemoteNotification:notification.request.content.userInfo fetchCompletionHandler:^(UIBackgroundFetchResult result) {
+ completionHandler(UNNotificationPresentationOptionAlert);
+ }];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge

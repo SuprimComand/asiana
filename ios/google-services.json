@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "301674512111",
+    "project_id": "asiana-304309",
+    "storage_bucket": "asiana-304309.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301674512111:android:3b2b2726af9bb79b8a651a",
+        "android_client_info": {
+          "package_name": "com.asiana"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "301674512111-bj5qq76koquq85fh5om7b0jre43b7rn8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDad_xHlVfDT7R657JU687r63lm93Izj74"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "301674512111-bj5qq76koquq85fh5om7b0jre43b7rn8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "301674512111-o97lm9h24mblaeq44nq5v5e1mc1iggs0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.asiana"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

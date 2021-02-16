@@ -5,7 +5,6 @@ import {
   View,
   StyleSheet,
   Text,
-  TextInput,
   Dimensions,
   KeyboardAvoidingView,
 } from 'react-native';
