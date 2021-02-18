@@ -14,7 +14,7 @@ const HistoryMaintenance: FC<IProps> = () => {
   const navigation = useNavigation();
 
   const onGoBack = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('Main');
   }, []);
 
   return (

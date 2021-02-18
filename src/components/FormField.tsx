@@ -27,9 +27,12 @@ interface IExternalProps {
   keyboardType?: ReactNative.KeyboardTypeOptions;
   maxLength?: number;
   mask?: string;
+  dateFormat?: string;
   multiline?: boolean;
   numberOfLines?: number;
   underlineColorAndroid?: ColorValue;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 interface IProps extends IExternalProps {}
@@ -37,6 +40,7 @@ interface IProps extends IExternalProps {}
 const FormField: FC<IProps> = ({
   customStyles,
   onChange,
+  dateFormat,
   value,
   editable,
   label,
@@ -45,6 +49,8 @@ const FormField: FC<IProps> = ({
   customTextStyle,
   listSelecter,
   autoFocus,
+  onFocus,
+  onBlur,
   ...props
 }) => {
   const handleChange = (value: any, value2?: any) => {
@@ -75,7 +81,7 @@ const FormField: FC<IProps> = ({
           mode="date"
           androidMode="spinner"
           placeholder={placeholder}
-          format="YYYY.MM.DD"
+          format={dateFormat || 'YYYY.MM.DD'}
           // minDate="2016-05-01"
           // maxDate="2016-06-01"
           confirmBtnText="Confirm"

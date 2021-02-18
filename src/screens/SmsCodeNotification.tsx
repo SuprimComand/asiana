@@ -23,6 +23,7 @@ const SmsCodeNotification: FC<IProps> = () => {
   const [code, setCode] = useState('');
   const [hasError, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [hasFocus, setFocus] = useState(false);
   let [timer, setTimer] = useState(60);
   const navigation = useNavigation();
 
@@ -73,6 +74,14 @@ const SmsCodeNotification: FC<IProps> = () => {
     }
   };
 
+  const handleFocus = () => {
+    setFocus(true);
+  };
+
+  const handleBlur = () => {
+    setFocus(false);
+  };
+
   const disableSendButton = code.length < 4;
 
   const errorStyle = hasError && { borderColor: COLORS.red };
@@ -89,6 +98,8 @@ const SmsCodeNotification: FC<IProps> = () => {
           <Text style={styles.label}>Подтвердите код из SMS</Text>
           <View style={styles.inputBlock}>
             <FormField
+              onFocus={handleFocus}
+              onBlur={handleBlur}
               autoFocus
               customStyles={{ ...styles.formField, ...errorStyle }}
               onChange={handleChangeCode}

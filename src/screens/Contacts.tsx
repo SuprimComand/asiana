@@ -13,7 +13,7 @@ const Contacts: FC<IProps> = () => {
   const navigation = useNavigation();
 
   const onGoBach = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('Main');
   }, []);
 
   const goToService = useCallback(() => {
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
     flex: 1,
-    paddingTop: 40,
+    paddingTop: 20,
   },
   content: {
     padding: 20,

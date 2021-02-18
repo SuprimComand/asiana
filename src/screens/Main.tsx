@@ -206,12 +206,7 @@ const Main: FC<IProps> = () => {
 
   return (
     <View style={styles.container}>
-      <HeaderProject
-        leftIcon={<UserSvg />}
-        rightIcon={<NotificationSvg />}
-        onPressLeftAction={handleLeftActionClick}
-        content={<Image source={logo} />}
-      />
+      <HeaderProject content={<Image source={logo} />} />
       <ScrollView>
         <View style={styles.content}>
           <View style={styles.cardBlock}>

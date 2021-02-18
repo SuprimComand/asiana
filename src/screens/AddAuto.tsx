@@ -39,7 +39,7 @@ const AddAuto: FC<IProps> = () => {
   );
 
   const handleSubmit = useCallback(() => {
-    const { id, profilecarSet, ...userCar } = car;
+    const { id, profilecarSet, requeststoSet, ...userCar } = car;
     createCarRequest({
       variables: {
         input: {
@@ -60,7 +60,7 @@ const AddAuto: FC<IProps> = () => {
   }, [createCar]);
 
   const onGoBack = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('Main');
   }, []);
 
   if (createCarLoading) {
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   formField: {
-    marginBottom: 23,
+    marginBottom: 5,
   },
   cardTitle: {
     fontSize: 16,

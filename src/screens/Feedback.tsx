@@ -28,7 +28,7 @@ interface IProps extends IExternalProps {}
 const Feedback: FC<IProps> = () => {
   const navigation = useNavigation();
   const [starCount, setStarCount] = useState(0);
-  const [date, setDate] = useState<string>('20.02.2000');
+  const [date, setDate] = useState<any>(new Date());
   const [feedback, setFeedback] = useState('');
   const [userId] = useAsyncStorage('userId');
   const [createReview, { data, loading }] = useMutation(CREATE_REVIEW);
@@ -39,11 +39,14 @@ const Feedback: FC<IProps> = () => {
       notifier.current?.showNotification({
         title: 'Отзыв успешно отправлен!!',
       });
+      setFeedback('');
+      setDate(new Date());
+      setStarCount(0);
     }
   }, [data]);
 
   const onGoBach = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('Main');
   }, []);
 
   const handleChangeRating = useCallback(
@@ -61,6 +64,15 @@ const Feedback: FC<IProps> = () => {
   );
 
   const handleCreateReview = useCallback(() => {
+    if (!userId) {
+      return;
+    }
+    if (!feedback) {
+      notifier.current?.showNotification({
+        title: 'Пожалуйста заполните поле отзыва!',
+      });
+      return;
+    }
     const input = {
       userId,
       comment: feedback,
@@ -119,6 +131,7 @@ const Feedback: FC<IProps> = () => {
               <FormField
                 editable
                 placeholder="Date"
+                dateFormat="hh:mm DD.MM.YYYY"
                 type="date"
                 value={date}
                 onChange={handleChangeDate}
@@ -183,7 +196,7 @@ const styles = StyleSheet.create({
   },
   container: {
     height: Dimensions.get('screen').height,
-    paddingTop: 40,
+    paddingTop: 20,
     backgroundColor: COLORS.white,
   },
   title: {

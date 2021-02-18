@@ -22,8 +22,14 @@ import { useQuery } from '@apollo/client';
 import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 import Loader from '../components/Loader';
 import Feedback from '../screens/Feedback';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import build from '../assets/footer-icons/build.png';
+import drive from '../assets/footer-icons/drive_eta.png';
+import forum from '../assets/footer-icons/forum.png';
+import pin_drop from '../assets/footer-icons/pin_drop.png';
+import portrait from '../assets/footer-icons/portrait.png';
+import whatshot from '../assets/footer-icons/whatshot.png';
 
 const Tab = createBottomTabNavigator();
 
@@ -53,48 +59,48 @@ const TabNavigation = () => {
     <Tab.Navigator
       screenOptions={({ route }: any) => ({
         tabBarIcon: ({ color, size }: any) => {
-          let iconName = '';
+          let iconName = null;
 
           if (route.name === 'Main') {
-            iconName = 'home';
+            iconName = drive;
           }
 
           if (route.name === 'User') {
-            iconName = 'user';
+            iconName = portrait;
           }
 
           if (route.name === 'EntrySto') {
-            iconName = 'plus';
+            iconName = build;
           }
 
           if (route.name === 'Stocks') {
-            iconName = 'pay-circle-o1';
+            iconName = whatshot;
           }
 
           if (route.name === 'Feedback') {
-            iconName = 'message1';
+            iconName = forum;
           }
 
           if (route.name === 'Contacts') {
-            iconName = 'contacts';
+            iconName = pin_drop;
           }
 
-          return <Icon name={iconName} size={size} color={color} />;
+          return <Image style={{ width: 30, height: 30 }} source={iconName} />;
         },
       })}
       tabBarOptions={{
         activeTintColor: COLORS.orange,
         inactiveTintColor: COLORS.gray,
         showLabel: false,
-        activeBackgroundColor: COLORS.white,
+        activeBackgroundColor: COLORS.bgColorLight,
         inactiveBackgroundColor: COLORS.white,
       }}
       sceneContainerStyle={{ borderColor: COLORS.gray, borderTopWidth: 2 }}>
       <Tab.Screen name="Main" component={Main} />
-      <Tab.Screen name="Feedback" component={Feedback} />
-      <Tab.Screen name="EntrySto" component={EtrySto} />
       <Tab.Screen name="User" component={User} />
       <Tab.Screen name="Stocks" component={Stocks} />
+      <Tab.Screen name="EntrySto" component={EtrySto} />
+      <Tab.Screen name="Feedback" component={Feedback} />
       <Tab.Screen name="Contacts" component={Contacts} />
     </Tab.Navigator>
   );

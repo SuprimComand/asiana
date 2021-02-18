@@ -48,7 +48,7 @@ const AddressModalContent: FC<IProps> = ({
           </View>
         </View>
       </View>
-      \{!hideButton && <Button onClick={onSubmit} label="Записаться в СТО" />}
+      {!hideButton && <Button onClick={onSubmit} label="Записаться в СТО" />}
     </View>
   );
 };

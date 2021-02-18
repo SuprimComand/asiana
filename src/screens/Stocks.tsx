@@ -28,7 +28,7 @@ const Stocks: FC<IProps> = () => {
   }, [data]);
 
   const onGoBack = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('Stock');
   }, []);
 
   const handleSelectStock = useCallback((id: number) => {
@@ -75,11 +75,6 @@ const Stocks: FC<IProps> = () => {
         onPressLeftAction={onGoBack}
       />
       <View style={styles.content}>
-        <Input
-          onChange={handleSearch}
-          placeholder="Поиск акций"
-          icon={<Icon name="search1" size={20} color={COLORS.gray} />}
-        />
         <ScrollView style={styles.dataContent}>
           <FlatList
             data={items}
@@ -103,7 +98,6 @@ const styles = StyleSheet.create({
   },
   dataContent: {
     flex: 1,
-    marginTop: 30,
   },
   container: {
     flex: 1,

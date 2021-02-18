@@ -151,7 +151,7 @@ const User: FC<IProps> = () => {
   );
 
   const onGoBach = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('Main');
   }, []);
 
   const color = editable ? COLORS.orange : COLORS.green;
@@ -239,8 +239,10 @@ const User: FC<IProps> = () => {
       <HeaderProject
         leftIcon={<Icon size={28} name="arrowleft" color={COLORS.darkOrange} />}
         onPressLeftAction={onGoBach}
-        onPressRightAction={handleLogout}
-        rightIcon={<Icon size={20} name="logout" color={COLORS.gray} />}
+        onPressRightAction={!editable ? handleLogout : () => {}}
+        rightIcon={
+          !editable && <Icon size={20} name="logout" color={COLORS.gray} />
+        }
         content={<Text style={styles.title}>Профиль</Text>}
       />
       <View style={styles.content}>
@@ -306,7 +308,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     justifyContent: 'center',
-    paddingTop: 40,
+    paddingTop: 20,
   },
   hr: {
     height: 2,

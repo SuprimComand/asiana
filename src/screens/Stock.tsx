@@ -27,7 +27,11 @@ const Stock: FC<IProps> = ({ route }) => {
   });
 
   const onGoBack = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('Stock');
+  }, []);
+
+  const handleClickSto = useCallback(() => {
+    navigation.navigate('EntrySto');
   }, []);
 
   const renderContent = useCallback(() => {
@@ -57,7 +61,9 @@ const Stock: FC<IProps> = ({ route }) => {
             </View>
           </View>
         </ScrollView>
-        {Boolean(data.action.button) && <Button label="Записаться в СТО" />}
+        {Boolean(data.action.button) && (
+          <Button onClick={handleClickSto} label="Записаться в СТО" />
+        )}
       </View>
     );
   }, [data, loading, error]);
@@ -66,7 +72,7 @@ const Stock: FC<IProps> = ({ route }) => {
     <View style={styles.container}>
       <HeaderProject
         leftIcon={<Icon size={28} name="arrowleft" color={COLORS.darkOrange} />}
-        content={<Text style={styles.title}>Акции</Text>}
+        content={<Text style={styles.title}>Акция</Text>}
         onPressLeftAction={onGoBack}
       />
       {renderContent()}

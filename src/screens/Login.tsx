@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   Dimensions,
   KeyboardAvoidingView,
 } from 'react-native';
@@ -23,6 +22,7 @@ const Login: FC<IProps> = () => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
+  const [hasFocus, setFocus] = useState(false);
 
   const handleChangeNumber = useCallback((formatted: any, value?: string) => {
     setPhone(value || formatted);
@@ -42,7 +42,16 @@ const Login: FC<IProps> = () => {
     setError(true);
   }, [phone]);
 
-  const disabled = phone.length < 10;
+  const handleFocus = useCallback(
+    (status: boolean) => {
+      return () => {
+        setFocus(status);
+      };
+    },
+    [hasFocus],
+  );
+
+  const disabled = !hasFocus && phone.length < 10;
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
@@ -51,6 +60,8 @@ const Login: FC<IProps> = () => {
           <Text style={styles.label}>Введите ваш номер телефона</Text>
           <View style={styles.inputBlock}>
             <FormField
+              onFocus={handleFocus(true)}
+              onBlur={handleFocus(false)}
               autoFocus
               customStyles={styles.formField}
               onChange={handleChangeNumber}

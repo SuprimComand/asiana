@@ -37,7 +37,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   );
   const [userId] = useAsyncStorage('userId');
   const [profileId] = useAsyncStorage('profileId');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState<any>(new Date());
   const [workKind, setWorkKind] = useState('');
   const [
     createRequest,
@@ -56,6 +56,8 @@ const EntrySto: FC<IProps> = ({ route }) => {
 
   useEffect(() => {
     if (createSto) {
+      setDate(new Date());
+      setWorkKind('');
       navigation.navigate('Main');
     }
   }, [createSto]);
@@ -69,7 +71,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   }, [route, addresses]);
 
   const onGoBack = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('Main');
   }, []);
 
   const handleChangeDate = useCallback((_: string, value: string) => {
@@ -153,6 +155,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
             type="date"
             placeholder="Date"
             onChange={handleChangeDate}
+            dateFormat="hh:mm DD.MM.YYYY"
             editable
             value={date}
           />
