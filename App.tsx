@@ -10,22 +10,27 @@
 
 import React, { useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import DeviceInfo from 'react-native-device-info';
 import StackNavigation from './src/navigations/stackNavigation';
 import configureApolloo from './src/configureApollo';
-import { ApolloProvider } from '@apollo/client';
+import { ApolloProvider, useMutation } from '@apollo/client';
 import { NotifierWrapper } from 'react-native-notifier';
 import ErrorBoundry from './src/components/ErrorBoundry';
 import PushNotification from 'react-native-push-notification';
 import { Platform, PushNotificationIOS } from 'react-native';
 import { NotifierRoot } from 'react-native-notifier';
+import { CREATE_PUSH_TOKEN } from './src/graph/mutations/createPushToken';
 
 export const client = configureApolloo();
 
-const Notification = () => {
+const deviceId = DeviceInfo.getDeviceId();
+
+export const Notification = () => {
   const notifier = useRef<any>(null);
+  const [createPushToken, { data }] = useMutation(CREATE_PUSH_TOKEN);
+  console.log(data);
 
   useEffect(() => {
-    console.log(notifier, 'notifier');
     notifier?.current.showNotification({
       title: 'notification.title',
     });
@@ -50,6 +55,14 @@ const Notification = () => {
     PushNotification.configure({
       onRegister: function (token) {
         console.log('TOKEN:', token);
+        createPushToken({
+          variables: {
+            input: {
+              value: token,
+              deviceId,
+            },
+          },
+        });
       },
 
       onNotification: function (notification: any) {
@@ -96,7 +109,6 @@ class App extends React.Component {
       <ApolloProvider client={client}>
         <NotifierWrapper>
           <NavigationContainer>
-            <Notification />
             <StackNavigation />
           </NavigationContainer>
         </NotifierWrapper>

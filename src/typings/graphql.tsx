@@ -150,6 +150,7 @@ export type Mutation = {
   deleteProfileCar?: Maybe<DeleteProfileCar>;
   createReview?: Maybe<CreateReview>;
   createRequest?: Maybe<CreateRequestSto>;
+  createPushToken?: Maybe<CreatePushToken>;
 };
 
 export type MutationCreateProfileArgs = {
@@ -180,6 +181,10 @@ export type MutationCreateReviewArgs = {
 
 export type MutationCreateRequestArgs = {
   input: RequestStoInput;
+};
+
+export type MutationCreatePushTokenArgs = {
+  input: PushTokenInput;
 };
 
 export type CreateProfile = {
@@ -263,6 +268,16 @@ export type RequestStoInput = {
   date?: Maybe<Scalars['DateTime']>;
   workKind?: Maybe<Scalars['String']>;
   addressId?: Maybe<Scalars['Int']>;
+};
+
+export type CreatePushToken = {
+  __typename?: 'CreatePushToken';
+  ok?: Maybe<Scalars['Boolean']>;
+};
+
+export type PushTokenInput = {
+  deviceId?: Maybe<Scalars['String']>;
+  value?: Maybe<Scalars['String']>;
 };
 
 export type ActionFragment = { __typename?: 'ActionType' } & Pick<
@@ -354,6 +369,16 @@ export type CreateProfileCarMutation = { __typename?: 'Mutation' } & {
           { __typename?: 'ProfileCarType' } & ProfileCarFragment
         >;
       }
+  >;
+};
+
+export type CreatePushTokenMutationVariables = Exact<{
+  input: PushTokenInput;
+}>;
+
+export type CreatePushTokenMutation = { __typename?: 'Mutation' } & {
+  createPushToken?: Maybe<
+    { __typename?: 'CreatePushToken' } & Pick<CreatePushToken, 'ok'>
   >;
 };
 
@@ -615,6 +640,54 @@ export type CreateProfileCarMutationResult = Apollo.MutationResult<CreateProfile
 export type CreateProfileCarMutationOptions = Apollo.BaseMutationOptions<
   CreateProfileCarMutation,
   CreateProfileCarMutationVariables
+>;
+export const CreatePushTokenDocument = gql`
+  mutation createPushToken($input: PushTokenInput!) {
+    createPushToken(input: $input) {
+      ok
+    }
+  }
+`;
+export type CreatePushTokenMutationFn = Apollo.MutationFunction<
+  CreatePushTokenMutation,
+  CreatePushTokenMutationVariables
+>;
+
+/**
+ * __useCreatePushTokenMutation__
+ *
+ * To run a mutation, you first call `useCreatePushTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePushTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPushTokenMutation, { data, loading, error }] = useCreatePushTokenMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreatePushTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreatePushTokenMutation,
+    CreatePushTokenMutationVariables
+  >,
+) {
+  return Apollo.useMutation<
+    CreatePushTokenMutation,
+    CreatePushTokenMutationVariables
+  >(CreatePushTokenDocument, baseOptions);
+}
+export type CreatePushTokenMutationHookResult = ReturnType<
+  typeof useCreatePushTokenMutation
+>;
+export type CreatePushTokenMutationResult = Apollo.MutationResult<CreatePushTokenMutation>;
+export type CreatePushTokenMutationOptions = Apollo.BaseMutationOptions<
+  CreatePushTokenMutation,
+  CreatePushTokenMutationVariables
 >;
 export const CreateRequestDocument = gql`
   mutation createRequest($input: RequestStoInput!) {

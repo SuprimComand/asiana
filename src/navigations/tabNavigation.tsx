@@ -30,6 +30,7 @@ import forum from '../assets/footer-icons/forum.png';
 import pin_drop from '../assets/footer-icons/pin_drop.png';
 import portrait from '../assets/footer-icons/portrait.png';
 import whatshot from '../assets/footer-icons/whatshot.png';
+import { Notification } from '../../App';
 
 const Tab = createBottomTabNavigator();
 
@@ -56,53 +57,58 @@ const TabNavigation = () => {
   }
 
   return (
-    <Tab.Navigator
-      screenOptions={({ route }: any) => ({
-        tabBarIcon: ({ color, size }: any) => {
-          let iconName = null;
+    <>
+      <Notification />
+      <Tab.Navigator
+        screenOptions={({ route }: any) => ({
+          tabBarIcon: ({ color, size }: any) => {
+            let iconName = null;
 
-          if (route.name === 'Main') {
-            iconName = drive;
-          }
+            if (route.name === 'Main') {
+              iconName = drive;
+            }
 
-          if (route.name === 'User') {
-            iconName = portrait;
-          }
+            if (route.name === 'User') {
+              iconName = portrait;
+            }
 
-          if (route.name === 'EntrySto') {
-            iconName = build;
-          }
+            if (route.name === 'EntrySto') {
+              iconName = build;
+            }
 
-          if (route.name === 'Stocks') {
-            iconName = whatshot;
-          }
+            if (route.name === 'Stocks') {
+              iconName = whatshot;
+            }
 
-          if (route.name === 'Feedback') {
-            iconName = forum;
-          }
+            if (route.name === 'Feedback') {
+              iconName = forum;
+            }
 
-          if (route.name === 'Contacts') {
-            iconName = pin_drop;
-          }
+            if (route.name === 'Contacts') {
+              iconName = pin_drop;
+            }
 
-          return <Image style={{ width: 30, height: 30 }} source={iconName} />;
-        },
-      })}
-      tabBarOptions={{
-        activeTintColor: COLORS.orange,
-        inactiveTintColor: COLORS.gray,
-        showLabel: false,
-        activeBackgroundColor: COLORS.bgColorLight,
-        inactiveBackgroundColor: COLORS.white,
-      }}
-      sceneContainerStyle={{ borderColor: COLORS.gray, borderTopWidth: 2 }}>
-      <Tab.Screen name="Main" component={Main} />
-      <Tab.Screen name="User" component={User} />
-      <Tab.Screen name="Stocks" component={Stocks} />
-      <Tab.Screen name="EntrySto" component={EtrySto} />
-      <Tab.Screen name="Feedback" component={Feedback} />
-      <Tab.Screen name="Contacts" component={Contacts} />
-    </Tab.Navigator>
+            return (
+              <Image style={{ width: 30, height: 30 }} source={iconName} />
+            );
+          },
+        })}
+        tabBarOptions={{
+          activeTintColor: COLORS.orange,
+          inactiveTintColor: COLORS.gray,
+          showLabel: false,
+          activeBackgroundColor: COLORS.bgColorLight,
+          inactiveBackgroundColor: COLORS.white,
+        }}
+        sceneContainerStyle={{ borderColor: COLORS.gray, borderTopWidth: 2 }}>
+        <Tab.Screen name="Main" component={Main} />
+        <Tab.Screen name="User" component={User} />
+        <Tab.Screen name="Stocks" component={Stocks} />
+        <Tab.Screen name="EntrySto" component={EtrySto} />
+        <Tab.Screen name="Feedback" component={Feedback} />
+        <Tab.Screen name="Contacts" component={Contacts} />
+      </Tab.Navigator>
+    </>
   );
 };
 
