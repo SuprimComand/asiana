@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import HeaderProject from '../components/HeaderProject';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -13,6 +13,7 @@ import { CarMock } from '../typings/car';
 import { CarType } from '../typings/graphql';
 import Loader from '../components/Loader';
 import ErrorBoundry from '../components/ErrorBoundry';
+import { NotifierRoot } from 'react-native-notifier';
 
 interface IExternalProps {}
 
@@ -28,6 +29,7 @@ const AddAuto: FC<IProps> = () => {
     refetchQueries: ['profileCars'],
   });
   const [car, setCar] = useState<CarType>(CarMock);
+  const notifier = useRef<any>(null);
 
   const handleChange = useCallback(
     (key: keyof CarType) => {
@@ -40,6 +42,11 @@ const AddAuto: FC<IProps> = () => {
 
   const handleSubmit = useCallback(() => {
     const { id, profilecarSet, requeststoSet, ...userCar } = car;
+    if (!userCar.model || !userCar.brand) {
+      return notifier?.current.showNotification({
+        title: 'Заполните все поля!',
+      });
+    }
     createCarRequest({
       variables: {
         input: {
@@ -79,6 +86,7 @@ const AddAuto: FC<IProps> = () => {
 
   return (
     <View style={styles.container}>
+      <NotifierRoot ref={notifier} />
       <HeaderProject
         leftIcon={<Icon size={28} name="arrowleft" color={COLORS.darkOrange} />}
         content={<Text style={styles.title}>Добавить авто</Text>}

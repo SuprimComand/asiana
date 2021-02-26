@@ -28,7 +28,6 @@ const deviceId = DeviceInfo.getDeviceId();
 export const Notification = () => {
   const notifier = useRef<any>(null);
   const [createPushToken, { data }] = useMutation(CREATE_PUSH_TOKEN);
-  console.log(data);
 
   useEffect(() => {
     notifier?.current.showNotification({
@@ -54,7 +53,6 @@ export const Notification = () => {
     // });
     PushNotification.configure({
       onRegister: function (token) {
-        console.log('TOKEN:', token);
         createPushToken({
           variables: {
             input: {

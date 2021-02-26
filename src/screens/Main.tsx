@@ -9,8 +9,6 @@ import {
   ScrollView,
 } from 'react-native';
 import HeaderProject from '../components/HeaderProject';
-import UserSvg from '../assets/icons/User';
-import NotificationSvg from '../assets/icons/Notification';
 import logo from '../assets/asiana-logotype.png';
 import loadingCard from '../assets/loading-row.gif';
 import { COLORS } from '../constants';
