@@ -188,6 +188,9 @@ const Main: FC<IProps> = () => {
       <View>
         <Text style={styles.title}>{profile?.bonus} Азкоин</Text>
         <Text style={styles.subTitle}>Сегодня +1 Азкоин</Text>
+        <Text style={[styles.title, { marginTop: 10 }]}>
+          Ваша скидка: {profile?.percents}%
+        </Text>
       </View>
     );
   }, [activeProfileCar, userId]);

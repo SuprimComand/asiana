@@ -27,13 +27,7 @@ const deviceId = DeviceInfo.getDeviceId();
 
 export const Notification = () => {
   const notifier = useRef<any>(null);
-  const [createPushToken, { data }] = useMutation(CREATE_PUSH_TOKEN);
-
-  useEffect(() => {
-    notifier?.current.showNotification({
-      title: 'notification.title',
-    });
-  }, [notifier]);
+  const [createPushToken] = useMutation(CREATE_PUSH_TOKEN);
 
   useEffect(() => {
     // PushNotification.localNotification({
