@@ -20,12 +20,17 @@ import { useMutation, useQuery } from '@apollo/client';
 import { useAsyncStorage } from '../hooks/asyncStorage';
 import { GET_PROFILE_CAR } from '../graph/queries/getProfileCar';
 import Loader from '../components/Loader';
-import { ProfileCarType, RequestStoType } from '../typings/graphql';
+import {
+  ProfileCarType,
+  ProfileType,
+  RequestStoType,
+} from '../typings/graphql';
 import CarItem from '../components/CarItem';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
 import AsyncStorage from '@react-native-community/async-storage';
 import { GET_REQUEST_STO } from '../graph/queries/getRequestSto';
 import moment from 'moment';
+import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 
 interface IExternalProps {}
 
@@ -41,12 +46,22 @@ const Main: FC<IProps> = () => {
     variables: { profileId: Number(profileId) },
     skip: !profileId,
   });
+  const { data: profiles, loading: loadingProfile } = useQuery(
+    GET_USER_PROFILES,
+    {
+      variables: { userId: Number(userId) },
+      skip: !userId,
+    },
+  );
   const { data: requestStoData, loading: requestStoLoading } = useQuery(
     GET_REQUEST_STO,
     {
       variables: { userId: Number(userId), profileId: Number(profileId) },
       skip: !userId || !profileId,
     },
+  );
+  const profile = profiles?.profiles.find(
+    (item: ProfileType) => item.id === profileId,
   );
 
   const requestStoList = requestStoData?.requestSto || [];
@@ -165,6 +180,18 @@ const Main: FC<IProps> = () => {
     });
   }, [requestStoList, userId]);
 
+  const renderBonusCard = useCallback(() => {
+    if (loadingProfile) {
+      return <Image style={styles.loadingRow} source={loadingCard} />;
+    }
+    return (
+      <View>
+        <Text style={styles.title}>{profile?.bonus} Азкоин</Text>
+        <Text style={styles.subTitle}>Сегодня +1 Азкоин</Text>
+      </View>
+    );
+  }, [activeProfileCar, userId]);
+
   const renderActiveCard = useCallback(() => {
     if (profileCarLoading) {
       return <Image style={styles.loadingRow} source={loadingCard} />;
@@ -207,6 +234,13 @@ const Main: FC<IProps> = () => {
       <HeaderProject content={<Image source={logo} />} />
       <ScrollView>
         <View style={styles.content}>
+          <View style={[styles.cardBlock, { marginBottom: 20 }]}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Бонусный счёт</Text>
+            </View>
+            <Card>{renderBonusCard()}</Card>
+          </View>
+
           <View style={styles.cardBlock}>
             <View style={styles.cardHeader}>
               <TouchableOpacity

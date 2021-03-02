@@ -80,6 +80,7 @@ export type ProfileType = {
   birthday?: Maybe<Scalars['Date']>;
   address?: Maybe<AddressType>;
   gender?: Maybe<Scalars['Int']>;
+  bonus: Scalars['Int'];
   profilecarSet: Array<ProfileCarType>;
   requeststoSet: Array<RequestStoType>;
 };
@@ -89,7 +90,7 @@ export type AddressType = {
   id: Scalars['ID'];
   type: Scalars['String'];
   address: Scalars['String'];
-  city: Scalars['String'];
+  city?: Maybe<Scalars['String']>;
   workTime: Scalars['String'];
   phone: Scalars['String'];
   email?: Maybe<Scalars['String']>;
@@ -338,7 +339,7 @@ export type CarFragment = { __typename?: 'CarType' } & Pick<
 
 export type ProfileFragment = { __typename?: 'ProfileType' } & Pick<
   ProfileType,
-  'id' | 'name' | 'email' | 'birthday' | 'gender'
+  'id' | 'name' | 'email' | 'birthday' | 'gender' | 'bonus'
 > & { address?: Maybe<{ __typename?: 'AddressType' } & AddressFragment> };
 
 export type ProfileCarFragment = { __typename?: 'ProfileCarType' } & Pick<
@@ -548,6 +549,7 @@ export const ProfileFragmentDoc = gql`
     email
     birthday
     gender
+    bonus
     address {
       ...address
     }
