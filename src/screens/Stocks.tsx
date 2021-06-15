@@ -4,11 +4,8 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import HeaderProject from '../components/HeaderProject';
 import { COLORS } from '../constants';
-import Input from '../components/Input';
 import CardStock from '../components/CardStock';
 import { FlatList } from 'react-native-gesture-handler';
-import { useQuery } from '@apollo/client';
-import { GET_ACTIONS } from '../graph/queries/getActions';
 import Loader from '../components/Loader';
 import { ActionType } from '../typings/graphql';
 
@@ -18,25 +15,34 @@ interface IProps extends IExternalProps {}
 
 const Stocks: FC<IProps> = () => {
   const navigation = useNavigation();
-  const { data, loading } = useQuery(GET_ACTIONS);
   const [items, setItems] = useState<ActionType[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (data) {
-      setItems(data.actions);
-    }
-  }, [data]);
+    setLoading(true);
+    fetch(
+      'http://test-rest-api.site/api/1/mobile/action/list/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setLoading(false);
+        setItems(data.data);
+      });
+  }, []);
 
   const onGoBack = useCallback(() => {
     navigation.navigate('Stock');
-  }, []);
+  }, [navigation]);
 
-  const handleSelectStock = useCallback((id: number) => {
-    navigation.navigate('StockDetails', { stockId: id });
-  }, []);
+  const handleSelectStock = useCallback(
+    (id: number) => {
+      navigation.navigate('StockDetails', { stockId: id });
+    },
+    [navigation],
+  );
 
   const renderCard = useCallback(
-    ({ item }) => {
+    ({ item: { Action: item } }) => {
       return (
         <CardStock
           onPress={handleSelectStock}
@@ -45,19 +51,19 @@ const Stocks: FC<IProps> = () => {
         />
       );
     },
-    [items],
+    [handleSelectStock],
   );
 
-  const handleSearch = useCallback(
-    (value: string) => {
-      setItems(
-        data?.actions.filter((item: ActionType) =>
-          item.title.toLowerCase().includes(value.toLowerCase()),
-        ) || items,
-      );
-    },
-    [items],
-  );
+  // const handleSearch = useCallback(
+  //   (value: string) => {
+  //     setItems(
+  //       data?.actions.filter((item: ActionType) =>
+  //         item.title.toLowerCase().includes(value.toLowerCase()),
+  //       ) || items,
+  //     );
+  //   },
+  //   [items],
+  // );
 
   if (loading) {
     return (
@@ -79,7 +85,7 @@ const Stocks: FC<IProps> = () => {
           <FlatList
             data={items}
             renderItem={renderCard}
-            keyExtractor={(item: ActionType) => String(item.id)}
+            keyExtractor={({ Action: item }: any) => String(item.id)}
           />
         </ScrollView>
       </View>

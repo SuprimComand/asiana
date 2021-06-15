@@ -1,19 +1,14 @@
 import React, { FC, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ImageSourcePropType,
-} from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { COLORS } from '../constants';
 
 export interface IStockType {
   title: string;
-  body: string;
-  image: ImageSourcePropType;
+  content: string;
+  preview: string;
   id: number;
+  image_url: string;
 }
 
 interface IExternalProps extends IStockType {
@@ -25,10 +20,10 @@ interface IProps extends IExternalProps {}
 
 const CardStock: FC<IProps> = ({
   title,
-  body,
-  image,
+  preview,
   id,
   onPress,
+  image_url,
   customStyles,
 }) => {
   const handleClick = useCallback(() => {
@@ -43,10 +38,10 @@ const CardStock: FC<IProps> = ({
       onPress={handleClick}
       activeOpacity={0.8}>
       <View style={styles.container}>
-        <Image style={styles.image} source={{ uri: String(image) }} />
+        <Image style={styles.image} source={{ uri: String(image_url) }} />
         <View style={styles.content}>
           <Text style={styles.title}>{title}</Text>
-          <Text>{body}</Text>
+          <Text>{preview}</Text>
         </View>
       </View>
     </TouchableOpacity>

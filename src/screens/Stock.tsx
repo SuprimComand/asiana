@@ -1,6 +1,5 @@
-import { useQuery } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -9,7 +8,6 @@ import ErrorBoundry from '../components/ErrorBoundry';
 import HeaderProject from '../components/HeaderProject';
 import Loader from '../components/Loader';
 import { COLORS } from '../constants';
-import { GET_ACTION } from '../graph/queries/getAction';
 
 interface IExternalProps {
   route: any; // TODO: fix this
@@ -20,19 +18,33 @@ interface IProps extends IExternalProps {}
 const Stock: FC<IProps> = ({ route }) => {
   const navigation = useNavigation();
   const { stockId } = route.params;
-  const { data, error, loading } = useQuery(GET_ACTION, {
-    variables: {
-      id: stockId,
-    },
-  });
+
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<any>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(
+      `http://test-rest-api.site/api/1/mobile/action/${stockId}/get/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
+    )
+      .then((response) => response.json())
+      .then((dataRes) => {
+        setData(dataRes.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+      });
+  }, [setLoading, setData, stockId]);
 
   const onGoBack = useCallback(() => {
-    navigation.navigate('Stock');
-  }, []);
+    navigation.navigate('Stocks');
+  }, [navigation]);
 
   const handleClickSto = useCallback(() => {
     navigation.navigate('EntrySto');
-  }, []);
+  }, [navigation]);
 
   const renderContent = useCallback(() => {
     if (loading) {
@@ -53,20 +65,18 @@ const Stock: FC<IProps> = ({ route }) => {
           <View>
             <Image
               style={styles.image}
-              source={{ uri: String(data.action.image) }}
+              source={{ uri: String(data?.action?.image_url) }}
             />
             <View style={styles.dataContent}>
-              <Text style={styles.stockTitle}>{data.action.title}</Text>
-              <Text style={styles.text}>{data.action.body}</Text>
+              <Text style={styles.stockTitle}>{data?.title}</Text>
+              <Text style={styles.text}>{data?.content_text}</Text>
             </View>
           </View>
         </ScrollView>
-        {Boolean(data.action.button) && (
-          <Button onClick={handleClickSto} label="Записаться в СТО" />
-        )}
+        <Button onClick={handleClickSto} label="Записаться в СТО" />
       </View>
     );
-  }, [data, loading, error]);
+  }, [data, loading, error, handleClickSto]);
 
   return (
     <View style={styles.container}>
