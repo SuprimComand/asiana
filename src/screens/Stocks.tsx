@@ -42,12 +42,13 @@ const Stocks: FC<IProps> = () => {
   );
 
   const renderCard = useCallback(
-    ({ item: { Action: item } }) => {
+    ({ item }) => {
       return (
         <CardStock
           onPress={handleSelectStock}
           customStyles={styles.card}
-          {...item}
+          {...item?.Action}
+          item={item}
         />
       );
     },

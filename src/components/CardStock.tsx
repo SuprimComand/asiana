@@ -9,6 +9,7 @@ export interface IStockType {
   preview: string;
   id: number;
   image_url: string;
+  item: any;
 }
 
 interface IExternalProps extends IStockType {
@@ -25,6 +26,7 @@ const CardStock: FC<IProps> = ({
   onPress,
   image_url,
   customStyles,
+  item,
 }) => {
   const handleClick = useCallback(() => {
     if (onPress) {
@@ -38,7 +40,14 @@ const CardStock: FC<IProps> = ({
       onPress={handleClick}
       activeOpacity={0.8}>
       <View style={styles.container}>
-        <Image style={styles.image} source={{ uri: String(image_url) }} />
+        <Image
+          style={styles.image}
+          source={{
+            uri: item.image_url?.includes('http://')
+              ? item.image_url
+              : `http://${item.image_url}`,
+          }}
+        />
         <View style={styles.content}>
           <Text style={styles.title}>{title}</Text>
           <Text>{preview}</Text>

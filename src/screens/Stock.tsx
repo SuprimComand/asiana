@@ -65,7 +65,11 @@ const Stock: FC<IProps> = ({ route }) => {
           <View>
             <Image
               style={styles.image}
-              source={{ uri: String(data?.action?.image_url) }}
+              source={{
+                uri: data?.image_url?.includes('http://')
+                  ? data?.image_url
+                  : `http://${data?.image_url}`,
+              }}
             />
             <View style={styles.dataContent}>
               <Text style={styles.stockTitle}>{data?.title}</Text>
