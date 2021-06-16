@@ -16,18 +16,27 @@ interface IProps extends IExternalProps {}
 const Stocks: FC<IProps> = () => {
   const navigation = useNavigation();
   const [items, setItems] = useState<ActionType[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<any>(false);
+  const [error, setError] = useState('');
+
+  const request = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        'http://test-rest-api.site/api/1/mobile/action/list/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+      );
+
+      const data = await response.json();
+      setItems(data.data);
+    } catch (err: any) {
+      setError(JSON.stringify(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setLoading(true);
-    fetch(
-      'http://test-rest-api.site/api/1/mobile/action/list/?token=b4831f21df6202f5bacade4b7bbc3e5c',
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        setLoading(false);
-        setItems(data.data);
-      });
+    request();
   }, []);
 
   const onGoBack = useCallback(() => {
@@ -65,6 +74,10 @@ const Stocks: FC<IProps> = () => {
   //   },
   //   [items],
   // );
+
+  if (error) {
+    return <Text>Error: {error}</Text>;
+  }
 
   if (loading) {
     return (
