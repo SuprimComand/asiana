@@ -1,10 +1,11 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Dimensions,
   KeyboardAvoidingView,
+  BackHandler,
 } from 'react-native';
 import { COLORS } from '../constants';
 import Button from '../components/Button';
@@ -23,6 +24,21 @@ const Login: FC<IProps> = () => {
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
   const [hasFocus, setFocus] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
 
   const handleChangeNumber = useCallback((formatted: any, value?: string) => {
     setPhone(value || formatted);
@@ -54,7 +70,7 @@ const Login: FC<IProps> = () => {
   const disabled = !hasFocus && phone.length < 10;
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
+    <KeyboardAvoidingView style={styles.keyboard}>
       <View style={styles.container}>
         <View style={styles.form}>
           <Text style={styles.label}>Введите ваш номер телефона</Text>
@@ -91,6 +107,7 @@ const styles = StyleSheet.create({
   header: {
     justifyContent: 'center',
     flexDirection: 'row',
+    backgroundColor: 'red',
     height: '50%',
   },
   errorText: {
@@ -104,6 +121,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 20,
+    marginTop: 20,
+    height: Dimensions.get('screen').height / 2.5,
     width: Dimensions.get('screen').width,
   },
   keyboard: {

@@ -8563,6 +8563,11 @@ react-native-animated-loader@0.0.9:
   dependencies:
     prop-types "^15.6.2"
 
+react-native-async-storage@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-async-storage/-/react-native-async-storage-0.0.1.tgz#5f2ef5ff30eae64b4248e265b534e72ea41cdc69"
+  integrity sha1-Xy71/zDq5ktCSOJltTTnLqQc3Gk=
+
 react-native-auto-scroll@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/react-native-auto-scroll/-/react-native-auto-scroll-0.0.1.tgz#c645c375b29811af6e4740eda436f1b36aad8d50"

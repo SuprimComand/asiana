@@ -9,7 +9,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import StackNavigation from './src/navigations/stackNavigation';
 import configureApolloo from './src/configureApollo';
@@ -17,9 +17,10 @@ import { ApolloProvider, useMutation } from '@apollo/client';
 import { NotifierWrapper } from 'react-native-notifier';
 import ErrorBoundry from './src/components/ErrorBoundry';
 import PushNotification from 'react-native-push-notification';
-import { Platform, PushNotificationIOS } from 'react-native';
+import { BackHandler, Platform, PushNotificationIOS } from 'react-native';
 import { NotifierRoot } from 'react-native-notifier';
 import { CREATE_PUSH_TOKEN } from './src/graph/mutations/createPushToken';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export const client = configureApolloo();
 
@@ -27,7 +28,32 @@ const deviceId = DeviceInfo.getDeviceId();
 
 export const Notification = () => {
   const notifier = useRef<any>(null);
+
+  const navigation = useNavigation();
   const [createPushToken] = useMutation(CREATE_PUSH_TOKEN);
+
+  useEffect(() => {
+    const logout = async () => {
+      await AsyncStorage.removeItem('refresh');
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('phone');
+      navigation.navigate('Login');
+    };
+
+    const backAction = () => {
+      logout();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
 
   useEffect(() => {
     // PushNotification.localNotification({

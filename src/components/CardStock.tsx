@@ -24,7 +24,6 @@ const CardStock: FC<IProps> = ({
   preview,
   id,
   onPress,
-  image_url,
   customStyles,
   item,
 }) => {
@@ -43,9 +42,9 @@ const CardStock: FC<IProps> = ({
         <Image
           style={styles.image}
           source={{
-            uri: item.image_url?.includes('http://')
+            uri: item.image_url?.includes('https://')
               ? item.image_url
-              : `http://${item.image_url}`,
+              : `https://${item.image_url}`,
           }}
         />
         <View style={styles.content}>

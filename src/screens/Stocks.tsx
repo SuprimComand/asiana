@@ -8,6 +8,7 @@ import CardStock from '../components/CardStock';
 import { FlatList } from 'react-native-gesture-handler';
 import Loader from '../components/Loader';
 import { ActionType } from '../typings/graphql';
+import Button from '../components/Button';
 
 interface IExternalProps {}
 
@@ -23,7 +24,7 @@ const Stocks: FC<IProps> = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        'http://test-rest-api.site/api/1/mobile/action/list/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+        'https://test-rest-api.site/api/1/mobile/action/list/?token=b4831f21df6202f5bacade4b7bbc3e5c',
       );
 
       const data = await response.json();
@@ -37,10 +38,10 @@ const Stocks: FC<IProps> = () => {
 
   useEffect(() => {
     request();
-  }, []);
+  }, [navigation]);
 
   const onGoBack = useCallback(() => {
-    navigation.navigate('Stock');
+    navigation.navigate('Main');
   }, [navigation]);
 
   const handleSelectStock = useCallback(
@@ -95,6 +96,11 @@ const Stocks: FC<IProps> = () => {
         onPressLeftAction={onGoBack}
       />
       <View style={styles.content}>
+        <Button
+          onClick={request}
+          label="Обновить список"
+          customStyles={styles.updateButton}
+        />
         <ScrollView style={styles.dataContent}>
           <FlatList
             data={items}
@@ -112,6 +118,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  updateButton: {
+    marginBottom: 30,
   },
   card: {
     marginBottom: 20,

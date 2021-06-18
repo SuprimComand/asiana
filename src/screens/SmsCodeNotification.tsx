@@ -46,7 +46,9 @@ const SmsCodeNotification: FC<IProps> = () => {
   }, []);
 
   const handleChangeCode = useCallback((value: string) => {
-    if (value.length <= 4 || value.length < code.length) setCode(value);
+    if (value.length <= 4 || value.length < code.length) {
+      setCode(value);
+    }
   }, []);
 
   const handleSendCode = useCallback(async () => {
@@ -87,7 +89,7 @@ const SmsCodeNotification: FC<IProps> = () => {
   const errorStyle = hasError && { borderColor: COLORS.red };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={styles.keyboard}>
+    <KeyboardAvoidingView style={styles.keyboard}>
       <View style={styles.container}>
         <HeaderProject
           customStyles={styles.header}

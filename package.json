@@ -39,6 +39,7 @@
     "react": "16.13.1",
     "react-native": "0.63.4",
     "react-native-animated-loader": "0.0.9",
+    "react-native-async-storage": "^0.0.1",
     "react-native-auto-scroll": "^0.0.1",
     "react-native-datepicker": "^1.7.2",
     "react-native-device-info": "^8.0.0",

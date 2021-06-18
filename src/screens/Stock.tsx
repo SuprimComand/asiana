@@ -26,7 +26,7 @@ const Stock: FC<IProps> = ({ route }) => {
   useEffect(() => {
     setLoading(true);
     fetch(
-      `http://test-rest-api.site/api/1/mobile/action/${stockId}/get/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
+      `https://test-rest-api.site/api/1/mobile/action/${stockId}/get/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
     )
       .then((response) => response.json())
       .then((dataRes) => {
@@ -66,14 +66,16 @@ const Stock: FC<IProps> = ({ route }) => {
             <Image
               style={styles.image}
               source={{
-                uri: data?.image_url?.includes('http://')
+                uri: data?.image_url?.includes('https://')
                   ? data?.image_url
-                  : `http://${data?.image_url}`,
+                  : `https://${data?.image_url}`,
               }}
             />
             <View style={styles.dataContent}>
               <Text style={styles.stockTitle}>{data?.title}</Text>
-              <Text style={styles.text}>{data?.content_text}</Text>
+              <Text style={styles.text}>
+                {data?.content?.replace(/<\/?[a-zA-Z]+>/gi, '')}
+              </Text>
             </View>
           </View>
         </ScrollView>

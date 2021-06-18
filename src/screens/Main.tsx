@@ -199,7 +199,6 @@ const Main: FC<IProps> = () => {
     if (profileCarLoading) {
       return <Image style={styles.loadingRow} source={loadingCard} />;
     }
-    console.log(activeProfileCar, 'activeProfileCar');
 
     return (
       <View>
