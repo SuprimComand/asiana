@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  BackHandler,
 } from 'react-native';
 import HeaderProject from '../components/HeaderProject';
 import logo from '../assets/asiana-logotype.png';
@@ -34,7 +35,9 @@ import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 
 interface IExternalProps {}
 
-interface IProps extends IExternalProps {}
+interface IProps extends IExternalProps {
+  navigation: any;
+}
 
 const Main: FC<IProps> = () => {
   const [isOpenModal, setOpenModal] = useState(false);
@@ -73,6 +76,30 @@ const Main: FC<IProps> = () => {
   const profileCars: ProfileCarType[] = data?.profileCars || [];
   const activeProfileCar = profileCars.find((car) => Boolean(car.active));
   const withoutActiveProfileCar = profileCars.filter((car) => !car.active);
+  const routeNameRef = navigation.isFocused;
+
+  useEffect(() => {
+    const logout = async () => {
+      BackHandler.exitApp();
+    };
+
+    const backAction = () => {
+      if (routeNameRef()) {
+        logout();
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (profileCar) {

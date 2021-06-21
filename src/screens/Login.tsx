@@ -1,11 +1,10 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Dimensions,
   KeyboardAvoidingView,
-  BackHandler,
 } from 'react-native';
 import { COLORS } from '../constants';
 import Button from '../components/Button';
@@ -24,21 +23,6 @@ const Login: FC<IProps> = () => {
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
   const [hasFocus, setFocus] = useState(false);
-
-  useEffect(() => {
-    const backAction = () => {
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-
-    return () => {
-      backHandler.remove();
-    };
-  }, []);
 
   const handleChangeNumber = useCallback((formatted: any, value?: string) => {
     setPhone(value || formatted);

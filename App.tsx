@@ -29,31 +29,7 @@ const deviceId = DeviceInfo.getDeviceId();
 export const Notification = () => {
   const notifier = useRef<any>(null);
 
-  const navigation = useNavigation();
   const [createPushToken] = useMutation(CREATE_PUSH_TOKEN);
-
-  useEffect(() => {
-    const logout = async () => {
-      await AsyncStorage.removeItem('refresh');
-      await AsyncStorage.removeItem('token');
-      await AsyncStorage.removeItem('phone');
-      navigation.navigate('Login');
-    };
-
-    const backAction = () => {
-      logout();
-      return true;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-
-    return () => {
-      backHandler.remove();
-    };
-  }, []);
 
   useEffect(() => {
     // PushNotification.localNotification({
