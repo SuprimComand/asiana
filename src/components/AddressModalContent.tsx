@@ -5,7 +5,7 @@ import { AddressType } from '../typings/graphql';
 import Button from './Button';
 
 interface IExternalProps {
-  address?: AddressType | null;
+  address?: any | null;
   onPressSend?: () => void;
   onSubmit?: (address?: AddressType | null) => void;
   hideButton?: boolean;
@@ -27,7 +27,7 @@ const AddressModalContent: FC<IProps> = ({
             <View style={styles.address}>
               <Text style={styles.label}>Адрес</Text>
               <Text style={styles.value}>
-                {address?.address || 'Нет адреса'}
+                {address?.Location?.address || 'Нет адреса'}
               </Text>
             </View>
             <TouchableOpacity onPress={onPressSend} style={styles.sendButton}>
@@ -36,7 +36,9 @@ const AddressModalContent: FC<IProps> = ({
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Телефон</Text>
-            <Text style={styles.value}>{address?.phone || 'Нет телефона'}</Text>
+            <Text style={styles.value}>
+              {address?.Location?.phones || 'Нет телефона'}
+            </Text>
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Часы работы</Text>
@@ -44,7 +46,9 @@ const AddressModalContent: FC<IProps> = ({
           </View>
           <View style={styles.field}>
             <Text style={styles.label}>Email</Text>
-            <Text style={styles.value}>{address?.email || 'Нет имейла'}</Text>
+            <Text style={styles.value}>
+              {address?.Location?.email || 'Нет имейла'}
+            </Text>
           </View>
         </View>
       </View>

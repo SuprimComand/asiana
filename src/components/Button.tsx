@@ -44,13 +44,18 @@ const Button: FC<IProps> = ({
         { flexDirection: loading ? 'row' : 'column' },
       ]}
       onPress={onClick}>
-      <Text
-        style={[
-          styles.label,
-          { color: color || styles.label.color, marginRight: loading ? 10 : 0 },
-        ]}>
-        {String(label)}
-      </Text>
+      {Boolean(label) ? (
+        <Text
+          style={[
+            styles.label,
+            {
+              color: color || styles.label.color,
+              marginRight: loading ? 10 : 0,
+            },
+          ]}>
+          {String(label)}
+        </Text>
+      ) : null}
       {Boolean(loading) && <ActivityIndicator color={COLORS.white} />}
     </TouchableOpacity>
   );

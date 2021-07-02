@@ -98,28 +98,35 @@ const SmsCodeNotification: FC<IProps> = () => {
         />
         <View style={styles.form}>
           <Text style={styles.label}>Подтвердите код из SMS</Text>
-          <View style={styles.inputBlock}>
-            <FormField
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              autoFocus
-              customStyles={{ ...styles.formField, ...errorStyle }}
-              onChange={handleChangeCode}
-              mask="[0000]"
-              keyboardType="number-pad"
-              editable
+          <View style={styles.container_form}>
+            <View style={styles.inputBlock}>
+              <FormField
+                onFocus={handleFocus}
+                textContentType="oneTimeCode"
+                onBlur={handleBlur}
+                autoFocus
+                customStyles={{ ...styles.formField, ...errorStyle }}
+                onChange={handleChangeCode}
+                mask="[0000]"
+                keyboardType="number-pad"
+                editable
+              />
+              {Boolean(hasError) && (
+                <Text style={styles.errorText}>Не верный код</Text>
+              )}
+            </View>
+            <Button
+              customStyles={[
+                styles.button,
+                !disableSendButton ? styles.activeButton : {},
+                hasError ? styles.errorButton : {},
+              ]}
+              loading={loading}
+              disabled={disableSendButton}
+              label={loading ? '' : 'OK'}
+              onClick={handleSendCode}
             />
-            {Boolean(hasError) && (
-              <Text style={styles.errorText}>Не верный код</Text>
-            )}
           </View>
-          <Button
-            loading={loading}
-            disabled={disableSendButton}
-            customStyles={styles.button}
-            label="Подтвердить смс"
-            onClick={handleSendCode}
-          />
           {timer ? (
             <Text style={styles.timerText}>Отправить повторно.. {timer}</Text>
           ) : (
@@ -140,8 +147,20 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 20,
   },
+  errorButton: { top: 29 },
   formField: {
-    marginBottom: 20,
+    // width: Dimensions.get('screen').width - 120,
+  },
+  activeButton: { backgroundColor: '#048417' },
+  button: {
+    paddingHorizontal: 10,
+    minWidth: 55,
+    maxWidth: 65,
+    height: 40,
+    borderRadius: 6,
+    position: 'absolute',
+    backgroundColor: '#b5b5b5',
+    right: 20,
   },
   timerText: {
     color: COLORS.gray,
@@ -159,6 +178,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     alignContent: 'flex-start',
+    textAlign: 'center',
   },
   keyboard: {
     flex: 1,
@@ -175,8 +195,10 @@ const styles = StyleSheet.create({
   errorText: {
     color: COLORS.red,
   },
-  button: {
-    marginBottom: 10,
+  container_form: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
   },
   inputBlock: {
     marginBottom: 20,

@@ -14,6 +14,7 @@ import { COLORS } from '../constants';
 import Selecter, { SelecterItem } from './Selecter';
 
 interface IExternalProps {
+  textContentType?: any;
   editable?: boolean;
   onChange?: (event: any, value2?: any) => void;
   value?: string | Date;
@@ -23,6 +24,7 @@ interface IExternalProps {
   customTextStyle?: { [key: string]: string | number };
   listSelecter?: SelecterItem[];
   customStyles?: { [key: string]: string | number };
+  style?: { [key: string]: string | number };
   autoFocus?: boolean;
   keyboardType?: ReactNative.KeyboardTypeOptions;
   maxLength?: number;
@@ -49,8 +51,7 @@ const FormField: FC<IProps> = ({
   customTextStyle,
   listSelecter,
   autoFocus,
-  onFocus,
-  onBlur,
+  style,
   ...props
 }) => {
   const handleChange = (value: any, value2?: any) => {
@@ -62,11 +63,11 @@ const FormField: FC<IProps> = ({
       return (
         <TextInputMask
           keyboardType="number-pad"
-          style={[styles.input, styles.inputField]}
+          style={[styles.input, styles.inputField, customStyles, style]}
           value={String(value || '')}
           onChangeText={handleChange}
-          mask={'+7 ([000]) [000] [00] [00]'}
-          placeholder="+7 (___) ___ __ __"
+          mask={'([000]) [000] [00] [00]'}
+          placeholder="(___) ___ __ __"
           autoFocus={autoFocus}
           {...props}
         />
@@ -76,7 +77,7 @@ const FormField: FC<IProps> = ({
     if (type === 'date') {
       return (
         <DatePicker
-          style={[styles.input, styles.inputField]}
+          style={[styles.input, styles.inputField, customStyles, style]}
           date={value}
           mode="date"
           androidMode="spinner"
@@ -131,7 +132,8 @@ const FormField: FC<IProps> = ({
 
     return (
       <TextInputMask
-        style={[styles.input, styles.inputField]}
+        textContentType="oneTimeCode"
+        style={[styles.input, styles.inputField, customStyles, style]}
         value={String(value || '')}
         onChangeText={handleChange}
         autoFocus={autoFocus}

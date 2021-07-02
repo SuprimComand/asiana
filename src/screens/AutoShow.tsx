@@ -27,17 +27,26 @@ interface IProps extends IExternalProps {}
 
 const AutoShow: FC<IProps> = () => {
   const navigation = useNavigation();
-  const [address, setAddress] = useState<AddressType | null>(null);
+  const [address, setAddress] = useState<any>(null);
   const [toDrawCoordinates, setDrawCoordinates] = useState(false);
   const [currentPosition, setCurrentPosition] = useState<any>(null);
   const [isOpenModal, setOpenModal] = useState<boolean>(false);
-  const { data: addressesData } = useQuery(GET_ADDRESSES, {
-    variables: {
-      addressType: 'Автосалон',
-    },
-  });
-  const addresses: AddressType[] = addressesData?.addresses || [];
+  const [addressesData, setAddresses] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const addresses = Array.isArray(addressesData?.data)
+    ? addressesData.data
+    : [];
   const notifier = useRef<any>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(
+      'https://test-rest-api.site/api/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=dealer',
+    )
+      .then((response) => response.json())
+      .then((data) => setAddresses(data))
+      .finally(() => setLoading(false));
+  }, []);
 
   const requestPermissions = async () => {
     if (Platform.OS === 'ios') {
@@ -101,23 +110,24 @@ const AutoShow: FC<IProps> = () => {
   );
 
   const renderMarkers = useCallback(() => {
-    return addresses.map((item) => {
-      const coordinates = item.coordinates.split(',');
+    return addresses?.map(({ Location: item }: any) => {
       return (
         <Marker
           key={item.id}
           onPress={handleSelectAddress(item)}
           image={iconMarker}
           coordinate={{
-            latitude: Number(coordinates[0]),
-            longitude: Number(coordinates[1]),
+            latitude: Number(item.lat),
+            longitude: Number(item.lon),
           }}
         />
       );
     });
   }, [addresses]);
 
-  const addressCoordinates = address?.coordinates.split(',') || [];
+  const addressCoordinates = address?.Location
+    ? [Number(address.Location.lat), Number(address.Location.lon)]
+    : [];
 
   const handleSubmit = useCallback(() => {
     if (!address) {

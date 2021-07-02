@@ -1,10 +1,11 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Dimensions,
   KeyboardAvoidingView,
+  BackHandler,
 } from 'react-native';
 import { COLORS } from '../constants';
 import Button from '../components/Button';
@@ -23,6 +24,30 @@ const Login: FC<IProps> = () => {
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
   const [hasFocus, setFocus] = useState(false);
+  const routeNameRef = navigation.isFocused;
+
+  useEffect(() => {
+    const logout = async () => {
+      BackHandler.exitApp();
+    };
+
+    const backAction = () => {
+      if (routeNameRef()) {
+        logout();
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
 
   const handleChangeNumber = useCallback((formatted: any, value?: string) => {
     setPhone(value || formatted);
@@ -58,26 +83,37 @@ const Login: FC<IProps> = () => {
       <View style={styles.container}>
         <View style={styles.form}>
           <Text style={styles.label}>Введите ваш номер телефона</Text>
-          <View style={styles.inputBlock}>
-            <FormField
-              onFocus={handleFocus(true)}
-              onBlur={handleFocus(false)}
-              autoFocus
-              customStyles={styles.formField}
-              onChange={handleChangeNumber}
-              type="number"
-              editable
+          <View style={styles.container_form}>
+            <View style={styles.inputBlock}>
+              <FormField
+                onFocus={handleFocus(true)}
+                onBlur={handleFocus(false)}
+                autoFocus
+                style={{ paddingLeft: 35 }}
+                customStyles={styles.formField}
+                onChange={handleChangeNumber}
+                type="number"
+                editable
+              />
+              <View style={styles.phone}>
+                <Text style={styles.phone_text}>+7</Text>
+              </View>
+              {Boolean(hasError) && (
+                <Text style={styles.errorText}>Не валидный номер</Text>
+              )}
+            </View>
+            <Button
+              customStyles={[
+                styles.button,
+                !disabled ? styles.activeButton : {},
+                hasError ? styles.errorButton : {},
+              ]}
+              loading={loading}
+              disabled={disabled}
+              label={loading ? '' : 'OK'}
+              onClick={handleSubmit}
             />
-            {Boolean(hasError) && (
-              <Text style={styles.errorText}>Не валидный номер</Text>
-            )}
           </View>
-          <Button
-            loading={loading}
-            disabled={disabled}
-            label="Отправить код по смс"
-            onClick={handleSubmit}
-          />
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -86,7 +122,32 @@ const Login: FC<IProps> = () => {
 
 const styles = StyleSheet.create({
   formField: {
-    marginBottom: 20,
+    // width: Dimensions.get('screen').width - 120,
+  },
+  activeButton: { backgroundColor: '#048417' },
+  errorButton: { top: 29 },
+  button: {
+    paddingHorizontal: 10,
+    minWidth: 55,
+    maxWidth: 65,
+    height: 40,
+    borderRadius: 6,
+    position: 'absolute',
+    backgroundColor: '#b5b5b5',
+    right: 20,
+  },
+  phone_text: {
+    fontSize: 17,
+  },
+  phone: {
+    position: 'absolute',
+    left: 10,
+    top: 36,
+  },
+  container_form: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
   },
   header: {
     justifyContent: 'center',

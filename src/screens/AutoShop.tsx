@@ -29,15 +29,24 @@ const AutoShop: FC<IProps> = () => {
   const navigation = useNavigation();
   const [toDrawCoordinates, setDrawCoordinates] = useState(false);
   const [currentPosition, setCurrentPosition] = useState<any>(null);
-  const [address, setAddress] = useState<AddressType | null>(null);
+  const [address, setAddress] = useState<any>(null);
   const [isOpenModal, setOpenModal] = useState<boolean>(false);
-  const { data: addressesData } = useQuery(GET_ADDRESSES, {
-    variables: {
-      addressType: 'Магазин',
-    },
-  });
-  const addresses: AddressType[] = addressesData?.addresses || [];
+  const [addressesData, setAddresses] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const addresses = Array.isArray(addressesData?.data)
+    ? addressesData.data
+    : [];
   const notifier = useRef<any>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(
+      'https://test-rest-api.site/api/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=shop',
+    )
+      .then((response) => response.json())
+      .then((data) => setAddresses(data))
+      .finally(() => setLoading(false));
+  }, []);
 
   const onGoBach = useCallback(() => {
     navigation.goBack();
@@ -101,23 +110,25 @@ const AutoShop: FC<IProps> = () => {
   );
 
   const renderMarkers = useCallback(() => {
-    return addresses.map((item) => {
-      const coordinates = item.coordinates.split(',');
+    return addresses?.map((a: any) => {
+      const { Location: item } = a;
       return (
         <Marker
           key={item.id}
-          onPress={handleSelectAddress(item)}
+          onPress={handleSelectAddress(a)}
           image={iconMarker}
           coordinate={{
-            latitude: Number(coordinates[0]),
-            longitude: Number(coordinates[1]),
+            latitude: Number(item.lat),
+            longitude: Number(item.lon),
           }}
         />
       );
     });
   }, [addresses]);
 
-  const addressCoordinates = address?.coordinates.split(',') || [];
+  const addressCoordinates = address?.Location
+    ? [Number(address.Location.lat), Number(address.Location.lon)]
+    : [];
 
   const handleSubmit = useCallback(() => {
     if (!address) {
@@ -138,10 +149,10 @@ const AutoShop: FC<IProps> = () => {
         <MapView
           style={styles.map}
           region={{
-            latitude: 60,
-            longitude: 30.4,
+            latitude: 59.9386,
+            longitude: 30.3141,
             latitudeDelta: 0,
-            longitudeDelta: 0.6,
+            longitudeDelta: 5,
           }}>
           {renderMarkers()}
           {currentPosition && toDrawCoordinates && (
@@ -162,6 +173,7 @@ const AutoShop: FC<IProps> = () => {
           )}
         </MapView>
       </View>
+      {console.log(address)}
       <Modal
         defaultHeight="70%"
         isVisible={isOpenModal}
