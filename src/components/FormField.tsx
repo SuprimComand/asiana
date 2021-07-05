@@ -35,6 +35,8 @@ interface IExternalProps {
   underlineColorAndroid?: ColorValue;
   onFocus?: () => void;
   onBlur?: () => void;
+  onKeyPress?: (e: any) => void;
+  onSubmitEditing?: () => void;
 }
 
 interface IProps extends IExternalProps {}
@@ -52,6 +54,7 @@ const FormField: FC<IProps> = ({
   listSelecter,
   autoFocus,
   style,
+  onKeyPress,
   ...props
 }) => {
   const handleChange = (value: any, value2?: any) => {
@@ -66,9 +69,10 @@ const FormField: FC<IProps> = ({
           style={[styles.input, styles.inputField, customStyles, style]}
           value={String(value || '')}
           onChangeText={handleChange}
-          mask={'([000]) [000] [00] [00]'}
-          placeholder="(___) ___ __ __"
+          mask={'[000]) [000] [00] [00]'}
+          placeholder="___) ___ __ __"
           autoFocus={autoFocus}
+          onKeyPress={onKeyPress}
           {...props}
         />
       );
@@ -106,6 +110,7 @@ const FormField: FC<IProps> = ({
             },
           }}
           onDateChange={handleChange}
+          onKeyPress={onKeyPress}
           {...props}
         />
       );
@@ -125,6 +130,7 @@ const FormField: FC<IProps> = ({
           onChangeText={handleChange}
           autoFocus={autoFocus}
           placeholder={placeholder}
+          onKeyPress={onKeyPress}
           {...props}
         />
       );
@@ -137,6 +143,7 @@ const FormField: FC<IProps> = ({
         value={String(value || '')}
         onChangeText={handleChange}
         autoFocus={autoFocus}
+        onKeyPress={onKeyPress}
         {...props}
       />
     );

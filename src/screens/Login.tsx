@@ -90,13 +90,18 @@ const Login: FC<IProps> = () => {
                 onBlur={handleFocus(false)}
                 autoFocus
                 style={{ paddingLeft: 35 }}
+                mask={'[000]) [000] [00] [00]'}
+                placeholder="___) ___ __ __"
                 customStyles={styles.formField}
                 onChange={handleChangeNumber}
+                onSubmitEditing={handleSubmit}
                 type="number"
                 editable
               />
               <View style={styles.phone}>
-                <Text style={styles.phone_text}>+7</Text>
+                <Text style={styles.phone_text}>
+                  +7 <Text style={{ color: phone ? 'black' : 'gray' }}>(</Text>
+                </Text>
               </View>
               {Boolean(hasError) && (
                 <Text style={styles.errorText}>Не валидный номер</Text>
@@ -129,7 +134,7 @@ const styles = StyleSheet.create({
   button: {
     paddingHorizontal: 10,
     minWidth: 55,
-    maxWidth: 65,
+    maxWidth: 85,
     height: 40,
     borderRadius: 6,
     position: 'absolute',
@@ -141,8 +146,8 @@ const styles = StyleSheet.create({
   },
   phone: {
     position: 'absolute',
-    left: 10,
-    top: 36,
+    left: 6,
+    top: 35,
   },
   container_form: {
     flexDirection: 'row',

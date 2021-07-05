@@ -105,6 +105,7 @@ const SmsCodeNotification: FC<IProps> = () => {
                 textContentType="oneTimeCode"
                 onBlur={handleBlur}
                 autoFocus
+                onSubmitEditing={handleSendCode}
                 customStyles={{ ...styles.formField, ...errorStyle }}
                 onChange={handleChangeCode}
                 mask="[0000]"
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
   button: {
     paddingHorizontal: 10,
     minWidth: 55,
-    maxWidth: 65,
+    maxWidth: 85,
     height: 40,
     borderRadius: 6,
     position: 'absolute',
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
     paddingTop: 150,
   },
   label: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
     alignContent: 'flex-start',
