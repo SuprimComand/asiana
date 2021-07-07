@@ -6,6 +6,7 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   BackHandler,
+  CheckBox,
 } from 'react-native';
 import { COLORS } from '../constants';
 import Button from '../components/Button';
@@ -21,10 +22,13 @@ interface IProps extends IExternalProps {}
 const Login: FC<IProps> = () => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
+  const [isSelected, setSelection] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
   const [hasFocus, setFocus] = useState(false);
   const routeNameRef = navigation.isFocused;
+
+  const disabled = (!hasFocus && phone.length < 10) || !isSelected;
 
   useEffect(() => {
     const logout = async () => {
@@ -54,6 +58,9 @@ const Login: FC<IProps> = () => {
   }, []);
 
   const handleSubmit = useCallback(async () => {
+    if (disabled) {
+      return;
+    }
     setLoading(true);
     const status = await AuthService.login({ phone: `7${phone}` });
     setTimeout(() => setLoading(false), 1000);
@@ -65,7 +72,7 @@ const Login: FC<IProps> = () => {
     }
 
     setError(true);
-  }, [phone]);
+  }, [phone, disabled]);
 
   const handleFocus = useCallback(
     (status: boolean) => {
@@ -75,8 +82,6 @@ const Login: FC<IProps> = () => {
     },
     [hasFocus],
   );
-
-  const disabled = !hasFocus && phone.length < 10;
 
   return (
     <KeyboardAvoidingView style={styles.keyboard}>
@@ -106,19 +111,31 @@ const Login: FC<IProps> = () => {
               {Boolean(hasError) && (
                 <Text style={styles.errorText}>Не валидный номер</Text>
               )}
+              {!isSelected && phone.length < 10 && !hasError && (
+                <Text style={styles.errorText}>
+                  Для продолжения установки необходимо согласиться с политикой
+                  обработки персональных данных
+                </Text>
+              )}
             </View>
             <Button
               customStyles={[
                 styles.button,
                 !disabled ? styles.activeButton : {},
-                hasError ? styles.errorButton : {},
+                hasError && !isSelected ? styles.errorButton : {},
               ]}
               loading={loading}
-              disabled={disabled}
+              disabled={disabled || !isSelected}
               label={loading ? '' : 'OK'}
               onClick={handleSubmit}
             />
           </View>
+        </View>
+        <View style={styles.checkbox}>
+          <CheckBox value={isSelected} onValueChange={setSelection} />
+          <Text style={styles.labelCheckbox}>
+            Согласен на обработку персональных данных
+          </Text>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -129,6 +146,11 @@ const styles = StyleSheet.create({
   formField: {
     // width: Dimensions.get('screen').width - 120,
   },
+  checkbox: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  labelCheckbox: {},
   activeButton: { backgroundColor: '#048417' },
   errorButton: { top: 29 },
   button: {
@@ -202,6 +224,7 @@ const styles = StyleSheet.create({
   },
   inputBlock: {
     marginBottom: 20,
+    height: 80,
   },
   input: {
     width: Dimensions.get('screen').width - 40,
