@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthService } from '../services/AuthService';
 import AsyncStorage from '@react-native-community/async-storage';
 import FormField from '../components/FormField';
+import TextInputMask from 'react-native-text-input-mask';
 
 interface IExternalProps {}
 
@@ -54,6 +55,7 @@ const Login: FC<IProps> = () => {
   }, []);
 
   const handleChangeNumber = useCallback((formatted: any, value?: string) => {
+    console.log(value, formatted.currentTarget);
     setPhone(value || formatted);
   }, []);
 
@@ -82,7 +84,7 @@ const Login: FC<IProps> = () => {
     },
     [hasFocus],
   );
-
+  console.log(phone, 'phone');
   return (
     <KeyboardAvoidingView style={styles.keyboard}>
       <View style={styles.container}>
@@ -90,50 +92,56 @@ const Login: FC<IProps> = () => {
           <Text style={styles.label}>Введите ваш номер телефона</Text>
           <View style={styles.container_form}>
             <View style={styles.inputBlock}>
-              <View style={{ position: 'relative' }}>
-                <FormField
-                  onFocus={handleFocus(true)}
-                  onBlur={handleFocus(false)}
-                  autoFocus
-                  style={{ paddingLeft: 35 }}
-                  mask={'[000]) [000] [00] [00]'}
-                  placeholder="___) ___ __ __"
-                  customStyles={styles.formField}
-                  onChange={handleChangeNumber}
-                  onSubmitEditing={handleSubmit}
-                  type="number"
-                  editable
-                />
+              <View style={styles.container_input}>
                 <View style={styles.phone}>
                   <Text style={styles.phone_text}>
                     +7{' '}
                     <Text style={{ color: phone ? 'black' : 'gray' }}>(</Text>
                   </Text>
                 </View>
+                <TextInputMask
+                  onFocus={handleFocus(true)}
+                  onBlur={handleFocus(false)}
+                  autoFocus
+                  value={String(phone || '')}
+                  mask={'[000]) [000] [00] [00]'}
+                  placeholder="___) ___ __ __"
+                  style={styles.formField}
+                  onChangeText={(value: any, value2?: any) => {
+                    if (handleChangeNumber) {
+                      handleChangeNumber(value, value2);
+                    }
+                  }}
+                  onSubmitEditing={handleSubmit}
+                />
+                <Button
+                  customStyles={[
+                    styles.button,
+                    !disabled ? styles.activeButton : {},
+                    hasError ||
+                    (!isSelected && phone.length === 10 && !hasError)
+                      ? styles.errorButton
+                      : {},
+                  ]}
+                  loading={loading}
+                  disabled={disabled || !isSelected}
+                  label={loading ? '' : 'OK'}
+                  onClick={handleSubmit}
+                />
               </View>
-              {Boolean(hasError) && (
-                <Text style={styles.errorText}>Не валидный номер</Text>
-              )}
-              {!isSelected && phone.length === 10 && !hasError && (
-                <Text style={styles.errorText}>
-                  Для продолжения установки необходимо согласиться с политикой
-                  обработки персональных данных
-                </Text>
-              )}
             </View>
-            <Button
-              customStyles={[
-                styles.button,
-                !disabled ? styles.activeButton : {},
-                hasError || (!isSelected && phone.length === 10 && !hasError)
-                  ? styles.errorButton
-                  : {},
-              ]}
-              loading={loading}
-              disabled={disabled || !isSelected}
-              label={loading ? '' : 'OK'}
-              onClick={handleSubmit}
-            />
+          </View>
+          <View style={{ paddingLeft: 10 }}>
+            {Boolean(hasError) && (
+              <Text style={styles.errorText}>Не валидный номер</Text>
+            )}
+            {console.log(isSelected, phone)}
+            {!isSelected && phone.length === 10 && !hasError && (
+              <Text style={styles.errorText}>
+                Для продолжения установки необходимо согласиться с политикой
+                обработки персональных данных
+              </Text>
+            )}
           </View>
         </View>
         <View style={styles.checkbox}>
@@ -149,7 +157,24 @@ const Login: FC<IProps> = () => {
 const styles = StyleSheet.create({
   formField: {
     // width: Dimensions.get('screen').width - 120,
-    width: Dimensions.get('screen').width - 20,
+    width: '65%',
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    marginBottom: 0,
+    height: 50,
+    fontSize: 17,
+  },
+  container_input: {
+    width: Dimensions.get('screen').width - 40,
+    fontSize: 18,
+    borderRadius: 8,
+    backgroundColor: COLORS.bgColorLight,
+    textAlignVertical: 'top',
+    borderWidth: 1,
+    borderColor: COLORS.lightGray,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   checkbox: {
     alignItems: 'center',
@@ -163,19 +188,16 @@ const styles = StyleSheet.create({
     width: '20%',
     height: 40,
     borderRadius: 6,
-    position: 'absolute',
     backgroundColor: '#b5b5b5',
-    right: 10,
-    top: '29%',
   },
-  errorButton: { top: '29%' },
+  errorButton: {},
   phone_text: {
     fontSize: 17,
   },
   phone: {
-    position: 'absolute',
-    left: 6,
-    top: '44%',
+    paddingLeft: 10,
+    width: '15%',
+    maxWidth: 40,
   },
   container_form: {
     flexDirection: 'row',
@@ -186,7 +208,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
     backgroundColor: 'red',
-    height: '50%',
+    height: '30%',
   },
   errorText: {
     color: COLORS.red,
@@ -200,7 +222,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 20,
-    marginTop: 20,
+    marginTop: 10,
     height: Dimensions.get('screen').height / 2.5,
     width: Dimensions.get('screen').width,
   },
@@ -221,7 +243,7 @@ const styles = StyleSheet.create({
     height: '100%',
     alignItems: 'center',
     paddingTop: 150,
-    paddingBottom: 50,
+    paddingBottom: 120,
     justifyContent: 'center',
     backgroundColor: 'white',
   },
@@ -231,7 +253,7 @@ const styles = StyleSheet.create({
   },
   inputBlock: {
     marginBottom: 20,
-    height: 80,
+    height: 50,
   },
   input: {
     width: Dimensions.get('screen').width - 40,
