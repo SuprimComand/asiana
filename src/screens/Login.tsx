@@ -90,28 +90,31 @@ const Login: FC<IProps> = () => {
           <Text style={styles.label}>Введите ваш номер телефона</Text>
           <View style={styles.container_form}>
             <View style={styles.inputBlock}>
-              <FormField
-                onFocus={handleFocus(true)}
-                onBlur={handleFocus(false)}
-                autoFocus
-                style={{ paddingLeft: 35 }}
-                mask={'[000]) [000] [00] [00]'}
-                placeholder="___) ___ __ __"
-                customStyles={styles.formField}
-                onChange={handleChangeNumber}
-                onSubmitEditing={handleSubmit}
-                type="number"
-                editable
-              />
-              <View style={styles.phone}>
-                <Text style={styles.phone_text}>
-                  +7 <Text style={{ color: phone ? 'black' : 'gray' }}>(</Text>
-                </Text>
+              <View style={{ position: 'relative' }}>
+                <FormField
+                  onFocus={handleFocus(true)}
+                  onBlur={handleFocus(false)}
+                  autoFocus
+                  style={{ paddingLeft: 35 }}
+                  mask={'[000]) [000] [00] [00]'}
+                  placeholder="___) ___ __ __"
+                  customStyles={styles.formField}
+                  onChange={handleChangeNumber}
+                  onSubmitEditing={handleSubmit}
+                  type="number"
+                  editable
+                />
+                <View style={styles.phone}>
+                  <Text style={styles.phone_text}>
+                    +7{' '}
+                    <Text style={{ color: phone ? 'black' : 'gray' }}>(</Text>
+                  </Text>
+                </View>
               </View>
               {Boolean(hasError) && (
                 <Text style={styles.errorText}>Не валидный номер</Text>
               )}
-              {!isSelected && phone.length < 10 && !hasError && (
+              {!isSelected && phone.length === 10 && !hasError && (
                 <Text style={styles.errorText}>
                   Для продолжения установки необходимо согласиться с политикой
                   обработки персональных данных
@@ -122,7 +125,9 @@ const Login: FC<IProps> = () => {
               customStyles={[
                 styles.button,
                 !disabled ? styles.activeButton : {},
-                hasError && !isSelected ? styles.errorButton : {},
+                hasError || (!isSelected && phone.length === 10 && !hasError)
+                  ? styles.errorButton
+                  : {},
               ]}
               loading={loading}
               disabled={disabled || !isSelected}
@@ -133,9 +138,8 @@ const Login: FC<IProps> = () => {
         </View>
         <View style={styles.checkbox}>
           <CheckBox value={isSelected} onValueChange={setSelection} />
-          <Text style={styles.labelCheckbox}>
-            Согласен на обработку персональных данных
-          </Text>
+          <Text>Согласен на обработку</Text>
+          <Text> персональных данных</Text>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -145,31 +149,33 @@ const Login: FC<IProps> = () => {
 const styles = StyleSheet.create({
   formField: {
     // width: Dimensions.get('screen').width - 120,
+    width: Dimensions.get('screen').width - 20,
   },
   checkbox: {
     alignItems: 'center',
     flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   labelCheckbox: {},
   activeButton: { backgroundColor: '#048417' },
-  errorButton: { top: 29 },
   button: {
     paddingHorizontal: 10,
-    minWidth: 55,
-    maxWidth: 85,
+    width: '20%',
     height: 40,
     borderRadius: 6,
     position: 'absolute',
     backgroundColor: '#b5b5b5',
-    right: 20,
+    right: 10,
+    top: '29%',
   },
+  errorButton: { top: '29%' },
   phone_text: {
     fontSize: 17,
   },
   phone: {
     position: 'absolute',
     left: 6,
-    top: 35,
+    top: '44%',
   },
   container_form: {
     flexDirection: 'row',
@@ -184,6 +190,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: COLORS.red,
+    paddingRight: 5,
   },
   title: {
     color: COLORS.black,
