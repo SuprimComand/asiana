@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   BackHandler,
   CheckBox,
+  Alert,
 } from 'react-native';
 import { COLORS } from '../constants';
 import Button from '../components/Button';
@@ -23,13 +24,13 @@ interface IProps extends IExternalProps {}
 const Login: FC<IProps> = () => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
-  const [isSelected, setSelection] = useState(false);
+  const [isSelected, setSelection] = useState(true);
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
   const [hasFocus, setFocus] = useState(false);
   const routeNameRef = navigation.isFocused;
 
-  const disabled = (!hasFocus && phone.length < 10) || !isSelected;
+  const disabled = phone.length < 10 || !isSelected;
 
   useEffect(() => {
     const logout = async () => {
@@ -55,7 +56,6 @@ const Login: FC<IProps> = () => {
   }, []);
 
   const handleChangeNumber = useCallback((formatted: any, value?: string) => {
-    console.log(value, formatted.currentTarget);
     setPhone(value || formatted);
   }, []);
 
@@ -84,7 +84,27 @@ const Login: FC<IProps> = () => {
     },
     [hasFocus],
   );
-  console.log(phone, 'phone');
+
+  const notification = () =>
+    Alert.alert(
+      '',
+      'Для продолжения установки необходимо согласиться с политикой обработки персональных данных',
+      [
+        {
+          text: 'Отмена',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        { text: 'Да', onPress: () => setSelection(true) },
+      ],
+    );
+
+  useEffect(() => {
+    if (!isSelected && phone.length === 10 && !hasError) {
+      notification();
+    }
+  }, [isSelected, phone, hasError]);
+
   return (
     <KeyboardAvoidingView style={styles.keyboard}>
       <View style={styles.container}>
@@ -135,19 +155,12 @@ const Login: FC<IProps> = () => {
             {Boolean(hasError) && (
               <Text style={styles.errorText}>Не валидный номер</Text>
             )}
-            {console.log(isSelected, phone)}
-            {!isSelected && phone.length === 10 && !hasError && (
-              <Text style={styles.errorText}>
-                Для продолжения установки необходимо согласиться с политикой
-                обработки персональных данных
-              </Text>
-            )}
           </View>
-        </View>
-        <View style={styles.checkbox}>
-          <CheckBox value={isSelected} onValueChange={setSelection} />
-          <Text>Согласен на обработку</Text>
-          <Text> персональных данных</Text>
+          <View style={styles.checkbox}>
+            <CheckBox value={isSelected} onValueChange={setSelection} />
+            <Text>Согласен на обработку</Text>
+            <Text> персональных данных</Text>
+          </View>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -196,8 +209,7 @@ const styles = StyleSheet.create({
   },
   phone: {
     paddingLeft: 10,
-    width: '15%',
-    maxWidth: 40,
+    width: '12.3%',
   },
   container_form: {
     flexDirection: 'row',
