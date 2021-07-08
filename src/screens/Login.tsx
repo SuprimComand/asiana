@@ -209,7 +209,6 @@ const styles = StyleSheet.create({
   },
   phone: {
     paddingLeft: 10,
-    width: '12.3%',
   },
   container_form: {
     flexDirection: 'row',

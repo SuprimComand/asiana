@@ -23,13 +23,17 @@ const HeaderProject: FC<IProps> = ({
 }) => {
   return (
     <View style={[styles.container, customStyles]}>
-      <TouchableOpacity style={styles.button} onPress={onPressLeftAction}>
-        {leftIcon}
-      </TouchableOpacity>
+      {leftIcon && (
+        <TouchableOpacity style={styles.button} onPress={onPressLeftAction}>
+          {leftIcon}
+        </TouchableOpacity>
+      )}
       <View style={styles.content}>{content}</View>
-      <TouchableOpacity style={styles.button} onPress={onPressRightAction}>
-        {rightIcon}
-      </TouchableOpacity>
+      {rightIcon && (
+        <TouchableOpacity style={styles.button} onPress={onPressRightAction}>
+          {rightIcon}
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

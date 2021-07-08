@@ -8,6 +8,7 @@ import {
   FlatList,
   ScrollView,
   BackHandler,
+  Alert,
 } from 'react-native';
 import HeaderProject from '../components/HeaderProject';
 import logo from '../assets/asiana-logotype.png';
@@ -32,6 +33,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { GET_REQUEST_STO } from '../graph/queries/getRequestSto';
 import moment from 'moment';
 import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
+import Button from '../components/Button';
 
 interface IExternalProps {}
 
@@ -77,6 +79,22 @@ const Main: FC<IProps> = () => {
   const activeProfileCar = profileCars.find((car) => Boolean(car.active));
   const withoutActiveProfileCar = profileCars.filter((car) => !car.active);
   const routeNameRef = navigation.isFocused;
+
+  const notification = () =>
+    Alert.alert(
+      '',
+      'Для продолжения установки необходимо согласиться с политикой обработки персональных данных',
+      [
+        {
+          text: 'OK',
+          onPress: () => navigation.navigate('User'),
+        },
+      ],
+    );
+
+  useEffect(() => {
+    notification();
+  }, []);
 
   useEffect(() => {
     const logout = async () => {
@@ -260,10 +278,73 @@ const Main: FC<IProps> = () => {
 
   return (
     <View style={styles.container}>
-      <HeaderProject content={<Image source={logo} />} />
+      <HeaderProject
+        customStyles={{ paddingHorizontal: 0, width: '100%' }}
+        content={
+          <View style={styles.header}>
+            <Image source={logo} />
+          </View>
+        }
+      />
       <ScrollView>
         <View style={styles.content}>
-          <View style={[styles.cardBlock, { marginBottom: 20 }]}>
+          <View style={styles.infoContainer}>
+            <Text style={styles.title}>Ваша скидка:</Text>
+            <Text>действительна при налиции стикера</Text>
+            <View style={styles.row}>
+              <Text style={styles.orange}>- 10% </Text>
+              <Text>на услуги наших СТО</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.orange}>- 7% </Text>
+              <Text>на покупку автозапчастей</Text>
+            </View>
+            <View style={styles.getInfoBlock}>
+              <TouchableOpacity style={styles.getInfoButton}>
+                <Text style={styles.getInfoLabel}>ПОДРОБНЕЕ</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={[styles.infoContainer, styles.infoContainerGray]}>
+            <Text style={styles.title}>Ваши автомобили:</Text>
+            <Text>KIA</Text>
+            <Text>SORENTO</Text>
+            <Text>e 555 cx</Text>
+            <View style={styles.getInfoBlockCenter}>
+              <TouchableOpacity>
+                <Text style={styles.getInfoLink}>
+                  выбрать другой автомобиль
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <Text style={styles.title}>Последнее посещение СТО:</Text>
+            <Text style={{ marginBottom: 10 }}>24.06.2021 г.</Text>
+            <Text style={styles.title}>Пробег:</Text>
+            <Text>81242 км</Text>
+          </View>
+
+          <View style={[styles.infoContainer, styles.infoContainerGray]}>
+            <Text style={styles.title}>Наши рекомендации:</Text>
+            <Text style={{ fontSize: 8 }}>
+              Замена передних колодок, обслуживание передних суппортов, замена
+              катушки зажигания 3 цилиндра, замена свечей зажигания
+            </Text>
+            <View style={styles.getInfoBlockCenter}>
+              <TouchableOpacity>
+                <Text style={styles.getInfoLink}>посмотреть полностью</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={[styles.getInfoBlockCenter, { marginVertical: 10 }]}>
+            <Button customStyles={styles.button} label="ЗАПИСАТЬСЯ НА СЕРВИС" />
+          </View>
+
+          {/* <View style={[styles.cardBlock, { marginBottom: 20 }]}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>Бонусный счёт</Text>
             </View>
@@ -292,7 +373,7 @@ const Main: FC<IProps> = () => {
               />
             )}
           </View>
-          {renderRequestSto()}
+          {renderRequestSto()} */}
         </View>
       </ScrollView>
       <Modal onCancel={handleCloseModal} isVisible={isOpenModal}>
@@ -320,13 +401,57 @@ const Main: FC<IProps> = () => {
 };
 
 const styles = StyleSheet.create({
+  button: {
+    backgroundColor: COLORS.darkOrange,
+    borderRadius: 6,
+  },
+  infoContainerGray: {
+    backgroundColor: COLORS.lightGray,
+  },
+  infoContainer: {
+    paddingLeft: 30,
+    paddingVertical: 15,
+  },
+  getInfoLink: {
+    color: COLORS.darkOrange,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.darkOrange,
+  },
+  getInfoBlockCenter: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  getInfoBlock: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingRight: 30,
+  },
+  getInfoButton: {
+    backgroundColor: COLORS.darkOrange,
+    padding: 3,
+    marginTop: 10,
+    paddingHorizontal: 10,
+  },
+  getInfoLabel: {
+    color: COLORS.white,
+    fontSize: 10,
+  },
   requestStoCard: {
     marginBottom: 10,
+  },
+  header: {
+    backgroundColor: 'orange',
+    width: '100%',
+    alignItems: 'center',
+    padding: 15,
   },
   containerLoading: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  row: {
+    flexDirection: 'row',
   },
   loadingRow: {
     width: 100,
@@ -367,7 +492,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.white,
-    paddingTop: 40,
+    // paddingTop: 40,
+  },
+  orange: {
+    color: COLORS.darkOrange,
+    fontWeight: 'bold',
   },
   cardTitle: {
     fontWeight: 'bold',
@@ -379,8 +508,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    // paddingHorizontal: 20,
+    // paddingTop: 20,
+    paddingTop: 10,
   },
 });
 
