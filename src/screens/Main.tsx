@@ -290,14 +290,14 @@ const Main: FC<IProps> = () => {
         <View style={styles.content}>
           <View style={styles.infoContainer}>
             <Text style={styles.title}>Ваша скидка:</Text>
-            <Text>действительна при налиции стикера</Text>
+            <Text style={styles.text}>действительна при налиции стикера</Text>
             <View style={styles.row}>
               <Text style={styles.orange}>- 10% </Text>
-              <Text>на услуги наших СТО</Text>
+              <Text style={styles.text}>на услуги наших СТО</Text>
             </View>
             <View style={styles.row}>
               <Text style={styles.orange}>- 7% </Text>
-              <Text>на покупку автозапчастей</Text>
+              <Text style={styles.text}>на покупку автозапчастей</Text>
             </View>
             <View style={styles.getInfoBlock}>
               <TouchableOpacity style={styles.getInfoButton}>
@@ -308,9 +308,9 @@ const Main: FC<IProps> = () => {
 
           <View style={[styles.infoContainer, styles.infoContainerGray]}>
             <Text style={styles.title}>Ваши автомобили:</Text>
-            <Text>KIA</Text>
-            <Text>SORENTO</Text>
-            <Text>e 555 cx</Text>
+            <Text style={styles.text}>KIA</Text>
+            <Text style={styles.text}>SORENTO</Text>
+            <Text style={styles.text}>e 555 cx</Text>
             <View style={styles.getInfoBlockCenter}>
               <TouchableOpacity>
                 <Text style={styles.getInfoLink}>
@@ -322,14 +322,16 @@ const Main: FC<IProps> = () => {
 
           <View style={styles.infoContainer}>
             <Text style={styles.title}>Последнее посещение СТО:</Text>
-            <Text style={{ marginBottom: 10 }}>24.06.2021 г.</Text>
+            <Text style={[styles.text, { marginBottom: 10 }]}>
+              24.06.2021 г.
+            </Text>
             <Text style={styles.title}>Пробег:</Text>
-            <Text>81242 км</Text>
+            <Text style={styles.text}>81242 км</Text>
           </View>
 
           <View style={[styles.infoContainer, styles.infoContainerGray]}>
             <Text style={styles.title}>Наши рекомендации:</Text>
-            <Text style={{ fontSize: 8 }}>
+            <Text style={[styles.text, { fontSize: 8 }]}>
               Замена передних колодок, обслуживание передних суппортов, замена
               катушки зажигания 3 цилиндра, замена свечей зажигания
             </Text>
@@ -411,11 +413,16 @@ const styles = StyleSheet.create({
   infoContainer: {
     paddingLeft: 30,
     paddingVertical: 15,
+    fontFamily: 'gotham',
+  },
+  text: {
+    fontFamily: 'gotham',
   },
   getInfoLink: {
     color: COLORS.darkOrange,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.darkOrange,
+    fontFamily: 'gothambookitalic',
   },
   getInfoBlockCenter: {
     flexDirection: 'row',
@@ -435,6 +442,7 @@ const styles = StyleSheet.create({
   getInfoLabel: {
     color: COLORS.white,
     fontSize: 10,
+    fontFamily: 'gotham',
   },
   requestStoCard: {
     marginBottom: 10,
@@ -475,6 +483,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 4,
     fontWeight: 'bold',
+    fontFamily: 'gothammedium.ttf',
   },
   subTitle: {
     color: COLORS['gray-200'],
