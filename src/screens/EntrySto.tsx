@@ -6,7 +6,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  CheckBox,
+  ScrollView,
+} from 'react-native';
 import HeaderProject from '../components/HeaderProject';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { COLORS } from '../constants';
@@ -39,6 +46,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [profileId] = useAsyncStorage('profileId');
   const [date, setDate] = useState<any>(new Date());
   const [workKind, setWorkKind] = useState('');
+  const [isSelected, setSelection] = useState(false);
   const [
     createRequest,
     { loading: loadingCreateRequest, data: createSto },
@@ -138,41 +146,104 @@ const EntrySto: FC<IProps> = ({ route }) => {
       <NotifierRoot ref={notifier} />
       <HeaderProject
         leftIcon={<Icon size={28} name="arrowleft" color={COLORS.darkOrange} />}
-        content={<Text style={styles.title}>Запись в СТО</Text>}
+        content={<Text style={styles.title}>Запись на сервис</Text>}
         onPressLeftAction={onGoBack}
       />
       <View style={styles.content}>
-        <View>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
-              {car.brand || 'Нет авто'} {car.model}
-            </Text>
-            <Text style={styles.subTitle}>
-              {car.complectation || 'Нет комплектации'}
-            </Text>
+        <ScrollView style={styles.scroll}>
+          <View style={[styles.infoContainer, styles.infoContainerGray]}>
+            <Text style={styles.titleMin}>Ваши автомобили:</Text>
+            <Text style={styles.text}>KIA</Text>
+            <Text style={styles.text}>SORENTO</Text>
+            <Text style={styles.text}>e 555 cx</Text>
+            <View style={styles.getInfoBlockCenter}>
+              <TouchableOpacity>
+                <Text style={styles.getInfoLink}>
+                  выбрать другой автомобиль
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <FormField
-            type="date"
-            placeholder="Date"
-            onChange={handleChangeDate}
-            dateFormat="hh:mm DD.MM.YYYY"
-            editable
-            value={date}
-          />
-          <FormField
-            customStyles={styles.formField}
-            type="text"
-            placeholder="Укажите вид работ"
-            editable
-            onChange={setWorkKind}
-            value={workKind}
-          />
-          <Dropdown
-            onSelect={handleSelectAddress}
-            selectedValue={address}
-            list={addressesList}
-          />
-        </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.titleMin}>Выбрать услугу:</Text>
+            <View style={styles.checkboxContainer}>
+              <CheckBox
+                value={isSelected}
+                onValueChange={setSelection}
+                style={styles.checkbox}
+              />
+              <Text style={styles.label}>Пройти регламентное ТО</Text>
+            </View>
+            <View style={styles.checkboxContainer}>
+              <CheckBox
+                value={isSelected}
+                onValueChange={setSelection}
+                style={styles.checkbox}
+              />
+              <Text style={styles.label}>Замена масла</Text>
+            </View>
+            <View style={styles.checkboxContainer}>
+              <CheckBox
+                value={isSelected}
+                onValueChange={setSelection}
+                style={styles.checkbox}
+              />
+              <Text style={styles.label}>Диагностика</Text>
+            </View>
+            <View style={styles.checkboxContainer}>
+              <CheckBox
+                value={isSelected}
+                onValueChange={setSelection}
+                style={styles.checkbox}
+              />
+              <Text style={styles.label}>Шиномонтаж</Text>
+            </View>
+            <View style={styles.checkboxContainer}>
+              <CheckBox
+                value={isSelected}
+                onValueChange={setSelection}
+                style={styles.checkbox}
+              />
+              <Text style={styles.label}>Другое</Text>
+            </View>
+          </View>
+          <View style={{ paddingBottom: 20 }}>
+            {/* <View style={styles.card}>
+              <Text style={styles.cardTitle}>
+                {car.brand || 'Нет авто'} {car.model}
+              </Text>
+              <Text style={styles.subTitle}>
+                {car.complectation || 'Нет комплектации'}
+              </Text>
+            </View> */}
+            <FormField
+              type="date"
+              label="Выбрать желаемое время и дату"
+              placeholder="Date"
+              customStyles={{ marginBottom: 10 }}
+              onChange={handleChangeDate}
+              dateFormat="hh:mm DD.MM.YYYY"
+              editable
+              value={date}
+            />
+            <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
+              Выбрать автосервис
+            </Text>
+            {/* <FormField
+              customStyles={styles.formField}
+              type="text"
+              placeholder="Укажите вид работ"
+              editable
+              onChange={setWorkKind}
+              value={workKind}
+            /> */}
+            <Dropdown
+              onSelect={handleSelectAddress}
+              selectedValue={address}
+              list={addressesList}
+            />
+          </View>
+        </ScrollView>
         <Button onClick={handleSubmit} label="Отправить" />
       </View>
     </View>
@@ -180,10 +251,51 @@ const EntrySto: FC<IProps> = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  scroll: {
+    paddingBottom: 20,
+  },
   containerLoading: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  checkbox: {
+    alignSelf: 'center',
+  },
+  label: {
+    alignSelf: 'center',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    marginLeft: -6,
+  },
+  titleMin: {
+    fontSize: 16,
+    marginBottom: 4,
+    fontWeight: 'bold',
+    fontFamily: 'gothammedium.ttf',
+  },
+  getInfoLink: {
+    color: COLORS.darkOrange,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.darkOrange,
+    fontFamily: 'gothambookitalic',
+  },
+  getInfoBlockCenter: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  text: {
+    fontFamily: 'gotham',
+  },
+  infoContainer: {
+    paddingLeft: 23,
+    paddingVertical: 15,
+    fontFamily: 'gotham',
+    marginBottom: 10,
+  },
+  infoContainerGray: {
+    backgroundColor: COLORS.lightGray,
   },
   formField: {
     marginBottom: 23,

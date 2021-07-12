@@ -80,39 +80,42 @@ const FormField: FC<IProps> = ({
 
     if (type === 'date') {
       return (
-        <DatePicker
-          style={[styles.input, styles.inputField, customStyles, style]}
-          date={value}
-          mode="date"
-          androidMode="spinner"
-          placeholder={placeholder}
-          format={dateFormat || 'YYYY.MM.DD'}
-          // minDate="2016-05-01"
-          // maxDate="2016-06-01"
-          confirmBtnText="Confirm"
-          cancelBtnText="Cancel"
-          customStyles={{
-            dateIcon: {
-              position: 'absolute',
-              right: 0,
-              top: -3,
-              marginLeft: 0,
-            },
-            dateInput: {
-              width: '100%',
-              marginTop: -15,
-              alignItems: 'flex-start',
-              marginLeft: -5,
-              borderColor: COLORS.transparent,
-            },
-            dateText: {
-              fontSize: 18,
-            },
-          }}
-          onDateChange={handleChange}
-          onKeyPress={onKeyPress}
-          {...props}
-        />
+        <>
+          {/* <Text style={styles.titleMin}>Выбрать желаемое время и дату</Text> */}
+          <DatePicker
+            style={[styles.input, styles.inputField, customStyles, style]}
+            date={value}
+            mode="date"
+            androidMode="spinner"
+            placeholder={placeholder}
+            format={dateFormat || 'YYYY.MM.DD'}
+            // minDate="2016-05-01"
+            // maxDate="2016-06-01"
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            customStyles={{
+              dateIcon: {
+                position: 'absolute',
+                right: 0,
+                top: -3,
+                marginLeft: 0,
+              },
+              dateInput: {
+                width: '100%',
+                marginTop: -15,
+                alignItems: 'flex-start',
+                marginLeft: -5,
+                borderColor: COLORS.transparent,
+              },
+              dateText: {
+                fontSize: 18,
+              },
+            }}
+            onDateChange={handleChange}
+            onKeyPress={onKeyPress}
+            {...props}
+          />
+        </>
       );
     }
 
@@ -159,7 +162,7 @@ const FormField: FC<IProps> = ({
 
   return (
     <View style={[styles.field, customStyles]}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.titleMin}>{label}</Text>
       {render()}
     </View>
   );
@@ -186,6 +189,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.lightGray,
     paddingLeft: 20,
+  },
+  titleMin: {
+    fontSize: 16,
+    marginBottom: 4,
+    fontWeight: 'bold',
+    fontFamily: 'gothammedium.ttf',
+    paddingLeft: 25,
   },
   text: {
     fontSize: 18,
