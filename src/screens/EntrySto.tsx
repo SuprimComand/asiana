@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   View,
   Text,
@@ -13,7 +14,10 @@ import {
   TouchableOpacity,
   CheckBox,
   ScrollView,
+  Platform,
+  FlatList,
 } from 'react-native';
+import Modal from '../components/Modal';
 import HeaderProject from '../components/HeaderProject';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { COLORS } from '../constants';
@@ -30,6 +34,9 @@ import { GET_ADDRESSES } from '../graph/queries/getAddresses';
 import { GET_PROFILE_CAR } from '../graph/queries/getProfileCar';
 import Loader from '../components/Loader';
 import { ProfileCarMock } from '../typings/profileCarMock';
+import CarItem from '../components/CarItem';
+import AsyncStorage from '@react-native-community/async-storage';
+import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
 
 interface IExternalProps {
   route: any;
@@ -46,21 +53,51 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [profileId] = useAsyncStorage('profileId');
   const [date, setDate] = useState<any>(new Date());
   const [workKind, setWorkKind] = useState('');
-  const [isSelected, setSelection] = useState(false);
+  const [other, setOther] = useState(false);
+  const [enterTO, setTO] = useState(false);
+  const [oilChange, setOil] = useState(false);
+  const [diagnostics, setDiagnostics] = useState(false);
+  const [tireService, setTireService] = useState(false);
+  const [show, setShow] = useState(false);
   const [
     createRequest,
     { loading: loadingCreateRequest, data: createSto },
   ] = useMutation(CREATE_REQUEST_STO);
+  const [
+    updateProfileCar,
+    { loading: profileCarLoading, data: profileCar },
+  ] = useMutation(UPDATE_PROFILE_CAR);
   const { data: cars, loading } = useQuery(GET_PROFILE_CAR, {
     variables: { profileId: Number(profileId) },
     skip: !profileId,
   });
   const { data: addressesData } = useQuery(GET_ADDRESSES);
+  const [time, setTime] = useState(new Date(1598051730000));
   const addresses: AddressType[] = addressesData?.addresses || [];
+  const [isOpenList, setOpenList] = useState(false);
   const carsArr = cars?.profileCars || [];
   const car =
     carsArr.find((car: ProfileCarType) => car.active)?.car || ProfileCarMock;
   const notifier = useRef<any>(null);
+  const withoutActiveProfileCar = carsArr.filter((car: any) => !car.active);
+  const [locations, setLocations] = useState<any>([]);
+  const [location, setLocation] = useState<any>(null);
+
+  useEffect(() => {
+    fetch(
+      'https://test-rest-api.site/api/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+    )
+      .then((response) => response.json())
+      .then((data) =>
+        setLocations(
+          data.data.map((item: any) => ({
+            ...item.Location,
+            label: item.Location.address,
+            value: item.Location.id,
+          })),
+        ),
+      );
+  }, []);
 
   useEffect(() => {
     if (createSto) {
@@ -106,6 +143,39 @@ const EntrySto: FC<IProps> = ({ route }) => {
     },
     [address],
   );
+
+  const handleChangeActiveCar = useCallback(
+    (id: ProfileCarType['id']) => {
+      return () => {
+        AsyncStorage.setItem('carId', id);
+        updateProfileCar({
+          variables: {
+            id,
+            input: {
+              active: 1,
+            },
+          },
+          refetchQueries: ['profileCars'],
+        });
+      };
+    },
+    [updateProfileCar],
+  );
+
+  const renderAutoCard = useCallback(
+    ({ item }) => {
+      return <CarItem {...item.car} onPress={handleChangeActiveCar(item.id)} />;
+    },
+    [isOpenList],
+  );
+
+  const renderRegion = ({ item }: any) => {
+    return (
+      <View>
+        <Text>{item.label}</Text>
+      </View>
+    );
+  };
 
   const handleSubmit = () => {
     if (!address) {
@@ -153,55 +223,73 @@ const EntrySto: FC<IProps> = ({ route }) => {
         <ScrollView style={styles.scroll}>
           <View style={[styles.infoContainer, styles.infoContainerGray]}>
             <Text style={styles.titleMin}>Ваши автомобили:</Text>
-            <Text style={styles.text}>KIA</Text>
-            <Text style={styles.text}>SORENTO</Text>
-            <Text style={styles.text}>e 555 cx</Text>
+            {car.brand ? <Text style={styles.text}>{car.brand}</Text> : null}
+            {car.model ? <Text style={styles.text}>{car.model}</Text> : null}
+            <Text style={styles.text}>
+              {car.complectation || 'Нет комплектации'}
+            </Text>
             <View style={styles.getInfoBlockCenter}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => setOpenList(true)}>
                 <Text style={styles.getInfoLink}>
                   выбрать другой автомобиль
                 </Text>
               </TouchableOpacity>
             </View>
+            <Modal
+              defaultHeight={200}
+              onCancel={() => setOpenList(false)}
+              isVisible={Boolean(isOpenList)}>
+              {withoutActiveProfileCar?.length ? (
+                <View>
+                  <FlatList
+                    data={withoutActiveProfileCar}
+                    renderItem={renderAutoCard}
+                  />
+                  <Button label="Указать автомобиль не из списка" />
+                </View>
+              ) : (
+                <Text>Нет данных о машинах</Text>
+              )}
+            </Modal>
           </View>
           <View style={styles.infoContainer}>
             <Text style={styles.titleMin}>Выбрать услугу:</Text>
             <View style={styles.checkboxContainer}>
               <CheckBox
-                value={isSelected}
-                onValueChange={setSelection}
+                value={enterTO}
+                onValueChange={setTO}
                 style={styles.checkbox}
               />
               <Text style={styles.label}>Пройти регламентное ТО</Text>
             </View>
             <View style={styles.checkboxContainer}>
               <CheckBox
-                value={isSelected}
-                onValueChange={setSelection}
+                value={oilChange}
+                onValueChange={setOil}
                 style={styles.checkbox}
               />
               <Text style={styles.label}>Замена масла</Text>
             </View>
             <View style={styles.checkboxContainer}>
               <CheckBox
-                value={isSelected}
-                onValueChange={setSelection}
+                value={diagnostics}
+                onValueChange={setDiagnostics}
                 style={styles.checkbox}
               />
               <Text style={styles.label}>Диагностика</Text>
             </View>
             <View style={styles.checkboxContainer}>
               <CheckBox
-                value={isSelected}
-                onValueChange={setSelection}
+                value={tireService}
+                onValueChange={setTireService}
                 style={styles.checkbox}
               />
               <Text style={styles.label}>Шиномонтаж</Text>
             </View>
             <View style={styles.checkboxContainer}>
               <CheckBox
-                value={isSelected}
-                onValueChange={setSelection}
+                value={other}
+                onValueChange={setOther}
                 style={styles.checkbox}
               />
               <Text style={styles.label}>Другое</Text>
@@ -222,11 +310,55 @@ const EntrySto: FC<IProps> = ({ route }) => {
               placeholder="Date"
               customStyles={{ marginBottom: 10 }}
               onChange={handleChangeDate}
-              dateFormat="hh:mm DD.MM.YYYY"
+              dateFormat="DD.MM.YYYY"
               editable
               value={date}
             />
+            <View
+              style={{
+                flexDirection: 'row',
+                marginBottom: 10,
+                alignItems: 'center',
+                paddingLeft: 25,
+              }}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: 'tomato',
+                  padding: 10,
+                  marginRight: 10,
+                }}
+                onPress={() => setShow(true)}>
+                <Text style={{ color: 'white' }}>Выбрать время</Text>
+              </TouchableOpacity>
+              <Text style={{ color: 'blue', fontSize: 20 }}>
+                {String(
+                  new Date(time).getHours() + ':' + new Date(time).getMinutes(),
+                )}
+              </Text>
+            </View>
+            {show && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode="time"
+                is24Hour={true}
+                onChange={(event: any, selectedDate: any) => {
+                  const currentDate = selectedDate || date;
+                  setShow(Platform.OS === 'ios');
+                  setTime(currentDate);
+                }}
+              />
+            )}
             <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
+              Выбрать регион
+            </Text>
+            <Dropdown
+              onSelect={(id: any) => setLocation(id)}
+              selectedValue={location}
+              list={locations}
+            />
+            {console.log(locations)}
+            <Text style={[styles.titleMin, { paddingLeft: 25, marginTop: 10 }]}>
               Выбрать автосервис
             </Text>
             {/* <FormField
