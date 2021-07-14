@@ -85,15 +85,15 @@ const EntrySto: FC<IProps> = ({ route }) => {
 
   useEffect(() => {
     fetch(
-      'https://test-rest-api.site/api/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+      'https://test-rest-api.site/api/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c',
     )
       .then((response) => response.json())
       .then((data) =>
         setLocations(
           data.data.map((item: any) => ({
-            ...item.Location,
-            label: item.Location.address,
-            value: item.Location.id,
+            ...item.City,
+            label: item.City.name,
+            value: item.City.id,
           })),
         ),
       );
