@@ -1,5 +1,11 @@
 import React, { FC } from 'react';
-import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Modal from 'react-native-modal';
 import { COLORS } from '../constants';
 import handle from '../assets/handle.png';
@@ -27,13 +33,20 @@ const ModalComponent: FC<IProps> = ({
 
   return (
     <Modal
+      onBackdropPress={onCancel}
       onSwipeComplete={onCancel}
       deviceWidth={deviceWidth}
       deviceHeight={deviceHeight}
       swipeDirection={swipeDirection || 'down'}
       isVisible={isVisible}
       style={styles.modal}
-      customBackdrop={<View style={styles.customBackdrop} />}>
+      customBackdrop={
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={onCancel}
+          style={styles.customBackdrop}
+        />
+      }>
       <View style={[styles.content, style]}>
         <View style={styles.header}>
           <Image source={handle} />

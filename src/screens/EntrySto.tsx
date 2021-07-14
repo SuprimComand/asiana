@@ -82,8 +82,16 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const withoutActiveProfileCar = carsArr.filter((car: any) => !car.active);
   const [locations, setLocations] = useState<any>([]);
   const [location, setLocation] = useState<any>(null);
+  const [isOpenAny, setOpenAny] = useState(false);
+  const [customService, setCustomService] = useState('');
 
   const [addressesList, setAddresses] = useState<any>([]);
+
+  useEffect(() => {
+    if (other) {
+      setOpenAny(true);
+    }
+  }, [other]);
 
   useEffect(() => {
     fetch(
@@ -95,6 +103,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
       .then((data) => {
         if (!data.data) {
           setAddresses([]);
+          return;
         }
         setAddresses(
           data.data.map((item: any) => ({
@@ -111,15 +120,19 @@ const EntrySto: FC<IProps> = ({ route }) => {
       'https://test-rest-api.site/api/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c',
     )
       .then((response) => response.json())
-      .then((data) =>
+      .then((data) => {
+        if (!data.data) {
+          setLocations([]);
+          return;
+        }
         setLocations(
-          data.data.map((item: any) => ({
+          data.data?.map((item: any) => ({
             ...item.City,
             label: item.City.name,
             value: item.City.id,
           })),
-        ),
-      );
+        );
+      });
   }, []);
 
   useEffect(() => {
@@ -246,6 +259,24 @@ const EntrySto: FC<IProps> = ({ route }) => {
             </View>
             <Modal
               defaultHeight={200}
+              onCancel={() => setOpenAny(false)}
+              isVisible={isOpenAny}>
+              <FormField
+                placeholder="Название услуги"
+                labelStyles={{ paddingLeft: 0 }}
+                customStyles={{ marginBottom: 10 }}
+                editable
+                label="Введите услугу"
+                onChange={(text) => setCustomService(text)}
+              />
+              <Button
+                onClick={() => setOpenAny(false)}
+                disabled={!customService}
+                label="Сохранить"
+              />
+            </Modal>
+            <Modal
+              defaultHeight={200}
               onCancel={() => setOpenList(false)}
               isVisible={Boolean(isOpenList)}>
               {withoutActiveProfileCar?.length ? (
@@ -366,23 +397,28 @@ const EntrySto: FC<IProps> = ({ route }) => {
               selectedValue={location}
               list={locations}
             />
-            {console.log(locations)}
-            <Text style={[styles.titleMin, { paddingLeft: 25, marginTop: 10 }]}>
-              Выбрать автосервис
-            </Text>
-            {/* <FormField
-              customStyles={styles.formField}
-              type="text"
-              placeholder="Укажите вид работ"
-              editable
-              onChange={setWorkKind}
-              value={workKind}
-            /> */}
-            <Dropdown
-              onSelect={handleSelectAddress}
-              selectedValue={address}
-              list={addressesList}
-            />
+            {location ? (
+              Boolean(addressesList.length) ? (
+                <>
+                  <Text
+                    style={[
+                      styles.titleMin,
+                      { paddingLeft: 25, marginTop: 10 },
+                    ]}>
+                    Выбрать автосервис
+                  </Text>
+                  <Dropdown
+                    onSelect={handleSelectAddress}
+                    selectedValue={address || addressesList[0]?.label}
+                    list={addressesList}
+                  />
+                </>
+              ) : (
+                <Text style={{ color: 'tomato', marginTop: 10 }}>
+                  В данном регионе не найдено поддразделений
+                </Text>
+              )
+            ) : null}
           </View>
         </ScrollView>
         <Button onClick={handleSubmit} label="Отправить" />
