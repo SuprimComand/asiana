@@ -1,4 +1,11 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+} from 'react';
 // @ts-ignore
 import AutoScroll from 'react-native-auto-scroll';
 import {
@@ -17,9 +24,12 @@ import { useNavigation } from '@react-navigation/native';
 import { NotifierRoot } from 'react-native-notifier';
 import FormField from '../components/FormField';
 import { CREATE_REVIEW } from '../graph/mutations/createReview';
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useAsyncStorage } from '../hooks/asyncStorage';
 import Loader from '../components/Loader';
+import Dropdown from '../components/Dropdown';
+import { GET_ADDRESSES } from '../graph/queries/getAddresses';
+import { AddressType } from '../typings/graphql';
 
 interface IExternalProps {}
 
@@ -27,12 +37,53 @@ interface IProps extends IExternalProps {}
 
 const Feedback: FC<IProps> = () => {
   const navigation = useNavigation();
+  const [address, setAddress] = useState<any>(0);
   const [starCount, setStarCount] = useState(0);
   const [date, setDate] = useState<any>(new Date());
   const [feedback, setFeedback] = useState('');
   const [userId] = useAsyncStorage('userId');
   const [createReview, { data, loading }] = useMutation(CREATE_REVIEW);
   const notifier = useRef<any>(null);
+  const [locations, setLocations] = useState<any>([]);
+  const [location, setLocation] = useState<any>(null);
+  const [addressesList, setAddresses] = useState<any>([]);
+
+  useEffect(() => {
+    fetch(
+      `https://test-rest-api.site/api/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=sto${
+        location ? `&city_id=${location}` : ''
+      }`,
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.data) {
+          setAddresses([]);
+        }
+        setAddresses(
+          data.data.map((item: any) => ({
+            ...item.Location,
+            label: item.Location.address,
+            value: item.Location.id,
+          })),
+        );
+      });
+  }, [location]);
+
+  useEffect(() => {
+    fetch(
+      'https://test-rest-api.site/api/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+    )
+      .then((response) => response.json())
+      .then((data) =>
+        setLocations(
+          data.data.map((item: any) => ({
+            ...item.City,
+            label: item.City.name,
+            value: item.City.id,
+          })),
+        ),
+      );
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -54,6 +105,13 @@ const Feedback: FC<IProps> = () => {
       setStarCount(count);
     },
     [setStarCount, starCount],
+  );
+
+  const handleSelectAddress = useCallback(
+    (id) => {
+      setAddress(id);
+    },
+    [address],
   );
 
   const handleChangeFeedback = useCallback(
@@ -110,7 +168,7 @@ const Feedback: FC<IProps> = () => {
             <Icon size={28} name="arrowleft" color={COLORS.darkOrange} />
           }
           onPressLeftAction={onGoBach}
-          content={<Text style={styles.title}>Отзыв</Text>}
+          content={<Text style={styles.title}>МОИ ОБРАЩЕНИЯ</Text>}
         />
         <View style={[styles.content, styles.flexContent]}>
           <View>
@@ -118,38 +176,78 @@ const Feedback: FC<IProps> = () => {
               Оставьте, пожалуйста, отзыв о посещении автосервиса Кореаны
             </Text>
             <View style={styles.form}>
-              <StarRating
-                starStyle={{ marginHorizontal: 5 }}
-                containerStyle={{ marginBottom: 15 }}
-                emptyStarColor={COLORS.orange}
-                disabled={false}
-                maxStars={5}
-                rating={starCount}
-                selectedStar={handleChangeRating}
-                fullStarColor={COLORS.orange}
-              />
-              <FormField
+              {/* <FormField
                 editable
                 placeholder="Date"
                 dateFormat="hh:mm DD.MM.YYYY"
                 type="date"
                 value={date}
                 onChange={handleChangeDate}
-              />
+              /> */}
               <View style={styles.inputBlock}>
                 <FormField
+                  labelStyles={styles.titleMin}
+                  label="ОСТАВЬТЕ ПОЖАЛУЙСТА ОТЗЫВ О ВАШЕМ ВИЗИТЕ"
                   editable
                   multiline
                   numberOfLines={6}
                   placeholder="Отзыв"
                   type="text"
+                  maxLength={255}
                   value={feedback}
                   onChange={handleChangeFeedback}
                   underlineColorAndroid={COLORS.transparent}
                 />
               </View>
+              <Text style={styles.titleMin}>ВЫБЕРИТЕ РЕГИОН</Text>
+              <Dropdown
+                onSelect={(id: any) => setLocation(id)}
+                selectedValue={location}
+                list={locations}
+              />
+              <Text style={[styles.titleMin, { marginTop: 10 }]}>
+                ПОДРАЗДЕЛЕНИЕ О КОТОРОМ ОСТАВЛЕН ОТЗЫВ
+              </Text>
+              {/* <FormField
+                customStyles={styles.formField}
+                type="text"
+                placeholder="Укажите вид работ"
+                editable
+                onChange={setWorkKind}
+                value={workKind}
+              /> */}
+              <Dropdown
+                onSelect={handleSelectAddress}
+                selectedValue={address}
+                list={addressesList}
+              />
+
+              <View
+                style={{
+                  marginTop: 50,
+                  marginBottom: 20,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  width: '100%',
+                }}>
+                <View style={{ alignItems: 'center', width: '100%' }}>
+                  <Text style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                    ОЦЕНКА УРОВНЯ СЕРВИСА
+                  </Text>
+                  <StarRating
+                    starStyle={{ marginHorizontal: 5 }}
+                    containerStyle={{ marginBottom: 15 }}
+                    emptyStarColor={COLORS.orange}
+                    disabled={false}
+                    maxStars={5}
+                    rating={starCount}
+                    selectedStar={handleChangeRating}
+                    fullStarColor={COLORS.orange}
+                  />
+                </View>
+              </View>
+              <Button onClick={handleCreateReview} label="Отправить" />
             </View>
-            <Button onClick={handleCreateReview} label="Отправить" />
           </View>
         </View>
       </AutoScroll>
@@ -183,6 +281,13 @@ const styles = StyleSheet.create({
   subtitle: {
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  titleMin: {
+    fontSize: 10,
+    marginBottom: 4,
+    fontWeight: 'bold',
+    paddingLeft: 0,
+    fontFamily: 'gothammedium.ttf',
   },
   content: {
     paddingTop: 30,

@@ -37,6 +37,7 @@ interface IExternalProps {
   onBlur?: () => void;
   onKeyPress?: (e: any) => void;
   onSubmitEditing?: () => void;
+  labelStyles?: any;
 }
 
 interface IProps extends IExternalProps {}
@@ -54,6 +55,7 @@ const FormField: FC<IProps> = ({
   listSelecter,
   autoFocus,
   style,
+  labelStyles,
   onKeyPress,
   ...props
 }) => {
@@ -162,7 +164,7 @@ const FormField: FC<IProps> = ({
 
   return (
     <View style={[styles.field, customStyles]}>
-      <Text style={styles.titleMin}>{label}</Text>
+      <Text style={[styles.titleMin, labelStyles]}>{label}</Text>
       {render()}
     </View>
   );

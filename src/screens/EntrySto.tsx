@@ -83,6 +83,29 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [locations, setLocations] = useState<any>([]);
   const [location, setLocation] = useState<any>(null);
 
+  const [addressesList, setAddresses] = useState<any>([]);
+
+  useEffect(() => {
+    fetch(
+      `https://test-rest-api.site/api/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=sto${
+        location ? `&city_id=${location}` : ''
+      }`,
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.data) {
+          setAddresses([]);
+        }
+        setAddresses(
+          data.data.map((item: any) => ({
+            ...item.Location,
+            label: item.Location.address,
+            value: item.Location.id,
+          })),
+        );
+      });
+  }, [location]);
+
   useEffect(() => {
     fetch(
       'https://test-rest-api.site/api/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c',
@@ -122,20 +145,6 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const handleChangeDate = useCallback((_: string, value: string) => {
     setDate(value);
   }, []);
-
-  const addressesList = useMemo(() => {
-    if (!Array.isArray(addresses)) {
-      return [];
-    }
-
-    return addresses
-      .map((item: AddressType) => ({
-        ...item,
-        label: item.address,
-        value: String(item.id),
-      }))
-      .filter((item) => item.type === 'СТО');
-  }, [addresses]);
 
   const handleSelectAddress = useCallback(
     (id) => {
