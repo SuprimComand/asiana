@@ -84,7 +84,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [location, setLocation] = useState<any>(null);
   const [isOpenAny, setOpenAny] = useState(false);
   const [customService, setCustomService] = useState('');
-
+  const [secondCustomService, setSecondCustomService] = useState('');
   const [addressesList, setAddresses] = useState<any>([]);
 
   useEffect(() => {
@@ -262,13 +262,30 @@ const EntrySto: FC<IProps> = ({ route }) => {
               onCancel={() => setOpenAny(false)}
               isVisible={isOpenAny}>
               <FormField
+                type="text"
+                autoFocus
                 placeholder="Название услуги"
                 labelStyles={{ paddingLeft: 0 }}
                 customStyles={{ marginBottom: 10 }}
                 editable
+                numberOfLines={2}
+                multiline
+                maxLength={50}
+                value={customService}
                 label="Введите услугу"
                 onChange={(text) => setCustomService(text)}
               />
+              {/* <FormField
+                type="text"
+                maxLength={50}
+                placeholder="Второе поле"
+                labelStyles={{ paddingLeft: 0 }}
+                customStyles={{ marginBottom: 10 }}
+                editable
+                value={secondCustomService}
+                label="Второе поле"
+                onChange={setSecondCustomService}
+              /> */}
               <Button
                 onClick={() => setOpenAny(false)}
                 disabled={!customService}
@@ -332,7 +349,10 @@ const EntrySto: FC<IProps> = ({ route }) => {
                 onValueChange={setOther}
                 style={styles.checkbox}
               />
-              <Text style={styles.label}>Другое</Text>
+              <Text style={styles.label}>
+                Другое ({customService.split('').slice(0, 10).join('')}
+                {customService.length > 10 ? '...' : ''})
+              </Text>
             </View>
           </View>
           <View style={{ paddingBottom: 20 }}>
