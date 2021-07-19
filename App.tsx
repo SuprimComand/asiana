@@ -21,6 +21,7 @@ import { BackHandler, Platform, PushNotificationIOS } from 'react-native';
 import { NotifierRoot } from 'react-native-notifier';
 import { CREATE_PUSH_TOKEN } from './src/graph/mutations/createPushToken';
 import AsyncStorage from '@react-native-community/async-storage';
+import { NativeBaseProvider } from 'native-base';
 
 export const client = configureApolloo();
 
@@ -102,9 +103,11 @@ class App extends React.Component {
     return (
       <ApolloProvider client={client}>
         <NotifierWrapper>
-          <NavigationContainer>
-            <StackNavigation />
-          </NavigationContainer>
+          <NativeBaseProvider>
+            <NavigationContainer>
+              <StackNavigation />
+            </NavigationContainer>
+          </NativeBaseProvider>
         </NotifierWrapper>
       </ApolloProvider>
     );
