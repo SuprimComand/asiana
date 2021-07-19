@@ -9,6 +9,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { useMutation, useQuery } from '@apollo/client';
 import Button from '../components/Button';
@@ -26,10 +27,9 @@ import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 import { GET_ADDRESSES } from '../graph/queries/getAddresses';
 import { AddressType, ProfileType } from '../typings/graphql';
 import { AuthService } from '../services/AuthService';
-import { Box } from 'native-base';
+import { Box, Modal as ModalNative } from 'native-base';
 import Modal from '../components/Modal';
 import TextInputMask from 'react-native-text-input-mask';
-import { textAlign } from 'styled-system';
 
 interface IExternalProps {}
 
@@ -73,6 +73,24 @@ const User: FC<IProps> = () => {
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [locations, setLocations] = useState<any>([]);
   const [location, setLocation] = useState<any>(null);
+  const [sliders, setSliders] = useState<any>([
+    {
+      id: 1,
+      title: 'Автомабиль',
+      subtitle: 'AUDI A6',
+      content: 'H 553 PO 178',
+    },
+    {
+      id: 2,
+      title: 'Автомабиль',
+      subtitle: 'AUDI A6',
+      content: 'H 553 PO 178',
+    },
+    {
+      id: 3,
+      addButton: true,
+    },
+  ]);
 
   useEffect(() => {
     fetch(
@@ -286,6 +304,12 @@ const User: FC<IProps> = () => {
           <View style={{ alignItems: 'center' }}>
             <Text>АВТОМОБИЛЬ KIA RIO</Text>
             <Button
+              onClick={() => {
+                setOpenDetail(false);
+                setSliders(
+                  sliders.filter((item: any) => item.id !== isOpenDetail),
+                );
+              }}
               label="Удалить"
               customStyles={{
                 width: 100,
@@ -297,8 +321,20 @@ const User: FC<IProps> = () => {
           </View>
         </View>
       </Modal>
-      <Modal isVisible={isOpenAddModal} onCancel={() => setOpenAddModal(false)}>
-        <View>
+      <ModalNative
+        isOpen={isOpenAddModal}
+        onClose={() => setOpenAddModal(false)}>
+        <ModalNative.Content
+          style={{
+            backgroundColor: 'white',
+            height: Dimensions.get('screen').height - 400,
+            padding: 20,
+            width: Dimensions.get('screen').width - 20,
+            borderRadius: 6,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ModalNative.CloseButton />
           <View style={{ flexDirection: 'row' }}>
             <TextInputMask
               style={{
@@ -342,75 +378,56 @@ const User: FC<IProps> = () => {
               }}
             />
           </View>
-        </View>
-      </Modal>
+        </ModalNative.Content>
+      </ModalNative>
       <View style={styles.content}>
         <ScrollView>
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal>
-            <Box
-              bg="white"
-              style={{ margin: 8, marginLeft: 20, padding: 6 }}
-              shadow={2}
-              rounded="lg">
-              <TouchableOpacity
-                onPress={() => setOpenDetail(true)}
-                style={{ height: '100%' }}>
-                <Text>Автомабиль</Text>
-                <Text style={{ fontWeight: 'bold' }}>AUDI A6</Text>
-                <Text style={{ fontWeight: 'bold' }}>H 553 PO 178</Text>
-              </TouchableOpacity>
-            </Box>
-            <Box
-              bg="white"
-              style={{ margin: 8, padding: 6 }}
-              shadow={2}
-              rounded="lg">
-              <TouchableOpacity
-                onPress={() => setOpenDetail(true)}
-                style={{ height: '100%' }}>
-                <Text>Автомабиль</Text>
-                <Text style={{ fontWeight: 'bold' }}>AUDI A6</Text>
-                <Text style={{ fontWeight: 'bold' }}>H 553 PO 178</Text>
-              </TouchableOpacity>
-            </Box>
-            <Box
-              bg="white"
-              style={{ margin: 8, padding: 6 }}
-              shadow={2}
-              rounded="lg">
-              <TouchableOpacity
-                onPress={() => setOpenDetail(true)}
-                style={{ height: '100%' }}>
-                <Text>Автомабиль</Text>
-                <Text style={{ fontWeight: 'bold' }}>AUDI A6</Text>
-                <Text style={{ fontWeight: 'bold' }}>H 553 PO 178</Text>
-              </TouchableOpacity>
-            </Box>
-            <Box
-              bg="white"
-              style={{ margin: 8, marginRight: 20, padding: 6 }}
-              shadow={2}
-              rounded="lg">
-              <TouchableOpacity
-                onPress={() => setOpenDetail(true)}
-                style={{ height: '100%' }}>
-                <Text>Автомабиль</Text>
-                <Text style={{ fontWeight: 'bold' }}>AUDI A6</Text>
-                <Text style={{ fontWeight: 'bold' }}>H 553 PO 178</Text>
-              </TouchableOpacity>
-            </Box>
-            <Box
-              bg="white"
-              style={{ margin: 8, marginRight: 20, padding: 6 }}
-              shadow={2}
-              rounded="lg">
-              <TouchableOpacity
-                style={{ height: '100%', justifyContent: 'center' }}
-                onPress={() => setOpenAddModal(true)}>
-                <Text style={{ color: 'blue' }}>Добавить автомобиль</Text>
-              </TouchableOpacity>
-            </Box>
-          </ScrollView>
+          <Carousel
+            data={sliders}
+            renderItem={({ item }: any) => {
+              if (item.addButton) {
+                return (
+                  <Box
+                    bg="white"
+                    style={{
+                      margin: 8,
+                      marginRight: 20,
+                      padding: 6,
+                      height: 80,
+                    }}
+                    shadow={2}
+                    rounded="lg">
+                    <TouchableOpacity
+                      style={{ height: '100%', justifyContent: 'center' }}
+                      onPress={() => setOpenAddModal(item.id)}>
+                      <Text style={{ color: 'blue', textAlign: 'center' }}>
+                        Добавить автомобиль
+                      </Text>
+                    </TouchableOpacity>
+                  </Box>
+                );
+              }
+
+              return (
+                <Box
+                  bg="white"
+                  width={Dimensions.get('screen').width - 100}
+                  style={{ marginVertical: 8, padding: 10 }}
+                  shadow={2}
+                  rounded="lg">
+                  <TouchableOpacity
+                    onPress={() => setOpenDetail(item.id)}
+                    style={{ height: '100%' }}>
+                    <Text>{item.title}</Text>
+                    <Text style={{ fontWeight: 'bold' }}>{item.subtitle}</Text>
+                    <Text style={{ fontWeight: 'bold' }}>{item.content}</Text>
+                  </TouchableOpacity>
+                </Box>
+              );
+            }}
+            sliderWidth={Dimensions.get('screen').width}
+            itemWidth={Dimensions.get('screen').width - 100}
+          />
           <View style={styles.field}>
             <View style={[styles.form, styleForm]}>
               <View style={styles.flex}>
@@ -504,16 +521,7 @@ const User: FC<IProps> = () => {
 
 const styles = StyleSheet.create({
   card: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    marginRight: 10,
-    elevation: 1,
-    padding: 5,
+    width: Dimensions.get('screen').width - 100,
   },
   formField: {
     width: Dimensions.get('screen').width - 40,
