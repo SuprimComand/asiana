@@ -30,6 +30,7 @@ import { AuthService } from '../services/AuthService';
 import { Box, Modal as ModalNative } from 'native-base';
 import Modal from '../components/Modal';
 import TextInputMask from 'react-native-text-input-mask';
+import AsyncStorage from '@react-native-community/async-storage';
 
 interface IExternalProps {}
 
@@ -91,6 +92,18 @@ const User: FC<IProps> = () => {
       addButton: true,
     },
   ]);
+
+  useEffect(() => {
+    (async () => {
+      const phone = await AsyncStorage.getItem('phone');
+      if (phone && !user.phone) {
+        setUser({
+          ...user,
+          number: phone,
+        });
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     fetch(
@@ -343,7 +356,7 @@ const User: FC<IProps> = () => {
                 borderRadius: 5,
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
-                width: 80,
+                width: 100,
                 textAlign: 'center',
               }}
               // style={[styles.input, styles.inputField, customStyles, style]}
@@ -428,8 +441,28 @@ const User: FC<IProps> = () => {
             sliderWidth={Dimensions.get('screen').width}
             itemWidth={Dimensions.get('screen').width - 100}
           />
-          <View style={styles.field}>
+          <View style={[styles.field, { marginTop: 10 }]}>
             <View style={[styles.form, styleForm]}>
+              <TextInputMask
+                autoFocus
+                value={user.number}
+                mask={'+7 ([000]) [000] [00] [00]'}
+                placeholder="(___) ___ __ __"
+                style={styles.formField}
+                onChangeText={(value: any, value2?: any) => {
+                  handleChangeForm('number')(value2 || value);
+                }}
+                onSubmitEditing={handleSubmit}
+              />
+              <Text
+                style={[styles.titleMin, { marginLeft: 40, marginTop: 10 }]}>
+                Выбрать регион
+              </Text>
+              <Dropdown
+                onSelect={(id: any) => setLocation(id)}
+                selectedValue={location}
+                list={locations}
+              />
               <View style={styles.flex}>
                 <FormField
                   type="text"
@@ -469,17 +502,6 @@ const User: FC<IProps> = () => {
                   onChange={handleChangeForm('birthday')}
                 />
               </View>
-              <TextInputMask
-                autoFocus
-                value={user.number}
-                mask={'+7 ([000]) [000] [00] [00]'}
-                placeholder="(___) ___ __ __"
-                style={styles.formField}
-                onChangeText={(value: any, value2?: any) => {
-                  handleChangeForm('number')(value2 || value);
-                }}
-                onSubmitEditing={handleSubmit}
-              />
               <View style={styles.flex}>
                 <FormField
                   type="text"
@@ -490,20 +512,11 @@ const User: FC<IProps> = () => {
                   onChange={handleChangeForm('email')}
                 />
               </View>
-              <Text
-                style={[styles.titleMin, { marginLeft: 40, marginTop: 10 }]}>
-                Выбрать регион
-              </Text>
-              <Dropdown
-                onSelect={(id: any) => setLocation(id)}
-                selectedValue={location}
-                list={locations}
-              />
-              <View style={[styles.flex, { paddingTop: 25 }]}>
+              {/* <View style={[styles.flex, { paddingTop: 25 }]}>
                 {renderGenderSelection()}
-              </View>
-              <View style={styles.hr} />
-              {renderAddresses()}
+              </View> */}
+              {/* <View style={styles.hr} />
+              {renderAddresses()} */}
             </View>
           </View>
         </ScrollView>
@@ -527,7 +540,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get('screen').width - 40,
     minHeight: 50,
     fontSize: 18,
-    marginBottom: 5,
+    // marginBottom: 5,
     borderRadius: 8,
     padding: 10,
     backgroundColor: COLORS.bgColorLight,
@@ -535,7 +548,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.lightGray,
     paddingLeft: 20,
-    marginTop: 25,
+    // marginTop: 25,
   },
   titleMin: {
     fontSize: 16,
@@ -576,6 +589,7 @@ const styles = StyleSheet.create({
   center: {
     alignItems: 'center',
     paddingBottom: 20,
+    paddingTop: 10,
   },
   label: {},
   value: {
@@ -590,7 +604,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   field: {
-    paddingVertical: 10,
+    // paddingVertical: 10,
     flexDirection: 'column',
     justifyContent: 'center',
     flex: 1,

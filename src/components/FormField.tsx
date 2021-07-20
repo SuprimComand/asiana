@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get('screen').width - 40,
     minHeight: 50,
     fontSize: 18,
-    marginBottom: 5,
+    // marginBottom: 5,
     borderRadius: 8,
     padding: 10,
     backgroundColor: COLORS.bgColorLight,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   },
   titleMin: {
     fontSize: 16,
-    marginBottom: 4,
+    // marginBottom: 4,
     fontWeight: 'bold',
     fontFamily: 'gothammedium.ttf',
     paddingLeft: 25,
