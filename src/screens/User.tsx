@@ -116,11 +116,30 @@ const User: FC<IProps> = () => {
           return;
         }
         setLocations(
-          data.data?.map((item: any) => ({
-            ...item.City,
-            label: item.City.name,
-            value: item.City.id,
-          })),
+          data.data?.reduce((arr: any, item: any) => {
+            if (
+              item.City.name === 'Москва' ||
+              item.City.name === 'Санкт-Петербург'
+            ) {
+              return [
+                {
+                  ...item.City,
+                  label: item.City.name,
+                  value: item.City.id,
+                },
+                ...arr,
+              ];
+            }
+
+            return [
+              ...arr,
+              {
+                ...item.City,
+                label: item.City.name,
+                value: item.City.id,
+              },
+            ];
+          }, []),
         );
       });
   }, []);
@@ -362,7 +381,7 @@ const User: FC<IProps> = () => {
               // style={[styles.input, styles.inputField, customStyles, style]}
               // value={String(value || '')}
               onChangeText={() => {}}
-              mask={'{E} [000] КХ'}
+              mask={'a [000] aa'}
               placeholder="Номер"
               autoFocus={true}
             />
