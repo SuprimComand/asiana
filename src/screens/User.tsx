@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   View,
   Text,
@@ -56,6 +57,7 @@ const User: FC<IProps> = () => {
   const [gender, setGender] = useState<number>(0);
   const [selectedAddress, setAddress] = useState<number | null>(null);
   const [isOpenDetail, setOpenDetail] = useState(false);
+  const [disabledPhone, setDisabledPhone] = useState(false);
   const [
     createUserRequest,
     { data: createUser, loading: createUserLoading },
@@ -381,7 +383,7 @@ const User: FC<IProps> = () => {
               // style={[styles.input, styles.inputField, customStyles, style]}
               // value={String(value || '')}
               onChangeText={() => {}}
-              mask={'a [000] aa'}
+              mask={'[A] [000] [AA]'}
               placeholder="Номер"
               autoFocus={true}
             />
@@ -397,7 +399,7 @@ const User: FC<IProps> = () => {
               // style={[styles.input, styles.inputField, customStyles, style]}
               // value={String(value || '')}
               onChangeText={() => {}}
-              mask={'[00]'}
+              mask={'[000]'}
               autoFocus={true}
             />
             <Button
@@ -462,17 +464,37 @@ const User: FC<IProps> = () => {
           />
           <View style={[styles.field, { marginTop: 10 }]}>
             <View style={[styles.form, styleForm]}>
-              <TextInputMask
-                autoFocus
-                value={user.number}
-                mask={'+7 ([000]) [000] [00] [00]'}
-                placeholder="(___) ___ __ __"
-                style={styles.formField}
-                onChangeText={(value: any, value2?: any) => {
-                  handleChangeForm('number')(value2 || value);
-                }}
-                onSubmitEditing={handleSubmit}
-              />
+              <View style={{ flexDirection: 'row' }}>
+                <TextInputMask
+                  editable={disabledPhone}
+                  autoFocus
+                  value={user.number}
+                  mask={'+7 ([000]) [000] [00] [00]'}
+                  placeholder="(___) ___ __ __"
+                  style={[styles.formField, { width: '72%', marginRight: 10 }]}
+                  onChangeText={(value: any, value2?: any) => {
+                    handleChangeForm('number')(value2 || value);
+                  }}
+                  onSubmitEditing={handleSubmit}
+                />
+                <Button
+                  onClick={() => setDisabledPhone(!disabledPhone)}
+                  customStyles={{
+                    width: '15%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 200,
+                    backgroundColor: COLORS.lightOrange,
+                  }}
+                  label={
+                    disabledPhone ? (
+                      <MaterialIcon name="pencil-outline" size={20} />
+                    ) : (
+                      <MaterialIcon name="pencil-off-outline" size={20} />
+                    )
+                  }
+                />
+              </View>
               <Text
                 style={[styles.titleMin, { marginLeft: 40, marginTop: 10 }]}>
                 Выбрать регион
@@ -486,7 +508,7 @@ const User: FC<IProps> = () => {
                 <FormField
                   type="text"
                   customTextStyle={{ fontSize: 24 }}
-                  value={user.name || ''}
+                  value={user.surname || ''}
                   editable={editable}
                   placeholder="Фамилия"
                   onChange={handleChangeForm('surname')}
@@ -506,7 +528,7 @@ const User: FC<IProps> = () => {
                 <FormField
                   type="text"
                   customTextStyle={{ fontSize: 24 }}
-                  value={user.name || ''}
+                  value={user.lastname || ''}
                   editable={editable}
                   placeholder="Отчество"
                   onChange={handleChangeForm('lastname')}

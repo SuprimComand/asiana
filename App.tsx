@@ -23,6 +23,8 @@ import { CREATE_PUSH_TOKEN } from './src/graph/mutations/createPushToken';
 import AsyncStorage from '@react-native-community/async-storage';
 import { NativeBaseProvider } from 'native-base';
 
+console.disableYellowBox = true;
+
 export const client = configureApolloo();
 
 const deviceId = DeviceInfo.getDeviceId();

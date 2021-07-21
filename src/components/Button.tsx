@@ -13,7 +13,7 @@ interface IExternalProps {
   bgColor?: string;
   onClick?: () => void;
   customStyles?: { [key: string]: any };
-  label: string;
+  label: any;
   disabled?: boolean;
   loading?: boolean;
 }
@@ -44,7 +44,7 @@ const Button: FC<IProps> = ({
         { flexDirection: loading ? 'row' : 'column' },
       ]}
       onPress={onClick}>
-      {Boolean(label) ? (
+      {typeof label === 'string' && Boolean(label) ? (
         <Text
           style={[
             styles.label,
@@ -55,7 +55,9 @@ const Button: FC<IProps> = ({
           ]}>
           {String(label)}
         </Text>
-      ) : null}
+      ) : (
+        label
+      )}
       {Boolean(loading) && <ActivityIndicator color={COLORS.white} />}
     </TouchableOpacity>
   );
