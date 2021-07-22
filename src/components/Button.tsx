@@ -13,7 +13,7 @@ interface IExternalProps {
   bgColor?: string;
   onClick?: () => void;
   customStyles?: { [key: string]: any };
-  label: any;
+  label?: any;
   disabled?: boolean;
   loading?: boolean;
   icon?: React.ReactNode;

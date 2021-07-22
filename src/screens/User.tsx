@@ -561,13 +561,13 @@ const User: FC<IProps> = () => {
             </View>
           </View>
         </ScrollView>
-        <View style={styles.center}>
+        {/* <View style={styles.center}>
           <Button
             bgColor={color}
             onClick={handleChangeEditable}
             label={label}
           />
-        </View>
+        </View> */}
       </View>
     </View>
   );
