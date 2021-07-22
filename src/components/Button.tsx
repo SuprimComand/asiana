@@ -16,6 +16,7 @@ interface IExternalProps {
   label: any;
   disabled?: boolean;
   loading?: boolean;
+  icon?: React.ReactNode;
 }
 
 interface IProps extends IExternalProps {}
@@ -28,6 +29,7 @@ const Button: FC<IProps> = ({
   disabled,
   customStyles,
   loading,
+  icon,
 }) => {
   const colorDisabled = disabled && COLORS.lightOrange;
   const backgroundColor =
@@ -44,7 +46,7 @@ const Button: FC<IProps> = ({
         { flexDirection: loading ? 'row' : 'column' },
       ]}
       onPress={onClick}>
-      {typeof label === 'string' && Boolean(label) ? (
+      {Boolean(label) ? (
         <Text
           style={[
             styles.label,
@@ -55,9 +57,8 @@ const Button: FC<IProps> = ({
           ]}>
           {String(label)}
         </Text>
-      ) : (
-        label
-      )}
+      ) : null}
+      {Boolean(icon) && !loading && icon}
       {Boolean(loading) && <ActivityIndicator color={COLORS.white} />}
     </TouchableOpacity>
   );

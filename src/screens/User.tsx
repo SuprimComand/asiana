@@ -486,7 +486,7 @@ const User: FC<IProps> = () => {
                     borderRadius: 200,
                     backgroundColor: COLORS.lightOrange,
                   }}
-                  label={
+                  icon={
                     disabledPhone ? (
                       <MaterialIcon name="pencil-outline" size={20} />
                     ) : (
