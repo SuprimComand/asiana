@@ -79,13 +79,13 @@ const User: FC<IProps> = () => {
   const [sliders, setSliders] = useState<any>([
     {
       id: 1,
-      title: 'Автомабиль',
+      title: 'Автомобиль',
       subtitle: 'AUDI A6',
       content: 'H 553 PO 178',
     },
     {
       id: 2,
-      title: 'Автомабиль',
+      title: 'Автомобиль',
       subtitle: 'AUDI A6',
       content: 'H 553 PO 178',
     },

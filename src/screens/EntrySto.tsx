@@ -16,7 +16,10 @@ import {
   ScrollView,
   Platform,
   FlatList,
+  Dimensions,
 } from 'react-native';
+
+import Carousel from 'react-native-snap-carousel';
 import Modal from '../components/Modal';
 import HeaderProject from '../components/HeaderProject';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -37,6 +40,8 @@ import { ProfileCarMock } from '../typings/profileCarMock';
 import CarItem from '../components/CarItem';
 import AsyncStorage from '@react-native-community/async-storage';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
+import { Box, Modal as ModalNative } from 'native-base';
+import TextInputMask from 'react-native-text-input-mask';
 
 interface IExternalProps {
   route: any;
@@ -86,6 +91,27 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [customService, setCustomService] = useState('');
   const [secondCustomService, setSecondCustomService] = useState('');
   const [addressesList, setAddresses] = useState<any>([]);
+  const [isOpenDetail, setOpenDetail] = useState(false);
+
+  const [isOpenAddModal, setOpenAddModal] = useState(false);
+  const [sliders, setSliders] = useState<any>([
+    {
+      id: 1,
+      title: 'Автомобиль',
+      subtitle: 'AUDI A6',
+      content: 'H 553 PO 178',
+    },
+    {
+      id: 2,
+      title: 'Автомобиль',
+      subtitle: 'AUDI A6',
+      content: 'H 553 PO 178',
+    },
+    {
+      id: 3,
+      addButton: true,
+    },
+  ]);
 
   useEffect(() => {
     if (other) {
@@ -243,20 +269,143 @@ const EntrySto: FC<IProps> = ({ route }) => {
       />
       <View style={styles.content}>
         <ScrollView style={styles.scroll}>
-          <View style={[styles.infoContainer, styles.infoContainerGray]}>
-            <Text style={styles.titleMin}>Ваши автомобили:</Text>
-            {car.brand ? <Text style={styles.text}>{car.brand}</Text> : null}
-            {car.model ? <Text style={styles.text}>{car.model}</Text> : null}
-            <Text style={styles.text}>
-              {car.complectation || 'Нет комплектации'}
-            </Text>
-            <View style={styles.getInfoBlockCenter}>
-              <TouchableOpacity onPress={() => setOpenList(true)}>
-                <Text style={styles.getInfoLink}>
-                  выбрать другой автомобиль
-                </Text>
-              </TouchableOpacity>
+          <Modal isVisible={isOpenDetail} onCancel={() => setOpenDetail(false)}>
+            <View>
+              <Text
+                style={[
+                  styles.title,
+                  { fontSize: 18, textAlign: 'center', marginBottom: 40 },
+                ]}>
+                ИНФОРМАЦИЯ ОБ АВТОМОБИЛЕ
+              </Text>
+              <View style={{ alignItems: 'center' }}>
+                <Text>АВТОМОБИЛЬ KIA RIO</Text>
+                <Button
+                  onClick={() => {
+                    setOpenDetail(false);
+                    setSliders(
+                      sliders.filter((item: any) => item.id !== isOpenDetail),
+                    );
+                  }}
+                  label="Удалить"
+                  customStyles={{
+                    width: 100,
+                    borderRadius: 4,
+                    height: 35,
+                    marginTop: 10,
+                  }}
+                />
+              </View>
             </View>
+          </Modal>
+          <ModalNative
+            isOpen={isOpenAddModal}
+            onClose={() => setOpenAddModal(false)}>
+            <ModalNative.Content
+              style={{
+                backgroundColor: 'white',
+                height: Dimensions.get('screen').height - 400,
+                padding: 20,
+                width: Dimensions.get('screen').width - 20,
+                borderRadius: 6,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ModalNative.CloseButton />
+              <View style={{ flexDirection: 'row' }}>
+                <TextInputMask
+                  style={{
+                    borderWidth: 1,
+                    height: 40,
+                    borderRadius: 5,
+                    borderTopRightRadius: 0,
+                    borderBottomRightRadius: 0,
+                    width: 100,
+                    textAlign: 'center',
+                  }}
+                  // style={[styles.input, styles.inputField, customStyles, style]}
+                  // value={String(value || '')}
+                  onChangeText={() => {}}
+                  mask={'a [000] aa'}
+                  placeholder="Номер"
+                  autoFocus={true}
+                />
+                <TextInputMask
+                  style={{
+                    borderWidth: 1,
+                    height: 40,
+                    borderRadius: 5,
+                    borderTopLeftRadius: 0,
+                    borderBottomLeftRadius: 0,
+                    borderLeftWidth: 0,
+                  }}
+                  // style={[styles.input, styles.inputField, customStyles, style]}
+                  // value={String(value || '')}
+                  onChangeText={() => {}}
+                  mask={'[00]'}
+                  autoFocus={true}
+                />
+                <Button
+                  label="ОК"
+                  customStyles={{
+                    width: 50,
+                    borderRadius: 4,
+                    height: 40,
+                    marginLeft: 10,
+                  }}
+                />
+              </View>
+            </ModalNative.Content>
+          </ModalNative>
+          <View style={[styles.infoContainer]}>
+            <Carousel
+              data={sliders}
+              renderItem={({ item }: any) => {
+                if (item.addButton) {
+                  return (
+                    <Box
+                      bg="white"
+                      style={{
+                        margin: 8,
+                        marginRight: 20,
+                        padding: 6,
+                        height: 80,
+                      }}
+                      shadow={2}
+                      rounded="lg">
+                      <TouchableOpacity
+                        style={{ height: '100%', justifyContent: 'center' }}
+                        onPress={() => setOpenAddModal(item.id)}>
+                        <Text style={{ color: 'blue', textAlign: 'center' }}>
+                          Добавить автомобиль
+                        </Text>
+                      </TouchableOpacity>
+                    </Box>
+                  );
+                }
+
+                return (
+                  <Box
+                    bg="white"
+                    width={Dimensions.get('screen').width - 100}
+                    style={{ marginVertical: 8, padding: 10, height: 80 }}
+                    shadow={2}
+                    rounded="lg">
+                    <TouchableOpacity
+                      onPress={() => setOpenDetail(item.id)}
+                      style={{ height: '100%' }}>
+                      <Text>{item.title}</Text>
+                      <Text style={{ fontWeight: 'bold' }}>
+                        {item.subtitle}
+                      </Text>
+                      <Text style={{ fontWeight: 'bold' }}>{item.content}</Text>
+                    </TouchableOpacity>
+                  </Box>
+                );
+              }}
+              sliderWidth={Dimensions.get('screen').width}
+              itemWidth={Dimensions.get('screen').width - 100}
+            />
             <Modal
               defaultHeight={200}
               onCancel={() => setOpenAny(false)}
@@ -374,7 +523,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
               editable
               value={date}
             />
-            <View
+            {/* <View
               style={{
                 flexDirection: 'row',
                 marginBottom: 10,
@@ -408,7 +557,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
                   setTime(currentDate);
                 }}
               />
-            )}
+            )} */}
             <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
               Выбрать регион
             </Text>
@@ -441,7 +590,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
             ) : null}
           </View>
         </ScrollView>
-        <Button onClick={handleSubmit} label="Отправить" />
+        <Button onClick={handleSubmit} label="Записаться" />
       </View>
     </View>
   );
@@ -489,7 +638,6 @@ const styles = StyleSheet.create({
     paddingLeft: 23,
     paddingVertical: 15,
     fontFamily: 'gotham',
-    marginBottom: 10,
   },
   infoContainerGray: {
     backgroundColor: COLORS.lightGray,

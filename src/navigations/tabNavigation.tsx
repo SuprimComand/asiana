@@ -21,7 +21,7 @@ import { useAsyncStorage } from '../hooks/asyncStorage';
 import { useQuery } from '@apollo/client';
 import { GET_USER_PROFILES } from '../graph/queries/getProfiles';
 import Loader from '../components/Loader';
-import Feedback from '../screens/Feedback';
+// import Feedback from '../screens/Feedback';
 import { Image, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import build from '../assets/footer-icons/build.png';
@@ -105,7 +105,7 @@ const TabNavigation = () => {
         <Tab.Screen name="User" component={User} />
         <Tab.Screen name="Stocks" component={Stocks} />
         <Tab.Screen name="EntrySto" component={EtrySto} />
-        <Tab.Screen name="Feedback" component={Feedback} />
+        {/* <Tab.Screen name="Feedback" component={Feedback} /> */}
         <Tab.Screen name="Contacts" component={Contacts} />
       </Tab.Navigator>
     </>

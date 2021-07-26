@@ -120,6 +120,7 @@ const Login: FC<IProps> = () => {
                   </Text>
                 </View>
                 <TextInputMask
+                  keyboardType="number-pad"
                   onFocus={handleFocus(true)}
                   onBlur={handleFocus(false)}
                   autoFocus
