@@ -42,6 +42,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
 import { Box, Modal as ModalNative } from 'native-base';
 import TextInputMask from 'react-native-text-input-mask';
+import { marginTop } from 'styled-system';
 
 interface IExternalProps {
   route: any;
@@ -81,12 +82,13 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const addresses: AddressType[] = addressesData?.addresses || [];
   const [isOpenList, setOpenList] = useState(false);
   const carsArr = cars?.profileCars || [];
+  const [regionId] = useAsyncStorage('regionId');
   const car =
     carsArr.find((car: ProfileCarType) => car.active)?.car || ProfileCarMock;
   const notifier = useRef<any>(null);
   const withoutActiveProfileCar = carsArr.filter((car: any) => !car.active);
   const [locations, setLocations] = useState<any>([]);
-  const [location, setLocation] = useState<any>(null);
+  const [location, setLocation] = useState<any>(regionId || null);
   const [isOpenAny, setOpenAny] = useState(false);
   const [customService, setCustomService] = useState('');
   const [secondCustomService, setSecondCustomService] = useState('');
@@ -458,7 +460,62 @@ const EntrySto: FC<IProps> = ({ route }) => {
               )}
             </Modal>
           </View>
-          <View style={styles.infoContainer}>
+          {!Boolean(regionId) && (
+            <>
+              <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
+                Выбрать регион
+              </Text>
+              <Dropdown
+                onSelect={(id: any) => setLocation(id)}
+                selectedValue={location}
+                list={locations}
+              />
+            </>
+          )}
+          {location ? (
+            Boolean(addressesList.length) ? (
+              <>
+                <Text
+                  style={[styles.titleMin, { paddingLeft: 25, marginTop: 10 }]}>
+                  Выбрать автосервис
+                </Text>
+                <Dropdown
+                  onSelect={handleSelectAddress}
+                  selectedValue={address || addressesList[0]?.label}
+                  list={addressesList}
+                />
+              </>
+            ) : (
+              <Text style={{ color: 'tomato', marginTop: 10 }}>
+                В данном регионе не найдено поддразделений
+              </Text>
+            )
+          ) : null}
+          <View style={{ marginTop: 7 }}>
+            <FormField
+              type="date"
+              label="Дата"
+              placeholder="Date"
+              customStyles={{ marginBottom: 10, marginTop: 3 }}
+              onChange={handleChangeDate}
+              dateFormat="DD.MM.YYYY"
+              editable
+              value={date}
+            />
+          </View>
+          <View>
+            <FormField
+              type="text"
+              label="Комментарий"
+              multiline
+              numberOfLines={6}
+              placeholder="Комментарий"
+              customStyles={{ marginBottom: 10 }}
+              onChange={() => {}}
+              editable
+            />
+          </View>
+          {/* <View style={styles.infoContainer}>
             <Text style={styles.titleMin}>Выбрать услугу:</Text>
             <View style={styles.checkboxContainer}>
               <CheckBox
@@ -503,9 +560,9 @@ const EntrySto: FC<IProps> = ({ route }) => {
                 {customService.length > 10 ? '...' : ''})
               </Text>
             </View>
-          </View>
-          <View style={{ paddingBottom: 20 }}>
-            {/* <View style={styles.card}>
+          </View> */}
+          {/* <View style={{ paddingBottom: 20 }}> */}
+          {/* <View style={styles.card}>
               <Text style={styles.cardTitle}>
                 {car.brand || 'Нет авто'} {car.model}
               </Text>
@@ -513,17 +570,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
                 {car.complectation || 'Нет комплектации'}
               </Text>
             </View> */}
-            <FormField
-              type="date"
-              label="Выбрать желаемое время и дату"
-              placeholder="Date"
-              customStyles={{ marginBottom: 10 }}
-              onChange={handleChangeDate}
-              dateFormat="DD.MM.YYYY"
-              editable
-              value={date}
-            />
-            {/* <View
+          {/* <View
               style={{
                 flexDirection: 'row',
                 marginBottom: 10,
@@ -558,39 +605,9 @@ const EntrySto: FC<IProps> = ({ route }) => {
                 }}
               />
             )} */}
-            <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
-              Выбрать регион
-            </Text>
-            <Dropdown
-              onSelect={(id: any) => setLocation(id)}
-              selectedValue={location}
-              list={locations}
-            />
-            {location ? (
-              Boolean(addressesList.length) ? (
-                <>
-                  <Text
-                    style={[
-                      styles.titleMin,
-                      { paddingLeft: 25, marginTop: 10 },
-                    ]}>
-                    Выбрать автосервис
-                  </Text>
-                  <Dropdown
-                    onSelect={handleSelectAddress}
-                    selectedValue={address || addressesList[0]?.label}
-                    list={addressesList}
-                  />
-                </>
-              ) : (
-                <Text style={{ color: 'tomato', marginTop: 10 }}>
-                  В данном регионе не найдено поддразделений
-                </Text>
-              )
-            ) : null}
-          </View>
+          {/* </View> */}
         </ScrollView>
-        <Button onClick={handleSubmit} label="Записаться" />
+        <Button onClick={handleSubmit} label="ЗАПИСАТЬСЯ" />
       </View>
     </View>
   );

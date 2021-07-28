@@ -10,6 +10,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { Text } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import StackNavigation from './src/navigations/stackNavigation';
 import configureApolloo from './src/configureApollo';
@@ -24,6 +25,12 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { NativeBaseProvider } from 'native-base';
 
 console.disableYellowBox = true;
+// @ts-ignore
+if (Text.defaultProps == null) {
+  // @ts-ignore
+  Text.defaultProps = {};
+}
+Text.defaultProps.allowFontScaling = false;
 
 export const client = configureApolloo();
 

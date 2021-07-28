@@ -16,6 +16,8 @@ import { AuthService } from '../services/AuthService';
 import AsyncStorage from '@react-native-community/async-storage';
 import FormField from '../components/FormField';
 import TextInputMask from 'react-native-text-input-mask';
+import Dropdown from '../components/Dropdown';
+import { useAsyncStorage } from '../hooks/asyncStorage';
 
 interface IExternalProps {}
 
@@ -24,13 +26,36 @@ interface IProps extends IExternalProps {}
 const Login: FC<IProps> = () => {
   const navigation = useNavigation();
   const [phone, setPhone] = useState('');
+  const [regionId] = useAsyncStorage('regionId');
   const [isSelected, setSelection] = useState(true);
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
   const [hasFocus, setFocus] = useState(false);
+  const [location, setLocation] = useState<any>(regionId || null);
+  const [locations, setLocations] = useState<any>([]);
   const routeNameRef = navigation.isFocused;
 
   const disabled = phone.length < 10 || !isSelected;
+
+  useEffect(() => {
+    fetch(
+      'https://test-rest-api.site/api/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data.data) {
+          setLocations([]);
+          return;
+        }
+        setLocations(
+          data.data?.map((item: any) => ({
+            ...item.City,
+            label: item.City.name,
+            value: item.City.id,
+          })),
+        );
+      });
+  }, []);
 
   useEffect(() => {
     const logout = async () => {
@@ -157,6 +182,17 @@ const Login: FC<IProps> = () => {
               <Text style={styles.errorText}>Не валидный номер</Text>
             )}
           </View>
+          <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
+            Выбрать регион
+          </Text>
+          <Dropdown
+            onSelect={(id: any) => {
+              setLocation(id);
+              AsyncStorage.setItem('regionId', id);
+            }}
+            selectedValue={location}
+            list={locations}
+          />
           <View style={styles.checkbox}>
             <CheckBox value={isSelected} onValueChange={setSelection} />
             <Text>Согласен на обработку</Text>
@@ -178,6 +214,12 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     height: 50,
     fontSize: 17,
+  },
+  titleMin: {
+    fontSize: 16,
+    marginBottom: 4,
+    fontWeight: 'bold',
+    fontFamily: 'gothammedium.ttf',
   },
   container_input: {
     width: Dimensions.get('screen').width - 40,

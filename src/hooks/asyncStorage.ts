@@ -20,5 +20,5 @@ export const useAsyncStorage = (key: string): any => {
     getAsyncStorage();
   }, [attempt]);
 
-  return [state];
+  return [state, setState];
 };

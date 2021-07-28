@@ -58,6 +58,8 @@ const User: FC<IProps> = () => {
   const [selectedAddress, setAddress] = useState<number | null>(null);
   const [isOpenDetail, setOpenDetail] = useState(false);
   const [disabledPhone, setDisabledPhone] = useState(false);
+  const [regionId] = useAsyncStorage('regionId');
+  const [valueCar, setCarValue] = useState('');
   const [
     createUserRequest,
     { data: createUser, loading: createUserLoading },
@@ -75,7 +77,7 @@ const User: FC<IProps> = () => {
   );
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [locations, setLocations] = useState<any>([]);
-  const [location, setLocation] = useState<any>(null);
+  const [location, setLocation] = useState<any>(regionId || null);
   const [sliders, setSliders] = useState<any>([
     {
       id: 1,
@@ -382,10 +384,11 @@ const User: FC<IProps> = () => {
               }}
               // style={[styles.input, styles.inputField, customStyles, style]}
               // value={String(value || '')}
-              onChangeText={() => {}}
+              onChangeText={setCarValue}
               mask={'[A] [000] [AA]'}
               placeholder="Номер"
-              autoFocus={true}
+              value={valueCar}
+              autoFocus={valueCar.replace(/\s/, '').length < 6}
             />
             <TextInputMask
               style={{
@@ -400,7 +403,7 @@ const User: FC<IProps> = () => {
               // value={String(value || '')}
               onChangeText={() => {}}
               mask={'[000]'}
-              autoFocus={true}
+              autoFocus={valueCar.replace(/\s/, '').length === 6}
             />
             <Button
               label="ОК"
@@ -495,15 +498,22 @@ const User: FC<IProps> = () => {
                   }
                 />
               </View>
-              <Text
-                style={[styles.titleMin, { marginLeft: 40, marginTop: 10 }]}>
-                Выбрать регион
-              </Text>
-              <Dropdown
-                onSelect={(id: any) => setLocation(id)}
-                selectedValue={location}
-                list={locations}
-              />
+              {!regionId && (
+                <>
+                  <Text
+                    style={[
+                      styles.titleMin,
+                      { marginLeft: 40, marginTop: 10 },
+                    ]}>
+                    Выбрать регион
+                  </Text>
+                  <Dropdown
+                    onSelect={(id: any) => setLocation(id)}
+                    selectedValue={location}
+                    list={locations}
+                  />
+                </>
+              )}
               <View style={styles.flex}>
                 <FormField
                   type="text"
