@@ -1,5 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   View,
@@ -9,6 +16,7 @@ import {
   ViewStyle,
   Dimensions,
   TouchableOpacity,
+  TextInput,
 } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -60,6 +68,7 @@ const User: FC<IProps> = () => {
   const [disabledPhone, setDisabledPhone] = useState(false);
   const [regionId] = useAsyncStorage('regionId');
   const [valueCar, setCarValue] = useState('');
+  const refReg = useRef<any>(null);
   const [
     createUserRequest,
     { data: createUser, loading: createUserLoading },
@@ -285,6 +294,12 @@ const User: FC<IProps> = () => {
     );
   }, [addressesList, editable]);
 
+  useEffect(() => {
+    if (valueCar.replace(/\s/, '').length === 6 && refReg.current) {
+      refReg.current.focus();
+    }
+  }, [valueCar]);
+
   if (!token || !userId || loading || createUserLoading) {
     return (
       <View style={styles.containerLoading}>
@@ -390,7 +405,9 @@ const User: FC<IProps> = () => {
               value={valueCar}
               autoFocus={valueCar.replace(/\s/, '').length < 6}
             />
-            <TextInputMask
+            <TextInput
+              ref={refReg}
+              keyboardType="number-pad"
               style={{
                 borderWidth: 1,
                 height: 40,
@@ -402,7 +419,7 @@ const User: FC<IProps> = () => {
               // style={[styles.input, styles.inputField, customStyles, style]}
               // value={String(value || '')}
               onChangeText={() => {}}
-              mask={'[000]'}
+              maxLength={3}
               autoFocus={valueCar.replace(/\s/, '').length === 6}
             />
             <Button

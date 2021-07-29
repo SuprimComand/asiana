@@ -17,6 +17,7 @@ import {
   Platform,
   FlatList,
   Dimensions,
+  TextInput,
 } from 'react-native';
 
 import Carousel from 'react-native-snap-carousel';
@@ -95,6 +96,9 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [addressesList, setAddresses] = useState<any>([]);
   const [isOpenDetail, setOpenDetail] = useState(false);
 
+  const [valueCar, setCarValue] = useState('');
+  const refReg = useRef<any>(null);
+
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [sliders, setSliders] = useState<any>([
     {
@@ -124,7 +128,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   useEffect(() => {
     fetch(
       `https://test-rest-api.site/api/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=sto${
-        location ? `&city_id=${location}` : ''
+        location || regionId ? `&city_id=${location || regionId}` : ''
       }`,
     )
       .then((response) => response.json())
@@ -141,7 +145,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
           })),
         );
       });
-  }, [location]);
+  }, [location, regionId]);
 
   useEffect(() => {
     fetch(
@@ -253,6 +257,12 @@ const EntrySto: FC<IProps> = ({ route }) => {
     });
   };
 
+  useEffect(() => {
+    if (valueCar.replace(/\s/, '').length === 6 && refReg.current) {
+      refReg.current.focus();
+    }
+  }, [valueCar]);
+
   if (loading || loadingCreateRequest) {
     return (
       <View style={styles.containerLoading}>
@@ -328,11 +338,14 @@ const EntrySto: FC<IProps> = ({ route }) => {
                   // style={[styles.input, styles.inputField, customStyles, style]}
                   // value={String(value || '')}
                   onChangeText={() => {}}
-                  mask={'a [000] aa'}
+                  mask={'[A] [000] [AA]'}
                   placeholder="Номер"
+                  value={valueCar}
                   autoFocus={true}
                 />
-                <TextInputMask
+                <TextInput
+                  ref={refReg}
+                  keyboardType="number-pad"
                   style={{
                     borderWidth: 1,
                     height: 40,
@@ -344,8 +357,8 @@ const EntrySto: FC<IProps> = ({ route }) => {
                   // style={[styles.input, styles.inputField, customStyles, style]}
                   // value={String(value || '')}
                   onChangeText={() => {}}
-                  mask={'[00]'}
-                  autoFocus={true}
+                  maxLength={3}
+                  autoFocus={valueCar.replace(/\s/, '').length === 6}
                 />
                 <Button
                   label="ОК"
@@ -460,7 +473,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
               )}
             </Modal>
           </View>
-          {!Boolean(regionId) && (
+          {(!regionId || !addressesList.length) && (
             <>
               <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
                 Выбрать регион
@@ -472,7 +485,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
               />
             </>
           )}
-          {location ? (
+          {location || regionId ? (
             Boolean(addressesList.length) ? (
               <>
                 <Text

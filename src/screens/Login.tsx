@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   BackHandler,
   CheckBox,
   Alert,
+  TextInput,
+  Keyboard,
 } from 'react-native';
 import { COLORS } from '../constants';
 import Button from '../components/Button';
@@ -33,6 +35,8 @@ const Login: FC<IProps> = () => {
   const [hasFocus, setFocus] = useState(false);
   const [location, setLocation] = useState<any>(regionId || null);
   const [locations, setLocations] = useState<any>([]);
+  const [closed, setClosed] = useState(false);
+  const ref = useRef<any>(null);
   const routeNameRef = navigation.isFocused;
 
   const disabled = phone.length < 10 || !isSelected;
@@ -93,6 +97,7 @@ const Login: FC<IProps> = () => {
     setTimeout(() => setLoading(false), 1000);
 
     if (status) {
+      Keyboard.dismiss();
       setError(false);
       AsyncStorage.setItem('phone', phone);
       return navigation.navigate('SmsCodeNotification', { phone });
@@ -131,76 +136,72 @@ const Login: FC<IProps> = () => {
   }, [isSelected, phone, hasError]);
 
   return (
-    <KeyboardAvoidingView style={styles.keyboard}>
-      <View style={styles.container}>
-        <View style={styles.form}>
-          <Text style={styles.label}>Введите ваш номер телефона</Text>
-          <View style={styles.container_form}>
-            <View style={styles.inputBlock}>
-              <View style={styles.container_input}>
-                <View style={styles.phone}>
-                  <Text style={styles.phone_text}>
-                    +7{' '}
-                    <Text style={{ color: phone ? 'black' : 'gray' }}>(</Text>
-                  </Text>
-                </View>
-                <TextInputMask
-                  keyboardType="number-pad"
-                  onFocus={handleFocus(true)}
-                  onBlur={handleFocus(false)}
-                  autoFocus
-                  value={String(phone || '')}
-                  mask={'[000]) [000] [00] [00]'}
-                  placeholder="___) ___ __ __"
-                  style={styles.formField}
-                  onChangeText={(value: any, value2?: any) => {
-                    if (handleChangeNumber) {
-                      handleChangeNumber(value, value2);
-                    }
-                  }}
-                  onSubmitEditing={handleSubmit}
-                />
-                <Button
-                  customStyles={[
-                    styles.button,
-                    !disabled ? styles.activeButton : {},
-                    hasError ||
-                    (!isSelected && phone.length === 10 && !hasError)
-                      ? styles.errorButton
-                      : {},
-                  ]}
-                  loading={loading}
-                  disabled={disabled || !isSelected}
-                  label={loading ? '' : 'OK'}
-                  onClick={handleSubmit}
-                />
+    <View style={styles.container}>
+      <View style={styles.form}>
+        <Text style={styles.label}>Введите ваш номер телефона</Text>
+        <View style={styles.container_form}>
+          <View style={styles.inputBlock}>
+            <View style={styles.container_input}>
+              <View style={styles.phone}>
+                <Text style={styles.phone_text}>
+                  +7 <Text style={{ color: phone ? 'black' : 'gray' }}>(</Text>
+                </Text>
               </View>
+              <TextInputMask
+                keyboardType="number-pad"
+                onFocus={handleFocus(true)}
+                onBlur={handleFocus(false)}
+                autoFocus
+                value={String(phone || '')}
+                mask={'[000]) [000] [00] [00]'}
+                placeholder="___) ___ __ __"
+                style={styles.formField}
+                onChangeText={(value: any, value2?: any) => {
+                  if (handleChangeNumber) {
+                    handleChangeNumber(value, value2);
+                  }
+                }}
+                onSubmitEditing={handleSubmit}
+              />
+              <Button
+                customStyles={[
+                  styles.button,
+                  !disabled ? styles.activeButton : {},
+                  hasError || (!isSelected && phone.length === 10 && !hasError)
+                    ? styles.errorButton
+                    : {},
+                ]}
+                loading={loading}
+                disabled={disabled || !isSelected}
+                label={loading ? '' : 'OK'}
+                onClick={handleSubmit}
+              />
             </View>
           </View>
-          <View style={{ paddingLeft: 10 }}>
-            {Boolean(hasError) && (
-              <Text style={styles.errorText}>Не валидный номер</Text>
-            )}
-          </View>
-          <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
-            Выбрать регион
-          </Text>
-          <Dropdown
-            onSelect={(id: any) => {
-              setLocation(id);
-              AsyncStorage.setItem('regionId', id);
-            }}
-            selectedValue={location}
-            list={locations}
-          />
-          <View style={styles.checkbox}>
-            <CheckBox value={isSelected} onValueChange={setSelection} />
-            <Text>Согласен на обработку</Text>
-            <Text> персональных данных</Text>
-          </View>
+        </View>
+        <View style={{ paddingLeft: 10 }}>
+          {Boolean(hasError) && (
+            <Text style={styles.errorText}>Не валидный номер</Text>
+          )}
+        </View>
+        <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
+          Выбрать регион
+        </Text>
+        <Dropdown
+          onSelect={(id: any) => {
+            setLocation(id);
+            AsyncStorage.setItem('regionId', id);
+          }}
+          selectedValue={location}
+          list={locations}
+        />
+        <View style={styles.checkbox}>
+          <CheckBox value={isSelected} onValueChange={setSelection} />
+          <Text>Согласен на обработку</Text>
+          <Text> персональных данных</Text>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
