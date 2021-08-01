@@ -66,6 +66,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [diagnostics, setDiagnostics] = useState(false);
   const [tireService, setTireService] = useState(false);
   const [show, setShow] = useState(false);
+  const [comment, setComment] = useState('');
   const [
     createRequest,
     { loading: loadingCreateRequest, data: createSto },
@@ -337,11 +338,11 @@ const EntrySto: FC<IProps> = ({ route }) => {
                   }}
                   // style={[styles.input, styles.inputField, customStyles, style]}
                   // value={String(value || '')}
-                  onChangeText={() => {}}
+                  onChangeText={setCarValue}
                   mask={'[A] [000] [AA]'}
                   placeholder="Номер"
                   value={valueCar}
-                  autoFocus={true}
+                  autoFocus={valueCar.replace(/\s/, '').length < 6}
                 />
                 <TextInput
                   ref={refReg}
@@ -524,7 +525,8 @@ const EntrySto: FC<IProps> = ({ route }) => {
               numberOfLines={6}
               placeholder="Комментарий"
               customStyles={{ marginBottom: 10 }}
-              onChange={() => {}}
+              onChange={setComment}
+              value={comment}
               editable
             />
           </View>

@@ -99,11 +99,13 @@ const Login: FC<IProps> = () => {
     if (status) {
       Keyboard.dismiss();
       setError(false);
-      AsyncStorage.setItem('phone', phone);
-      return navigation.navigate('SmsCodeNotification', { phone });
+      setTimeout(() => {
+        AsyncStorage.setItem('phone', phone);
+        return navigation.navigate('SmsCodeNotification', { phone });
+      }, 100);
+    } else {
+      setError(true);
     }
-
-    setError(true);
   }, [phone, disabled]);
 
   const handleFocus = useCallback(
