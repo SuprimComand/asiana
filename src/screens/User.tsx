@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import { useNavigation } from '@react-navigation/native';
 import React, {
   FC,
@@ -25,10 +26,9 @@ import Button from '../components/Button';
 import Dropdown from '../components/Dropdown';
 import FormField from '../components/FormField';
 import HeaderProject from '../components/HeaderProject';
-import SelectButtonGroup, { Action } from '../components/SelectButtonGroup';
+import { Action } from '../components/SelectButtonGroup';
 import { COLORS } from '../constants';
 import Loader from '../components/Loader';
-import ErrorBoundry from '../components/ErrorBoundry';
 import { UserMock } from '../typings/userProfile';
 import { useAsyncStorage } from '../hooks/asyncStorage';
 import { CREATE_USER_PROFILE } from '../graph/mutations/createUser';
@@ -45,16 +45,16 @@ interface IExternalProps {}
 
 interface IProps extends IExternalProps {}
 
-const defaultData: Action[] = [
-  {
-    id: 0,
-    label: 'Женщина',
-  },
-  {
-    id: 1,
-    label: 'Мужчина',
-  },
-];
+// const defaultData: Action[] = [
+//   {
+//     id: 0,
+//     label: 'Женщина',
+//   },
+//   {
+//     id: 1,
+//     label: 'Мужчина',
+//   },
+// ];
 
 const User: FC<IProps> = () => {
   const navigation = useNavigation();
@@ -73,17 +73,17 @@ const User: FC<IProps> = () => {
     createUserRequest,
     { data: createUser, loading: createUserLoading },
   ] = useMutation(CREATE_USER_PROFILE);
-  const { data, loading, error, refetch } = useQuery(GET_USER_PROFILES, {
+  const { data, loading, refetch } = useQuery(GET_USER_PROFILES, {
     variables: { userId: Number(userId) },
     skip: !userId,
   });
   const { data: addressesData } = useQuery(GET_ADDRESSES);
   const [user, setUser] = useState<any>(UserMock);
   const addresses: AddressType[] = addressesData?.addresses || [];
-  const selectedGender = useMemo(
-    () => defaultData.find((item) => item.id === gender),
-    [gender],
-  );
+  // const selectedGender = useMemo(
+  //   () => defaultData.find((item) => item.id === gender),
+  //   [gender],
+  // );
   const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [locations, setLocations] = useState<any>([]);
   const [location, setLocation] = useState<any>(regionId || null);
@@ -105,6 +105,12 @@ const User: FC<IProps> = () => {
       addButton: true,
     },
   ]);
+
+  useEffect(() => {
+    if (location !== regionId) {
+      AsyncStorage.setItem('regionId', location);
+    }
+  }, [location, regionId]);
 
   useEffect(() => {
     (async () => {
@@ -157,19 +163,19 @@ const User: FC<IProps> = () => {
       });
   }, []);
 
-  const addressesList = useMemo(() => {
-    if (!Array.isArray(addresses)) {
-      return [];
-    }
+  // const addressesList = useMemo(() => {
+  //   if (!Array.isArray(addresses)) {
+  //     return [];
+  //   }
 
-    return addresses
-      .map((item: AddressType) => ({
-        ...item,
-        label: item.address,
-        value: String(item.id),
-      }))
-      .filter((item) => item.type === 'СТО');
-  }, [addresses]);
+  //   return addresses
+  //     .map((item: AddressType) => ({
+  //       ...item,
+  //       label: item.address,
+  //       value: String(item.id),
+  //     }))
+  //     .filter((item) => item.type === 'СТО');
+  // }, [addresses]);
 
   useEffect(() => {
     if (!createUserLoading && createUser) {
@@ -246,8 +252,8 @@ const User: FC<IProps> = () => {
     navigation.navigate('Main');
   }, []);
 
-  const color = editable ? COLORS.orange : COLORS.green;
-  const label = editable ? 'Сохранить' : 'Изменить';
+  // const color = editable ? COLORS.orange : COLORS.green;
+  // const label = editable ? 'Сохранить' : 'Изменить';
 
   const handleChangeForm = useCallback(
     (key: any) => {
@@ -258,44 +264,44 @@ const User: FC<IProps> = () => {
     [user, setUser],
   );
 
-  const renderGenderSelection = useCallback(() => {
-    if (editable) {
-      return (
-        <SelectButtonGroup
-          onSelect={handleChangeGender}
-          actions={defaultData}
-          selectedAction={selectedGender}
-        />
-      );
-    }
+  // const renderGenderSelection = useCallback(() => {
+  //   if (editable) {
+  //     return (
+  //       <SelectButtonGroup
+  //         onSelect={handleChangeGender}
+  //         actions={defaultData}
+  //         selectedAction={selectedGender}
+  //       />
+  //     );
+  //   }
 
-    return <Text>{selectedGender?.label}</Text>;
-  }, [editable, gender]);
+  //   return <Text>{selectedGender?.label}</Text>;
+  // }, [editable, gender]);
 
-  const renderAddresses = useCallback(() => {
-    if (editable) {
-      return (
-        <Dropdown
-          selectedValue={String(selectedAddress)}
-          onSelect={handleChangeAddress}
-          list={addressesList}
-        />
-      );
-    }
-    const findAddress = addressesList.find(
-      (address) => Number(selectedAddress) === Number(address.id),
-    );
+  // const renderAddresses = useCallback(() => {
+  //   if (editable) {
+  //     return (
+  //       <Dropdown
+  //         selectedValue={String(selectedAddress)}
+  //         onSelect={handleChangeAddress}
+  //         list={addressesList}
+  //       />
+  //     );
+  //   }
+  //   const findAddress = addressesList.find(
+  //     (address) => Number(selectedAddress) === Number(address.id),
+  //   );
 
-    return (
-      <View>
-        <Text style={styles.dropdownLabel}>СТО</Text>
-        <Text>{findAddress?.address}</Text>
-      </View>
-    );
-  }, [addressesList, editable]);
+  //   return (
+  //     <View>
+  //       <Text style={styles.dropdownLabel}>СТО</Text>
+  //       <Text>{findAddress?.address}</Text>
+  //     </View>
+  //   );
+  // }, [addressesList, editable]);
 
   useEffect(() => {
-    if (valueCar.replace(/\s/, '').length === 6 && refReg.current) {
+    if (valueCar.replace(/\s/g, '').length === 6 && refReg.current) {
       refReg.current.focus();
     }
   }, [valueCar]);
@@ -376,6 +382,7 @@ const User: FC<IProps> = () => {
         isOpen={isOpenAddModal}
         onClose={() => setOpenAddModal(false)}>
         <ModalNative.Content
+          // eslint-disable-next-line react-native/no-inline-styles
           style={{
             backgroundColor: 'white',
             height: Dimensions.get('screen').height - 400,
@@ -388,6 +395,7 @@ const User: FC<IProps> = () => {
           <ModalNative.CloseButton />
           <View style={{ flexDirection: 'row' }}>
             <TextInputMask
+              // eslint-disable-next-line react-native/no-inline-styles
               style={{
                 borderWidth: 1,
                 height: 40,
@@ -515,22 +523,15 @@ const User: FC<IProps> = () => {
                   }
                 />
               </View>
-              {!regionId && (
-                <>
-                  <Text
-                    style={[
-                      styles.titleMin,
-                      { marginLeft: 40, marginTop: 10 },
-                    ]}>
-                    Выбрать регион
-                  </Text>
-                  <Dropdown
-                    onSelect={(id: any) => setLocation(id)}
-                    selectedValue={location}
-                    list={locations}
-                  />
-                </>
-              )}
+              <Text
+                style={[styles.titleMin, { marginLeft: 40, marginTop: 10 }]}>
+                Выбрать регион
+              </Text>
+              <Dropdown
+                onSelect={(id: any) => setLocation(id)}
+                selectedValue={location}
+                list={locations}
+              />
               <View style={styles.flex}>
                 <FormField
                   type="text"

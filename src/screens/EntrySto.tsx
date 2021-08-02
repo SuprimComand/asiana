@@ -1,20 +1,21 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {
   FC,
   useCallback,
   useEffect,
-  useMemo,
+  // useMemo,
   useRef,
   useState,
 } from 'react';
-import DateTimePicker from '@react-native-community/datetimepicker';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  CheckBox,
+  // CheckBox,
   ScrollView,
-  Platform,
+  // Platform,
   FlatList,
   Dimensions,
   TextInput,
@@ -43,7 +44,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
 import { Box, Modal as ModalNative } from 'native-base';
 import TextInputMask from 'react-native-text-input-mask';
-import { marginTop } from 'styled-system';
+// import { marginTop } from 'styled-system';
 
 interface IExternalProps {
   route: any;
@@ -60,12 +61,12 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [profileId] = useAsyncStorage('profileId');
   const [date, setDate] = useState<any>(new Date());
   const [workKind, setWorkKind] = useState('');
-  const [other, setOther] = useState(false);
-  const [enterTO, setTO] = useState(false);
-  const [oilChange, setOil] = useState(false);
-  const [diagnostics, setDiagnostics] = useState(false);
-  const [tireService, setTireService] = useState(false);
-  const [show, setShow] = useState(false);
+  const [other] = useState(false);
+  // const [enterTO, setTO] = useState(false);
+  // const [oilChange, setOil] = useState(false);
+  // const [diagnostics, setDiagnostics] = useState(false);
+  // const [tireService, setTireService] = useState(false);
+  // const [show, setShow] = useState(false);
   const [comment, setComment] = useState('');
   const [
     createRequest,
@@ -73,14 +74,14 @@ const EntrySto: FC<IProps> = ({ route }) => {
   ] = useMutation(CREATE_REQUEST_STO);
   const [
     updateProfileCar,
-    { loading: profileCarLoading, data: profileCar },
+    // { loading: profileCarLoading, data: profileCar },
   ] = useMutation(UPDATE_PROFILE_CAR);
   const { data: cars, loading } = useQuery(GET_PROFILE_CAR, {
     variables: { profileId: Number(profileId) },
     skip: !profileId,
   });
   const { data: addressesData } = useQuery(GET_ADDRESSES);
-  const [time, setTime] = useState(new Date(1598051730000));
+  // const [time, setTime] = useState(new Date(1598051730000));
   const addresses: AddressType[] = addressesData?.addresses || [];
   const [isOpenList, setOpenList] = useState(false);
   const carsArr = cars?.profileCars || [];
@@ -93,7 +94,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const [location, setLocation] = useState<any>(regionId || null);
   const [isOpenAny, setOpenAny] = useState(false);
   const [customService, setCustomService] = useState('');
-  const [secondCustomService, setSecondCustomService] = useState('');
+  // const [secondCustomService, setSecondCustomService] = useState('');
   const [addressesList, setAddresses] = useState<any>([]);
   const [isOpenDetail, setOpenDetail] = useState(false);
 
@@ -159,11 +160,30 @@ const EntrySto: FC<IProps> = ({ route }) => {
           return;
         }
         setLocations(
-          data.data?.map((item: any) => ({
-            ...item.City,
-            label: item.City.name,
-            value: item.City.id,
-          })),
+          data.data?.reduce((arr: any, item: any) => {
+            if (
+              item.City.name === 'Москва' ||
+              item.City.name === 'Санкт-Петербург'
+            ) {
+              return [
+                {
+                  ...item.City,
+                  label: item.City.name,
+                  value: item.City.id,
+                },
+                ...arr,
+              ];
+            }
+
+            return [
+              ...arr,
+              {
+                ...item.City,
+                label: item.City.name,
+                value: item.City.id,
+              },
+            ];
+          }, []),
         );
       });
   }, []);
@@ -259,7 +279,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   };
 
   useEffect(() => {
-    if (valueCar.replace(/\s/, '').length === 6 && refReg.current) {
+    if (valueCar.replace(/\s/g, '').length === 6 && refReg.current) {
       refReg.current.focus();
     }
   }, [valueCar]);

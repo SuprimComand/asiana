@@ -186,7 +186,7 @@ const Login: FC<IProps> = () => {
             <Text style={styles.errorText}>Не валидный номер</Text>
           )}
         </View>
-        <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
+        {/* <Text style={[styles.titleMin, { paddingLeft: 25 }]}>
           Выбрать регион
         </Text>
         <Dropdown
@@ -196,7 +196,7 @@ const Login: FC<IProps> = () => {
           }}
           selectedValue={location}
           list={locations}
-        />
+        /> */}
         <View style={styles.checkbox}>
           <CheckBox value={isSelected} onValueChange={setSelection} />
           <Text>Согласен на обработку</Text>
