@@ -122,6 +122,19 @@ const EntrySto: FC<IProps> = ({ route }) => {
   ]);
 
   useEffect(() => {
+    if (regionId !== location) {
+      setLocation(regionId);
+    }
+  }, [regionId]);
+
+  const handleChangeLocation = (l: any) => {
+    setLocation(l);
+    (async () => {
+      await AsyncStorage.setItem('regionId', l);
+    })();
+  };
+
+  useEffect(() => {
     if (other) {
       setOpenAny(true);
     }
@@ -500,7 +513,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
                 Выбрать регион
               </Text>
               <Dropdown
-                onSelect={(id: any) => setLocation(id)}
+                onSelect={handleChangeLocation}
                 selectedValue={location}
                 list={locations}
               />

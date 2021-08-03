@@ -107,10 +107,17 @@ const User: FC<IProps> = () => {
   ]);
 
   useEffect(() => {
-    if (location !== regionId) {
-      AsyncStorage.setItem('regionId', location);
+    if (regionId !== location) {
+      setLocation(regionId);
     }
-  }, [location, regionId]);
+  }, [regionId]);
+
+  const handleChangeLocation = (l: any) => {
+    setLocation(l);
+    (async () => {
+      await AsyncStorage.setItem('regionId', l);
+    })();
+  };
 
   useEffect(() => {
     (async () => {
@@ -528,7 +535,7 @@ const User: FC<IProps> = () => {
                 Выбрать регион
               </Text>
               <Dropdown
-                onSelect={(id: any) => setLocation(id)}
+                onSelect={handleChangeLocation}
                 selectedValue={location}
                 list={locations}
               />

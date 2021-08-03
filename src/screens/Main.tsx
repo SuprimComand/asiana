@@ -106,21 +106,21 @@ const Main: FC<IProps> = () => {
     },
   ]);
 
-  const notification = () =>
-    Alert.alert(
-      '',
-      'Для продолжения установки необходимо согласиться с политикой обработки персональных данных',
-      [
-        {
-          text: 'OK',
-          onPress: () => navigation.navigate('User'),
-        },
-      ],
-    );
+  // const notification = () =>
+  //   Alert.alert(
+  //     '',
+  //     'Для продолжения установки необходимо согласиться с политикой обработки персональных данных',
+  //     [
+  //       {
+  //         text: 'OK',
+  //         onPress: () => navigation.navigate('User'),
+  //       },
+  //     ],
+  //   );
 
-  useEffect(() => {
-    notification();
-  }, []);
+  // useEffect(() => {
+  //   notification();
+  // }, []);
 
   useEffect(() => {
     const logout = async () => {

@@ -22,6 +22,7 @@ const Dropdown: FC<IProps> = ({ list, onSelect, selectedValue }) => {
   );
 
   const handleSelect = (value: string | number) => {
+    console.log('select', value);
     if (onSelect) {
       onSelect(value);
     }
