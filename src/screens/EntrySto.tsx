@@ -44,6 +44,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
 import { Box, Modal as ModalNative } from 'native-base';
 import TextInputMask from 'react-native-text-input-mask';
+import SliderCars from '../components/SliderCars';
 // import { marginTop } from 'styled-system';
 
 interface IExternalProps {
@@ -291,12 +292,6 @@ const EntrySto: FC<IProps> = ({ route }) => {
     });
   };
 
-  useEffect(() => {
-    if (valueCar.replace(/\s/g, '').length === 6 && refReg.current) {
-      refReg.current.focus();
-    }
-  }, [valueCar]);
-
   if (loading || loadingCreateRequest) {
     return (
       <View style={styles.containerLoading}>
@@ -304,6 +299,8 @@ const EntrySto: FC<IProps> = ({ route }) => {
       </View>
     );
   }
+
+  console.log(sliders);
 
   return (
     <View style={styles.container}>
@@ -344,117 +341,8 @@ const EntrySto: FC<IProps> = ({ route }) => {
               </View>
             </View>
           </Modal>
-          <ModalNative
-            isOpen={isOpenAddModal}
-            onClose={() => setOpenAddModal(false)}>
-            <ModalNative.Content
-              style={{
-                backgroundColor: 'white',
-                height: Dimensions.get('screen').height - 400,
-                padding: 20,
-                width: Dimensions.get('screen').width - 20,
-                borderRadius: 6,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <ModalNative.CloseButton />
-              <View style={{ flexDirection: 'row' }}>
-                <TextInputMask
-                  style={{
-                    borderWidth: 1,
-                    height: 40,
-                    borderRadius: 5,
-                    borderTopRightRadius: 0,
-                    borderBottomRightRadius: 0,
-                    width: 100,
-                    textAlign: 'center',
-                  }}
-                  // style={[styles.input, styles.inputField, customStyles, style]}
-                  // value={String(value || '')}
-                  onChangeText={setCarValue}
-                  mask={'[A] [000] [AA]'}
-                  placeholder="Номер"
-                  value={valueCar}
-                  autoFocus={valueCar.replace(/\s/, '').length < 6}
-                />
-                <TextInput
-                  ref={refReg}
-                  keyboardType="number-pad"
-                  style={{
-                    borderWidth: 1,
-                    height: 40,
-                    borderRadius: 5,
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
-                    borderLeftWidth: 0,
-                  }}
-                  // style={[styles.input, styles.inputField, customStyles, style]}
-                  // value={String(value || '')}
-                  onChangeText={() => {}}
-                  maxLength={3}
-                  autoFocus={valueCar.replace(/\s/, '').length === 6}
-                />
-                <Button
-                  label="ОК"
-                  customStyles={{
-                    width: 50,
-                    borderRadius: 4,
-                    height: 40,
-                    marginLeft: 10,
-                  }}
-                />
-              </View>
-            </ModalNative.Content>
-          </ModalNative>
           <View style={[styles.infoContainer]}>
-            <Carousel
-              data={sliders}
-              renderItem={({ item }: any) => {
-                if (item.addButton) {
-                  return (
-                    <Box
-                      bg="white"
-                      style={{
-                        margin: 8,
-                        marginRight: 20,
-                        padding: 6,
-                        height: 80,
-                      }}
-                      shadow={2}
-                      rounded="lg">
-                      <TouchableOpacity
-                        style={{ height: '100%', justifyContent: 'center' }}
-                        onPress={() => setOpenAddModal(item.id)}>
-                        <Text style={{ color: 'blue', textAlign: 'center' }}>
-                          Добавить автомобиль
-                        </Text>
-                      </TouchableOpacity>
-                    </Box>
-                  );
-                }
-
-                return (
-                  <Box
-                    bg="white"
-                    width={Dimensions.get('screen').width - 100}
-                    style={{ marginVertical: 8, padding: 10, height: 80 }}
-                    shadow={2}
-                    rounded="lg">
-                    <TouchableOpacity
-                      onPress={() => setOpenDetail(item.id)}
-                      style={{ height: '100%' }}>
-                      <Text>{item.title}</Text>
-                      <Text style={{ fontWeight: 'bold' }}>
-                        {item.subtitle}
-                      </Text>
-                      <Text style={{ fontWeight: 'bold' }}>{item.content}</Text>
-                    </TouchableOpacity>
-                  </Box>
-                );
-              }}
-              sliderWidth={Dimensions.get('screen').width}
-              itemWidth={Dimensions.get('screen').width - 100}
-            />
+            <SliderCars />
             <Modal
               defaultHeight={200}
               onCancel={() => setOpenAny(false)}

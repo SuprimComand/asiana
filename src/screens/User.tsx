@@ -40,6 +40,7 @@ import { Box, Modal as ModalNative } from 'native-base';
 import Modal from '../components/Modal';
 import TextInputMask from 'react-native-text-input-mask';
 import AsyncStorage from '@react-native-community/async-storage';
+import SliderCars from '../components/SliderCars';
 
 interface IExternalProps {}
 
@@ -64,11 +65,8 @@ const User: FC<IProps> = () => {
   const [token] = useAsyncStorage('token');
   const [gender, setGender] = useState<number>(0);
   const [selectedAddress, setAddress] = useState<number | null>(null);
-  const [isOpenDetail, setOpenDetail] = useState(false);
   const [disabledPhone, setDisabledPhone] = useState(false);
   const [regionId] = useAsyncStorage('regionId');
-  const [valueCar, setCarValue] = useState('');
-  const refReg = useRef<any>(null);
   const [
     createUserRequest,
     { data: createUser, loading: createUserLoading },
@@ -80,31 +78,8 @@ const User: FC<IProps> = () => {
   const { data: addressesData } = useQuery(GET_ADDRESSES);
   const [user, setUser] = useState<any>(UserMock);
   const addresses: AddressType[] = addressesData?.addresses || [];
-  // const selectedGender = useMemo(
-  //   () => defaultData.find((item) => item.id === gender),
-  //   [gender],
-  // );
-  const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [locations, setLocations] = useState<any>([]);
   const [location, setLocation] = useState<any>(regionId || null);
-  const [sliders, setSliders] = useState<any>([
-    {
-      id: 1,
-      title: 'Автомобиль',
-      subtitle: 'AUDI A6',
-      content: 'H 553 PO 178',
-    },
-    {
-      id: 2,
-      title: 'Автомобиль',
-      subtitle: 'AUDI A6',
-      content: 'H 553 PO 178',
-    },
-    {
-      id: 3,
-      addButton: true,
-    },
-  ]);
 
   useEffect(() => {
     if (regionId !== location) {
@@ -170,20 +145,6 @@ const User: FC<IProps> = () => {
       });
   }, []);
 
-  // const addressesList = useMemo(() => {
-  //   if (!Array.isArray(addresses)) {
-  //     return [];
-  //   }
-
-  //   return addresses
-  //     .map((item: AddressType) => ({
-  //       ...item,
-  //       label: item.address,
-  //       value: String(item.id),
-  //     }))
-  //     .filter((item) => item.type === 'СТО');
-  // }, [addresses]);
-
   useEffect(() => {
     if (!createUserLoading && createUser) {
       refetch();
@@ -228,32 +189,10 @@ const User: FC<IProps> = () => {
     setEditable(false);
   }, [user, selectedAddress, gender]);
 
-  const handleChangeEditable = useCallback(() => {
-    if (editable) {
-      handleSubmit();
-    } else {
-      setEditable(!editable);
-    }
-  }, [editable, user, handleSubmit, selectedAddress]);
-
   const styleForm: ViewStyle = {
     alignItems: !editable ? 'flex-start' : 'center',
     paddingHorizontal: !editable ? 15 : 0,
   };
-
-  const handleChangeGender = useCallback(
-    (gender: Action) => {
-      setGender(gender.id);
-    },
-    [gender],
-  );
-
-  const handleChangeAddress = useCallback(
-    (address: string | number) => {
-      setAddress(Number(address));
-    },
-    [addresses, selectedAddress],
-  );
 
   const onGoBach = useCallback(() => {
     navigation.navigate('Main');
@@ -271,48 +210,6 @@ const User: FC<IProps> = () => {
     [user, setUser],
   );
 
-  // const renderGenderSelection = useCallback(() => {
-  //   if (editable) {
-  //     return (
-  //       <SelectButtonGroup
-  //         onSelect={handleChangeGender}
-  //         actions={defaultData}
-  //         selectedAction={selectedGender}
-  //       />
-  //     );
-  //   }
-
-  //   return <Text>{selectedGender?.label}</Text>;
-  // }, [editable, gender]);
-
-  // const renderAddresses = useCallback(() => {
-  //   if (editable) {
-  //     return (
-  //       <Dropdown
-  //         selectedValue={String(selectedAddress)}
-  //         onSelect={handleChangeAddress}
-  //         list={addressesList}
-  //       />
-  //     );
-  //   }
-  //   const findAddress = addressesList.find(
-  //     (address) => Number(selectedAddress) === Number(address.id),
-  //   );
-
-  //   return (
-  //     <View>
-  //       <Text style={styles.dropdownLabel}>СТО</Text>
-  //       <Text>{findAddress?.address}</Text>
-  //     </View>
-  //   );
-  // }, [addressesList, editable]);
-
-  useEffect(() => {
-    if (valueCar.replace(/\s/g, '').length === 6 && refReg.current) {
-      refReg.current.focus();
-    }
-  }, [valueCar]);
-
   if (!token || !userId || loading || createUserLoading) {
     return (
       <View style={styles.containerLoading}>
@@ -320,13 +217,6 @@ const User: FC<IProps> = () => {
       </View>
     );
   }
-
-  // if (!data || error) {
-  //   const title = !data
-  //     ? 'Ошибка загрузки данных'
-  //     : 'Произошла ошибка уже исправляем';
-  //   return <ErrorBoundry title={title} />;
-  // }
 
   let birthday = null;
   if (!editable && user.birthday) {
@@ -356,147 +246,9 @@ const User: FC<IProps> = () => {
         }
         content={<Text style={styles.title}>Профиль</Text>}
       />
-      <Modal isVisible={isOpenDetail} onCancel={() => setOpenDetail(false)}>
-        <View>
-          <Text
-            style={[
-              styles.title,
-              { fontSize: 18, textAlign: 'center', marginBottom: 40 },
-            ]}>
-            ИНФОРМАЦИЯ ОБ АВТОМОБИЛЕ
-          </Text>
-          <View style={{ alignItems: 'center' }}>
-            <Text>АВТОМОБИЛЬ KIA RIO</Text>
-            <Button
-              onClick={() => {
-                setOpenDetail(false);
-                setSliders(
-                  sliders.filter((item: any) => item.id !== isOpenDetail),
-                );
-              }}
-              label="Удалить"
-              customStyles={{
-                width: 100,
-                borderRadius: 4,
-                height: 35,
-                marginTop: 10,
-              }}
-            />
-          </View>
-        </View>
-      </Modal>
-      <ModalNative
-        isOpen={isOpenAddModal}
-        onClose={() => setOpenAddModal(false)}>
-        <ModalNative.Content
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            backgroundColor: 'white',
-            height: Dimensions.get('screen').height - 400,
-            padding: 20,
-            width: Dimensions.get('screen').width - 20,
-            borderRadius: 6,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <ModalNative.CloseButton />
-          <View style={{ flexDirection: 'row' }}>
-            <TextInputMask
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                borderWidth: 1,
-                height: 40,
-                borderRadius: 5,
-                borderTopRightRadius: 0,
-                borderBottomRightRadius: 0,
-                width: 100,
-                textAlign: 'center',
-              }}
-              // style={[styles.input, styles.inputField, customStyles, style]}
-              // value={String(value || '')}
-              onChangeText={setCarValue}
-              mask={'[A] [000] [AA]'}
-              placeholder="Номер"
-              value={valueCar}
-              autoFocus={valueCar.replace(/\s/, '').length < 6}
-            />
-            <TextInput
-              ref={refReg}
-              keyboardType="number-pad"
-              style={{
-                borderWidth: 1,
-                height: 40,
-                borderRadius: 5,
-                borderTopLeftRadius: 0,
-                borderBottomLeftRadius: 0,
-                borderLeftWidth: 0,
-              }}
-              // style={[styles.input, styles.inputField, customStyles, style]}
-              // value={String(value || '')}
-              onChangeText={() => {}}
-              maxLength={3}
-              autoFocus={valueCar.replace(/\s/, '').length === 6}
-            />
-            <Button
-              label="ОК"
-              customStyles={{
-                width: 50,
-                borderRadius: 4,
-                height: 40,
-                marginLeft: 10,
-              }}
-            />
-          </View>
-        </ModalNative.Content>
-      </ModalNative>
       <View style={styles.content}>
         <ScrollView>
-          <Carousel
-            data={sliders}
-            renderItem={({ item }: any) => {
-              if (item.addButton) {
-                return (
-                  <Box
-                    bg="white"
-                    style={{
-                      margin: 8,
-                      marginRight: 20,
-                      padding: 6,
-                      height: 80,
-                    }}
-                    shadow={2}
-                    rounded="lg">
-                    <TouchableOpacity
-                      style={{ height: '100%', justifyContent: 'center' }}
-                      onPress={() => setOpenAddModal(item.id)}>
-                      <Text style={{ color: 'blue', textAlign: 'center' }}>
-                        Добавить автомобиль
-                      </Text>
-                    </TouchableOpacity>
-                  </Box>
-                );
-              }
-
-              return (
-                <Box
-                  bg="white"
-                  width={Dimensions.get('screen').width - 100}
-                  style={{ marginVertical: 8, padding: 10 }}
-                  shadow={2}
-                  rounded="lg">
-                  <TouchableOpacity
-                    onPress={() => setOpenDetail(item.id)}
-                    style={{ height: '100%' }}>
-                    <Text>{item.title}</Text>
-                    <Text style={{ fontWeight: 'bold' }}>{item.subtitle}</Text>
-                    <Text style={{ fontWeight: 'bold' }}>{item.content}</Text>
-                  </TouchableOpacity>
-                </Box>
-              );
-            }}
-            sliderWidth={Dimensions.get('screen').width}
-            itemWidth={Dimensions.get('screen').width - 100}
-          />
+          <SliderCars />
           <View style={[styles.field, { marginTop: 10 }]}>
             <View style={[styles.form, styleForm]}>
               <View style={{ flexDirection: 'row' }}>
