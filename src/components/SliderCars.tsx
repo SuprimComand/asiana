@@ -20,6 +20,7 @@ const SliderCars = () => {
   const navigation = useNavigation();
   const [isOpenDetail, setOpenDetail] = useState(false);
   const [sliders] = useAsyncStorage('sliders', [], true);
+  const [activeCar, setCar] = useState<any>(null);
   // const [sliders, setSliders] = useState<any>([
   //   {
   //     id: 1,
@@ -59,7 +60,8 @@ const SliderCars = () => {
             ИНФОРМАЦИЯ ОБ АВТОМОБИЛЕ
           </Text>
           <View style={{ alignItems: 'center' }}>
-            <Text>АВТОМОБИЛЬ KIA RIO</Text>
+            <Text>{activeCar?.title}</Text>
+            <Text>{activeCar?.subtitle}</Text>
             <Button
               onClick={async () => {
                 const newArr = sliders.filter(
@@ -116,7 +118,10 @@ const SliderCars = () => {
               shadow={2}
               rounded="lg">
               <TouchableOpacity
-                onPress={() => setOpenDetail(item.id)}
+                onPress={() => {
+                  setOpenDetail(item.id);
+                  setCar(item);
+                }}
                 style={{ height: '100%' }}>
                 <Text>{item.title}</Text>
                 <Text style={{ fontWeight: 'bold' }}>{item.subtitle}</Text>

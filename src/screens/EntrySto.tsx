@@ -25,7 +25,7 @@ import Carousel from 'react-native-snap-carousel';
 import Modal from '../components/Modal';
 import HeaderProject from '../components/HeaderProject';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { COLORS } from '../constants';
+import { API_URL, COLORS } from '../constants';
 import FormField from '../components/FormField';
 import Dropdown from '../components/Dropdown';
 import Button from '../components/Button';
@@ -121,6 +121,9 @@ const EntrySto: FC<IProps> = ({ route }) => {
       addButton: true,
     },
   ]);
+  // useFocusEffect(() => {
+
+  // })
 
   useEffect(() => {
     if (regionId !== location) {
@@ -143,7 +146,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
 
   useEffect(() => {
     fetch(
-      `https://test-rest-api.site/api/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=sto${
+      `${API_URL}/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=sto${
         location || regionId ? `&city_id=${location || regionId}` : ''
       }`,
     )
@@ -165,7 +168,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
 
   useEffect(() => {
     fetch(
-      'https://test-rest-api.site/api/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+      `${API_URL}/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
     )
       .then((response) => response.json())
       .then((data) => {
@@ -299,8 +302,6 @@ const EntrySto: FC<IProps> = ({ route }) => {
       </View>
     );
   }
-
-  console.log(sliders);
 
   return (
     <View style={styles.container}>

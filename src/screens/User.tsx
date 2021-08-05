@@ -27,7 +27,7 @@ import Dropdown from '../components/Dropdown';
 import FormField from '../components/FormField';
 import HeaderProject from '../components/HeaderProject';
 import { Action } from '../components/SelectButtonGroup';
-import { COLORS } from '../constants';
+import { API_URL, COLORS } from '../constants';
 import Loader from '../components/Loader';
 import { UserMock } from '../typings/userProfile';
 import { useAsyncStorage } from '../hooks/asyncStorage';
@@ -108,7 +108,7 @@ const User: FC<IProps> = () => {
 
   useEffect(() => {
     fetch(
-      'https://test-rest-api.site/api/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+      `${API_URL}/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
     )
       .then((response) => response.json())
       .then((data) => {
@@ -188,6 +188,24 @@ const User: FC<IProps> = () => {
     });
     setEditable(false);
   }, [user, selectedAddress, gender]);
+
+  const saveUserData = () => {
+    fetch(
+      `${API_URL}/1/mobile/user/save_profile/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: 1,
+          city_id: location,
+          firstname: user.name,
+          lastname: user.surname,
+          middlename: user.lastname,
+          email: user.email,
+          bday: user.birthday,
+        }),
+      },
+    ).then((response) => console.log(response));
+  };
 
   const styleForm: ViewStyle = {
     alignItems: !editable ? 'flex-start' : 'center',

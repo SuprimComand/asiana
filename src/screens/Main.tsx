@@ -358,7 +358,11 @@ const Main: FC<IProps> = () => {
           </View>
 
           <View style={[styles.getInfoBlockCenter, { marginVertical: 10 }]}>
-            <Button customStyles={styles.button} label="ЗАПИСАТЬСЯ НА СЕРВИС" />
+            <Button
+              customStyles={styles.button}
+              onClick={() => navigation.navigate('EntrySto')}
+              label="ЗАПИСАТЬСЯ НА СЕРВИС"
+            />
           </View>
         </View>
       </ScrollView>

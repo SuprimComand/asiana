@@ -7,7 +7,7 @@ import Button from '../components/Button';
 import ErrorBoundry from '../components/ErrorBoundry';
 import HeaderProject from '../components/HeaderProject';
 import Loader from '../components/Loader';
-import { COLORS } from '../constants';
+import { API_URL, COLORS } from '../constants';
 
 interface IExternalProps {
   route: any; // TODO: fix this
@@ -26,7 +26,7 @@ const Stock: FC<IProps> = ({ route }) => {
   useEffect(() => {
     setLoading(true);
     fetch(
-      `https://test-rest-api.site/api/1/mobile/action/${stockId}/get/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
+      `${API_URL}/1/mobile/action/${stockId}/get/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
     )
       .then((response) => response.json())
       .then((dataRes) => {

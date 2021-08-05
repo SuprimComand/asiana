@@ -14,3 +14,5 @@ export const COLORS = {
   bgModal: 'rgba(0,0,0, .8)',
   primary: '#7070fa',
 };
+
+export const API_URL = 'https://test-rest-api.site/api';

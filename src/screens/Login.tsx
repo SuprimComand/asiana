@@ -11,7 +11,7 @@ import {
   TextInput,
   Keyboard,
 } from 'react-native';
-import { COLORS } from '../constants';
+import { API_URL, COLORS } from '../constants';
 import Button from '../components/Button';
 import { useNavigation } from '@react-navigation/native';
 import { AuthService } from '../services/AuthService';
@@ -43,7 +43,7 @@ const Login: FC<IProps> = () => {
 
   useEffect(() => {
     fetch(
-      'https://test-rest-api.site/api/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c',
+      `${API_URL}/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
     )
       .then((response) => response.json())
       .then((data) => {

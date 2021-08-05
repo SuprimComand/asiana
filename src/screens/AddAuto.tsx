@@ -89,7 +89,7 @@ const AddAuto: FC<IProps> = () => {
     const newCar = {
       id: Date.now(),
       title: 'Автомобиль #' + Date.now(),
-      subtitle: 'AUDI A6',
+      subtitle: 'AUDI A' + Math.floor(Math.random() * 10),
       content: valueCar + ' ' + regionCar,
     };
 
