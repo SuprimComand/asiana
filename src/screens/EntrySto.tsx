@@ -19,13 +19,14 @@ import {
   FlatList,
   Dimensions,
   TextInput,
+  Alert,
 } from 'react-native';
 
 import Carousel from 'react-native-snap-carousel';
 import Modal from '../components/Modal';
 import HeaderProject from '../components/HeaderProject';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { API_URL, COLORS } from '../constants';
+import { API_URL, COLORS, token } from '../constants';
 import FormField from '../components/FormField';
 import Dropdown from '../components/Dropdown';
 import Button from '../components/Button';
@@ -42,18 +43,27 @@ import { ProfileCarMock } from '../typings/profileCarMock';
 import CarItem from '../components/CarItem';
 import AsyncStorage from '@react-native-community/async-storage';
 import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
-import { Box, Modal as ModalNative } from 'native-base';
-import TextInputMask from 'react-native-text-input-mask';
+// import { Box, Modal as ModalNative } from 'native-base';
+// import TextInputMask from 'react-native-text-input-mask';
 import SliderCars from '../components/SliderCars';
+import { connect } from 'react-redux';
+import { setLocation } from '../../actions';
 // import { marginTop } from 'styled-system';
 
 interface IExternalProps {
   route: any;
 }
 
-interface IProps extends IExternalProps {}
+interface IProps extends IExternalProps {
+  setLocation: any;
+  activeLocation: any;
+}
 
-const EntrySto: FC<IProps> = ({ route }) => {
+const EntrySto: FC<IProps> = ({
+  route,
+  setLocation,
+  activeLocation: location,
+}) => {
   const navigation = useNavigation();
   const [address, setAddress] = useState<AddressType['id']>(
     route?.params?.addressId || 0,
@@ -69,6 +79,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   // const [tireService, setTireService] = useState(false);
   // const [show, setShow] = useState(false);
   const [comment, setComment] = useState('');
+  const [updatedForm, setForm] = useState(false);
   const [
     createRequest,
     { loading: loadingCreateRequest, data: createSto },
@@ -92,17 +103,17 @@ const EntrySto: FC<IProps> = ({ route }) => {
   const notifier = useRef<any>(null);
   const withoutActiveProfileCar = carsArr.filter((car: any) => !car.active);
   const [locations, setLocations] = useState<any>([]);
-  const [location, setLocation] = useState<any>(regionId || null);
+  // const [location, setLocation] = useState<any>(regionId || null);
   const [isOpenAny, setOpenAny] = useState(false);
   const [customService, setCustomService] = useState('');
   // const [secondCustomService, setSecondCustomService] = useState('');
   const [addressesList, setAddresses] = useState<any>([]);
   const [isOpenDetail, setOpenDetail] = useState(false);
 
-  const [valueCar, setCarValue] = useState('');
-  const refReg = useRef<any>(null);
+  // const [valueCar, setCarValue] = useState('');
+  // const refReg = useRef<any>(null);
 
-  const [isOpenAddModal, setOpenAddModal] = useState(false);
+  // const [isOpenAddModal, setOpenAddModal] = useState(false);
   const [sliders, setSliders] = useState<any>([
     {
       id: 1,
@@ -121,18 +132,16 @@ const EntrySto: FC<IProps> = ({ route }) => {
       addButton: true,
     },
   ]);
-  // useFocusEffect(() => {
-
-  // })
 
   useEffect(() => {
-    if (regionId !== location) {
+    if (regionId !== location && regionId) {
       setLocation(regionId);
     }
   }, [regionId]);
 
   const handleChangeLocation = (l: any) => {
     setLocation(l);
+    setForm(true);
     (async () => {
       await AsyncStorage.setItem('regionId', l);
     })();
@@ -146,7 +155,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
 
   useEffect(() => {
     fetch(
-      `${API_URL}/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=sto${
+      `${API_URL}/1/mobile/location/list/?token=${token}&location_type=sto${
         location || regionId ? `&city_id=${location || regionId}` : ''
       }`,
     )
@@ -167,9 +176,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
   }, [location, regionId]);
 
   useEffect(() => {
-    fetch(
-      `${API_URL}/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
-    )
+    fetch(`${API_URL}/1/mobile/location/cities/?token=${token}`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.data) {
@@ -192,14 +199,7 @@ const EntrySto: FC<IProps> = ({ route }) => {
               ];
             }
 
-            return [
-              ...arr,
-              {
-                ...item.City,
-                label: item.City.name,
-                value: item.City.id,
-              },
-            ];
+            return arr;
           }, []),
         );
       });
@@ -226,11 +226,13 @@ const EntrySto: FC<IProps> = ({ route }) => {
   }, []);
 
   const handleChangeDate = useCallback((_: string, value: string) => {
+    setForm(true);
     setDate(value);
   }, []);
 
   const handleSelectAddress = useCallback(
     (id) => {
+      setForm(true);
       setAddress(id);
     },
     [address],
@@ -313,37 +315,8 @@ const EntrySto: FC<IProps> = ({ route }) => {
       />
       <View style={styles.content}>
         <ScrollView style={styles.scroll}>
-          <Modal isVisible={isOpenDetail} onCancel={() => setOpenDetail(false)}>
-            <View>
-              <Text
-                style={[
-                  styles.title,
-                  { fontSize: 18, textAlign: 'center', marginBottom: 40 },
-                ]}>
-                ИНФОРМАЦИЯ ОБ АВТОМОБИЛЕ
-              </Text>
-              <View style={{ alignItems: 'center' }}>
-                <Text>АВТОМОБИЛЬ KIA RIO</Text>
-                <Button
-                  onClick={() => {
-                    setOpenDetail(false);
-                    setSliders(
-                      sliders.filter((item: any) => item.id !== isOpenDetail),
-                    );
-                  }}
-                  label="Удалить"
-                  customStyles={{
-                    width: 100,
-                    borderRadius: 4,
-                    height: 35,
-                    marginTop: 10,
-                  }}
-                />
-              </View>
-            </View>
-          </Modal>
           <View style={[styles.infoContainer]}>
-            <SliderCars />
+            <SliderCars hideDetails />
             <Modal
               defaultHeight={200}
               onCancel={() => setOpenAny(false)}
@@ -360,19 +333,22 @@ const EntrySto: FC<IProps> = ({ route }) => {
                 maxLength={50}
                 value={customService}
                 label="Введите услугу"
-                onChange={(text) => setCustomService(text)}
+                onChange={(text) => {
+                  setCustomService(text);
+                  setForm(true);
+                }}
               />
               {/* <FormField
-                type="text"
-                maxLength={50}
-                placeholder="Второе поле"
-                labelStyles={{ paddingLeft: 0 }}
-                customStyles={{ marginBottom: 10 }}
-                editable
-                value={secondCustomService}
-                label="Второе поле"
-                onChange={setSecondCustomService}
-              /> */}
+                  type="text"
+                  maxLength={50}
+                  placeholder="Второе поле"
+                  labelStyles={{ paddingLeft: 0 }}
+                  customStyles={{ marginBottom: 10 }}
+                  editable
+                  value={secondCustomService}
+                  label="Второе поле"
+                  onChange={setSecondCustomService}
+                /> */}
               <Button
                 onClick={() => setOpenAny(false)}
                 disabled={!customService}
@@ -447,104 +423,111 @@ const EntrySto: FC<IProps> = ({ route }) => {
               numberOfLines={6}
               placeholder="Комментарий"
               customStyles={{ marginBottom: 10 }}
-              onChange={setComment}
+              onChange={(value) => {
+                setComment(value);
+                setForm(true);
+              }}
               value={comment}
               editable
             />
           </View>
           {/* <View style={styles.infoContainer}>
-            <Text style={styles.titleMin}>Выбрать услугу:</Text>
-            <View style={styles.checkboxContainer}>
-              <CheckBox
-                value={enterTO}
-                onValueChange={setTO}
-                style={styles.checkbox}
-              />
-              <Text style={styles.label}>Пройти регламентное ТО</Text>
-            </View>
-            <View style={styles.checkboxContainer}>
-              <CheckBox
-                value={oilChange}
-                onValueChange={setOil}
-                style={styles.checkbox}
-              />
-              <Text style={styles.label}>Замена масла</Text>
-            </View>
-            <View style={styles.checkboxContainer}>
-              <CheckBox
-                value={diagnostics}
-                onValueChange={setDiagnostics}
-                style={styles.checkbox}
-              />
-              <Text style={styles.label}>Диагностика</Text>
-            </View>
-            <View style={styles.checkboxContainer}>
-              <CheckBox
-                value={tireService}
-                onValueChange={setTireService}
-                style={styles.checkbox}
-              />
-              <Text style={styles.label}>Шиномонтаж</Text>
-            </View>
-            <View style={styles.checkboxContainer}>
-              <CheckBox
-                value={other}
-                onValueChange={setOther}
-                style={styles.checkbox}
-              />
-              <Text style={styles.label}>
-                Другое ({customService.split('').slice(0, 10).join('')}
-                {customService.length > 10 ? '...' : ''})
-              </Text>
-            </View>
-          </View> */}
+              <Text style={styles.titleMin}>Выбрать услугу:</Text>
+              <View style={styles.checkboxContainer}>
+                <CheckBox
+                  value={enterTO}
+                  onValueChange={setTO}
+                  style={styles.checkbox}
+                />
+                <Text style={styles.label}>Пройти регламентное ТО</Text>
+              </View>
+              <View style={styles.checkboxContainer}>
+                <CheckBox
+                  value={oilChange}
+                  onValueChange={setOil}
+                  style={styles.checkbox}
+                />
+                <Text style={styles.label}>Замена масла</Text>
+              </View>
+              <View style={styles.checkboxContainer}>
+                <CheckBox
+                  value={diagnostics}
+                  onValueChange={setDiagnostics}
+                  style={styles.checkbox}
+                />
+                <Text style={styles.label}>Диагностика</Text>
+              </View>
+              <View style={styles.checkboxContainer}>
+                <CheckBox
+                  value={tireService}
+                  onValueChange={setTireService}
+                  style={styles.checkbox}
+                />
+                <Text style={styles.label}>Шиномонтаж</Text>
+              </View>
+              <View style={styles.checkboxContainer}>
+                <CheckBox
+                  value={other}
+                  onValueChange={setOther}
+                  style={styles.checkbox}
+                />
+                <Text style={styles.label}>
+                  Другое ({customService.split('').slice(0, 10).join('')}
+                  {customService.length > 10 ? '...' : ''})
+                </Text>
+              </View>
+            </View> */}
           {/* <View style={{ paddingBottom: 20 }}> */}
           {/* <View style={styles.card}>
-              <Text style={styles.cardTitle}>
-                {car.brand || 'Нет авто'} {car.model}
-              </Text>
-              <Text style={styles.subTitle}>
-                {car.complectation || 'Нет комплектации'}
-              </Text>
-            </View> */}
+                <Text style={styles.cardTitle}>
+                  {car.brand || 'Нет авто'} {car.model}
+                </Text>
+                <Text style={styles.subTitle}>
+                  {car.complectation || 'Нет комплектации'}
+                </Text>
+              </View> */}
           {/* <View
-              style={{
-                flexDirection: 'row',
-                marginBottom: 10,
-                alignItems: 'center',
-                paddingLeft: 25,
-              }}>
-              <TouchableOpacity
                 style={{
-                  backgroundColor: 'tomato',
-                  padding: 10,
-                  marginRight: 10,
-                }}
-                onPress={() => setShow(true)}>
-                <Text style={{ color: 'white' }}>Выбрать время</Text>
-              </TouchableOpacity>
-              <Text style={{ color: 'blue', fontSize: 20 }}>
-                {String(
-                  new Date(time).getHours() + ':' + new Date(time).getMinutes(),
-                )}
-              </Text>
-            </View>
-            {show && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date}
-                mode="time"
-                is24Hour={true}
-                onChange={(event: any, selectedDate: any) => {
-                  const currentDate = selectedDate || date;
-                  setShow(Platform.OS === 'ios');
-                  setTime(currentDate);
-                }}
-              />
-            )} */}
+                  flexDirection: 'row',
+                  marginBottom: 10,
+                  alignItems: 'center',
+                  paddingLeft: 25,
+                }}>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: 'tomato',
+                    padding: 10,
+                    marginRight: 10,
+                  }}
+                  onPress={() => setShow(true)}>
+                  <Text style={{ color: 'white' }}>Выбрать время</Text>
+                </TouchableOpacity>
+                <Text style={{ color: 'blue', fontSize: 20 }}>
+                  {String(
+                    new Date(time).getHours() + ':' + new Date(time).getMinutes(),
+                  )}
+                </Text>
+              </View>
+              {show && (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={date}
+                  mode="time"
+                  is24Hour={true}
+                  onChange={(event: any, selectedDate: any) => {
+                    const currentDate = selectedDate || date;
+                    setShow(Platform.OS === 'ios');
+                    setTime(currentDate);
+                  }}
+                />
+              )} */}
           {/* </View> */}
         </ScrollView>
-        <Button onClick={handleSubmit} label="ЗАПИСАТЬСЯ" />
+        <Button
+          onClick={handleSubmit}
+          disabled={!updatedForm}
+          label="ЗАПИСАТЬСЯ"
+        />
       </View>
     </View>
   );
@@ -631,4 +614,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EntrySto;
+const mapStateToProps = (state: any) => state;
+
+export default connect(mapStateToProps, { setLocation })(EntrySto);

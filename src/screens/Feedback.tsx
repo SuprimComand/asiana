@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import Button from '../components/Button';
 import HeaderProject from '../components/HeaderProject';
-import { API_URL, COLORS } from '../constants';
+import { API_URL, COLORS, token } from '../constants';
 import Icon from 'react-native-vector-icons/AntDesign';
 import StarRating from 'react-native-star-rating';
 import { useNavigation } from '@react-navigation/native';
@@ -50,7 +50,7 @@ const Feedback: FC<IProps> = () => {
 
   useEffect(() => {
     fetch(
-      `${API_URL}/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=sto${
+      `${API_URL}/1/mobile/location/list/?token=${token}&location_type=sto${
         location ? `&city_id=${location}` : ''
       }`,
     )
@@ -70,9 +70,7 @@ const Feedback: FC<IProps> = () => {
   }, [location]);
 
   useEffect(() => {
-    fetch(
-      `${API_URL}/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
-    )
+    fetch(`${API_URL}/1/mobile/location/cities/?token=${token}`)
       .then((response) => response.json())
       .then((data) =>
         setLocations(

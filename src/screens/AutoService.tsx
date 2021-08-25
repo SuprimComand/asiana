@@ -10,7 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import HeaderProject from '../components/HeaderProject';
-import { API_URL, COLORS } from '../constants';
+import { API_URL, COLORS, token } from '../constants';
 import Modal from '../components/Modal';
 import iconMarker from '../assets/autoservice.png';
 import { useQuery } from '@apollo/client';
@@ -41,9 +41,7 @@ const AutoService: FC<IProps> = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(
-      `${API_URL}/1/mobile/location/list/?token=b4831f21df6202f5bacade4b7bbc3e5c&location_type=sto`,
-    )
+    fetch(`${API_URL}/1/mobile/location/list/?token=${token}&location_type=sto`)
       .then((response) => response.json())
       .then((data) => setAddresses(data))
       .finally(() => setLoading(false));

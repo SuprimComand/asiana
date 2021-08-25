@@ -9,8 +9,8 @@ const AuthProvider = ({ children }: PropsWithChildren<IProps>) => {
   const navigation = useNavigation();
 
   const handleCheckToken = async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (token) {
+    const user = await AsyncStorage.getItem('userData');
+    if (user) {
       navigation.navigate('Project');
     } else {
       navigation.navigate('Login');

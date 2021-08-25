@@ -23,6 +23,8 @@ import { NotifierRoot } from 'react-native-notifier';
 import { CREATE_PUSH_TOKEN } from './src/graph/mutations/createPushToken';
 import AsyncStorage from '@react-native-community/async-storage';
 import { NativeBaseProvider } from 'native-base';
+import { Provider } from 'react-redux';
+import store from './store';
 
 console.disableYellowBox = true;
 // @ts-ignore
@@ -110,15 +112,17 @@ class App extends React.Component {
     }
 
     return (
-      <ApolloProvider client={client}>
-        <NotifierWrapper>
-          <NativeBaseProvider>
-            <NavigationContainer>
-              <StackNavigation />
-            </NavigationContainer>
-          </NativeBaseProvider>
-        </NotifierWrapper>
-      </ApolloProvider>
+      <Provider store={store}>
+        <ApolloProvider client={client}>
+          <NotifierWrapper>
+            <NativeBaseProvider>
+              <NavigationContainer>
+                <StackNavigation />
+              </NavigationContainer>
+            </NativeBaseProvider>
+          </NotifierWrapper>
+        </ApolloProvider>
+      </Provider>
     );
   }
 }

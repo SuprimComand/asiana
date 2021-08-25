@@ -9,11 +9,12 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Button from '../components/Button';
-import { COLORS } from '../constants';
+import { API_URL, COLORS, token } from '../constants';
 import { AuthService } from '../services/AuthService';
 import AsyncStorage from '@react-native-community/async-storage';
 import FormField from '../components/FormField';
 import HeaderProject from '../components/HeaderProject';
+import { useAsyncStorage } from '../hooks/asyncStorage';
 
 interface IExternalProps {}
 
@@ -24,7 +25,10 @@ const SmsCodeNotification: FC<IProps> = () => {
   const [hasError, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasFocus, setFocus] = useState(false);
-  let [timer, setTimer] = useState(60);
+  // const [code] = useAsyncStorage('code');
+  const [auth_id] = useAsyncStorage('auth_id');
+  let [timer, setTimer] = useState(240);
+  const [error, setErrorMessage] = useState<string | null>(null);
   const navigation = useNavigation();
 
   const handleChangeTimer = () => {
@@ -35,8 +39,38 @@ const SmsCodeNotification: FC<IProps> = () => {
     }, 1000);
   };
 
+  const handleCheckSms = async () => {
+    if (code.length < 4) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('auth_id', auth_id);
+      formData.append('code', code);
+      const response = await fetch(
+        `${API_URL}/1/mobile/user/check_code?token=${token}`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
+      const data = await response.json();
+      setLoading(false);
+      if (!data.data) {
+        return;
+      }
+      await AsyncStorage.setItem('auth_id', data.data.auth_id);
+      await AsyncStorage.setItem('userData', JSON.stringify(data.data.data));
+      return navigation.navigate('Project');
+    } catch (err) {
+      console.log('err', err);
+      setErrorMessage('Не верный код');
+    }
+  };
+
   useEffect(() => {
-    if (timer === 60) {
+    if (timer === 240) {
       handleChangeTimer();
     }
   }, [timer]);
@@ -51,28 +85,28 @@ const SmsCodeNotification: FC<IProps> = () => {
     }
   }, []);
 
-  const handleSendCode = useCallback(async () => {
-    if (code.length === 4) {
-      setLoading(true);
-      const data = await AuthService.sendCode(code);
-      setTimeout(() => setLoading(false), 1000);
-      // TODO: fix
-      if (data) {
-        setError(false);
-        const { refresh, token } = data;
-        await AsyncStorage.setItem('refresh', refresh);
-        await AsyncStorage.setItem('token', token);
-        return navigation.navigate('Project');
-      }
-      setError(true);
-    }
-  }, [code]);
+  // const handleSendCode = useCallback(async () => {
+  //   if (code.length === 4) {
+  //     setLoading(true);
+  //     const data = await AuthService.sendCode(code);
+  //     setTimeout(() => setLoading(false), 1000);
+  //     // TODO: fix
+  //     if (data) {
+  //       setError(false);
+  //       const { refresh, token } = data;
+  //       await AsyncStorage.setItem('refresh', refresh);
+  //       await AsyncStorage.setItem('token', token);
+  //       return navigation.navigate('Project');
+  //     }
+  //     setError(true);
+  //   }
+  // }, [code]);
 
   const reSendPhone = async () => {
     const phone = await AsyncStorage.getItem('phone');
     const status = await AuthService.login({ phone: `7${phone}` });
     if (status) {
-      setTimer(60);
+      setTimer(240);
     }
   };
 
@@ -105,27 +139,27 @@ const SmsCodeNotification: FC<IProps> = () => {
                 textContentType="oneTimeCode"
                 onBlur={handleBlur}
                 autoFocus
-                onSubmitEditing={handleSendCode}
+                onSubmitEditing={handleCheckSms}
                 customStyles={{ ...styles.formField, ...errorStyle }}
                 onChange={handleChangeCode}
                 mask="[0000]"
                 keyboardType="number-pad"
                 editable
               />
-              {Boolean(hasError) && (
-                <Text style={styles.errorText}>Не верный код</Text>
+              {(Boolean(hasError) || Boolean(error)) && (
+                <Text style={styles.errorText}>{error || 'Не верный код'}</Text>
               )}
             </View>
             <Button
               customStyles={[
                 styles.button,
                 !disableSendButton ? styles.activeButton : {},
-                hasError ? styles.errorButton : {},
+                hasError || Boolean(error) ? styles.errorButton : {},
               ]}
               loading={loading}
               disabled={disableSendButton}
               label={loading ? '' : 'OK'}
-              onClick={handleSendCode}
+              onClick={handleCheckSms}
             />
           </View>
           {timer ? (
@@ -148,7 +182,7 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 20,
   },
-  errorButton: { top: 29 },
+  errorButton: { top: 26 },
   formField: {
     // width: Dimensions.get('screen').width - 120,
   },

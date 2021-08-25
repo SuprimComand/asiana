@@ -16,3 +16,4 @@ export const COLORS = {
 };
 
 export const API_URL = 'https://test-rest-api.site/api';
+export const token = 'b4831f21df6202f5bacade4b7bbc3e5c';

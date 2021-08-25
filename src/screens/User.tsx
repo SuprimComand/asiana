@@ -27,7 +27,7 @@ import Dropdown from '../components/Dropdown';
 import FormField from '../components/FormField';
 import HeaderProject from '../components/HeaderProject';
 import { Action } from '../components/SelectButtonGroup';
-import { API_URL, COLORS } from '../constants';
+import { API_URL, COLORS, token } from '../constants';
 import Loader from '../components/Loader';
 import { UserMock } from '../typings/userProfile';
 import { useAsyncStorage } from '../hooks/asyncStorage';
@@ -41,10 +41,15 @@ import Modal from '../components/Modal';
 import TextInputMask from 'react-native-text-input-mask';
 import AsyncStorage from '@react-native-community/async-storage';
 import SliderCars from '../components/SliderCars';
+import { connect } from 'react-redux';
+import { setLocation } from '../../actions';
 
 interface IExternalProps {}
 
-interface IProps extends IExternalProps {}
+interface IProps extends IExternalProps {
+  setLocation: any;
+  activeLocation: any;
+}
 
 // const defaultData: Action[] = [
 //   {
@@ -57,12 +62,12 @@ interface IProps extends IExternalProps {}
 //   },
 // ];
 
-const User: FC<IProps> = () => {
+const User: FC<IProps> = (props) => {
   const navigation = useNavigation();
   const [editable, setEditable] = useState(true);
   const [userId] = useAsyncStorage('userId');
+  const [userData] = useAsyncStorage('userData');
   const [profileId] = useAsyncStorage('profileId');
-  const [token] = useAsyncStorage('token');
   const [gender, setGender] = useState<number>(0);
   const [selectedAddress, setAddress] = useState<number | null>(null);
   const [disabledPhone, setDisabledPhone] = useState(false);
@@ -76,13 +81,15 @@ const User: FC<IProps> = () => {
     skip: !userId,
   });
   const { data: addressesData } = useQuery(GET_ADDRESSES);
-  const [user, setUser] = useState<any>(UserMock);
+  const [user, setUser] = useState<any>({});
+  const [load, setLoading] = useState(false);
   const addresses: AddressType[] = addressesData?.addresses || [];
   const [locations, setLocations] = useState<any>([]);
-  const [location, setLocation] = useState<any>(regionId || null);
+  // const [location, setLocation] = useState<any>(regionId || null);
+  const { setLocation, activeLocation: location } = props;
 
   useEffect(() => {
-    if (regionId !== location) {
+    if (regionId !== location && regionId) {
       setLocation(regionId);
     }
   }, [regionId]);
@@ -93,23 +100,56 @@ const User: FC<IProps> = () => {
       await AsyncStorage.setItem('regionId', l);
     })();
   };
+  const getUser = () => {
+    const user = JSON.parse(userData);
+    if (!user) {
+      return;
+    }
+    const f = new FormData();
+    f.append('user_id', user.id);
+
+    fetch(`${API_URL}/1/mobile/user/profile/?token=${token}`, {
+      body: f,
+      method: 'POST',
+    })
+      .then((response) => console.log(response))
+      .then(async (data) => {
+        console.log(data);
+        const phone = await AsyncStorage.getItem('phone');
+      })
+      .catch((err) => console.log(err));
+  };
 
   useEffect(() => {
     (async () => {
+      getUser();
+      setLoading(true);
       const phone = await AsyncStorage.getItem('phone');
       if (phone && !user.phone) {
-        setUser({
-          ...user,
-          number: phone,
-        });
+        if (userData) {
+          setUser({
+            ...JSON.parse(userData),
+            number: phone,
+          });
+        } else {
+          setUser({
+            ...user,
+            number: phone,
+          });
+        }
+
+        setLoading(false);
+      } else {
+        if (userData) {
+          setUser(JSON.parse(userData));
+        }
+        setLoading(false);
       }
     })();
-  }, []);
+  }, [userData]);
 
   useEffect(() => {
-    fetch(
-      `${API_URL}/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
-    )
+    fetch(`/1/mobile/location/cities/?token`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.data) {
@@ -132,14 +172,7 @@ const User: FC<IProps> = () => {
               ];
             }
 
-            return [
-              ...arr,
-              {
-                ...item.City,
-                label: item.City.name,
-                value: item.City.id,
-              },
-            ];
+            return arr;
           }, []),
         );
       });
@@ -173,7 +206,7 @@ const User: FC<IProps> = () => {
   }, [data]);
 
   const handleSubmit = useCallback(() => {
-    const { id, address, __typename, birthday, ...restUser } = user;
+    const { id, address, __typename, date_of_birth, ...restUser } = user;
     createUserRequest({
       variables: {
         input: {
@@ -182,29 +215,39 @@ const User: FC<IProps> = () => {
           userId: Number(userId),
           addressId: selectedAddress,
           gender,
-          birthday: birthday.replace(/\./g, '-'),
+          date_of_birth: date_of_birth.replace(/\./g, '-'),
         },
       },
     });
     setEditable(false);
   }, [user, selectedAddress, gender]);
 
-  const saveUserData = () => {
-    fetch(
-      `${API_URL}/1/mobile/user/save_profile/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          user_id: 1,
-          city_id: location,
-          firstname: user.name,
-          lastname: user.surname,
-          middlename: user.lastname,
-          email: user.email,
-          bday: user.birthday,
-        }),
-      },
-    ).then((response) => console.log(response));
+  const saveUserData = async () => {
+    if (!userData) {
+      return;
+    }
+    setLoading(true);
+    const userD = JSON.parse(userData);
+    const formData = new FormData();
+    const userDataForm = {
+      user_id: userD.id,
+      city_id: location,
+      ...user,
+    };
+
+    await AsyncStorage.setItem('userData', JSON.stringify(userDataForm));
+    Object.entries(userDataForm).forEach(([key, value]) =>
+      formData.append(key, value),
+    );
+    fetch(`${API_URL}/1/mobile/user/save_profile/?token=${token}`, {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data, 'result');
+      })
+      .finally(() => setLoading(false));
   };
 
   const styleForm: ViewStyle = {
@@ -228,7 +271,7 @@ const User: FC<IProps> = () => {
     [user, setUser],
   );
 
-  if (!token || !userId || loading || createUserLoading) {
+  if (load) {
     return (
       <View style={styles.containerLoading}>
         <Loader size={50} />
@@ -236,12 +279,12 @@ const User: FC<IProps> = () => {
     );
   }
 
-  let birthday = null;
-  if (!editable && user.birthday) {
-    if (user.birthday.includes('-')) {
-      birthday = user.birthday.split('-').reverse().join('.');
+  let date_of_birth = null;
+  if (!editable && user.date_of_birth) {
+    if (user.date_of_birth.includes('-')) {
+      date_of_birth = user.date_of_birth.split('-').reverse().join('.');
     } else {
-      birthday = user.birthday.split('.').reverse().join('.');
+      date_of_birth = user.date_of_birth.split('.').reverse().join('.');
     }
   }
 
@@ -266,7 +309,7 @@ const User: FC<IProps> = () => {
       />
       <View style={styles.content}>
         <ScrollView>
-          <SliderCars />
+          <SliderCars hideDetails />
           <View style={[styles.field, { marginTop: 10 }]}>
             <View style={[styles.form, styleForm]}>
               <View style={{ flexDirection: 'row' }}>
@@ -280,7 +323,7 @@ const User: FC<IProps> = () => {
                   onChangeText={(value: any, value2?: any) => {
                     handleChangeForm('number')(value2 || value);
                   }}
-                  onSubmitEditing={handleSubmit}
+                  onSubmitEditing={saveUserData}
                 />
                 <Button
                   onClick={() => setDisabledPhone(!disabledPhone)}
@@ -313,30 +356,30 @@ const User: FC<IProps> = () => {
                 <FormField
                   type="text"
                   customTextStyle={{ fontSize: 24 }}
-                  value={user.surname || ''}
-                  editable={editable}
-                  placeholder="Фамилия"
-                  onChange={handleChangeForm('surname')}
-                />
-              </View>
-              <View style={styles.flex}>
-                <FormField
-                  type="text"
-                  customTextStyle={{ fontSize: 24 }}
-                  value={user.name || ''}
-                  editable={editable}
-                  placeholder="Имя"
-                  onChange={handleChangeForm('name')}
-                />
-              </View>
-              <View style={styles.flex}>
-                <FormField
-                  type="text"
-                  customTextStyle={{ fontSize: 24 }}
                   value={user.lastname || ''}
                   editable={editable}
-                  placeholder="Отчество"
+                  placeholder="Фамилия"
                   onChange={handleChangeForm('lastname')}
+                />
+              </View>
+              <View style={styles.flex}>
+                <FormField
+                  type="text"
+                  customTextStyle={{ fontSize: 24 }}
+                  value={user.firstname || ''}
+                  editable={editable}
+                  placeholder="Имя"
+                  onChange={handleChangeForm('firstname')}
+                />
+              </View>
+              <View style={styles.flex}>
+                <FormField
+                  type="text"
+                  customTextStyle={{ fontSize: 24 }}
+                  value={user.middlename || ''}
+                  editable={editable}
+                  placeholder="Отчество"
+                  onChange={handleChangeForm('middlename')}
                 />
               </View>
               <View style={styles.flex}>
@@ -344,8 +387,8 @@ const User: FC<IProps> = () => {
                   editable={editable}
                   placeholder="Дата и год рождения"
                   type="date"
-                  value={!editable ? birthday : user.birthday}
-                  onChange={handleChangeForm('birthday')}
+                  value={!editable ? date_of_birth : user.bday}
+                  onChange={handleChangeForm('bday')}
                 />
               </View>
               <View style={styles.flex}>
@@ -366,13 +409,9 @@ const User: FC<IProps> = () => {
             </View>
           </View>
         </ScrollView>
-        {/* <View style={styles.center}>
-          <Button
-            bgColor={color}
-            onClick={handleChangeEditable}
-            label={label}
-          />
-        </View> */}
+        <View style={styles.center}>
+          <Button onClick={saveUserData} label="Сохранить" />
+        </View>
       </View>
     </View>
   );
@@ -460,4 +499,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default User;
+const mapStateToProps = (state: any) => state;
+
+export default connect(mapStateToProps, { setLocation })(User);

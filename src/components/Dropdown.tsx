@@ -11,7 +11,7 @@ interface DropDownItem {
 interface IExternalProps {
   list: DropDownItem[];
   onSelect?: (value: string | number) => void;
-  selectedValue?: string | number;
+  selectedValue?: string | number | null;
 }
 
 interface IProps extends IExternalProps {}

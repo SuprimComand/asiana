@@ -3,7 +3,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import HeaderProject from '../components/HeaderProject';
-import { API_URL, COLORS } from '../constants';
+import { API_URL, COLORS, token } from '../constants';
 import CardStock from '../components/CardStock';
 import { FlatList } from 'react-native-gesture-handler';
 import Loader from '../components/Loader';
@@ -24,7 +24,7 @@ const Stocks: FC<IProps> = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_URL}/1/mobile/action/list/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
+        `${API_URL}/1/mobile/action/list/?token=${token}`,
       );
 
       const data = await response.json();

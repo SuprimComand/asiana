@@ -10,6 +10,7 @@ import {
   BackHandler,
   Alert,
   Dimensions,
+  AppState,
 } from 'react-native';
 
 import TextInputMask from 'react-native-text-input-mask';
@@ -50,62 +51,44 @@ interface IProps extends IExternalProps {
 const Main: FC<IProps> = () => {
   const [isOpenModal, setOpenModal] = useState(false);
   const navigation = useNavigation();
-  const [profileId] = useAsyncStorage('profileId');
-  const [userId] = useAsyncStorage('userId');
+  // const [profileId] = useAsyncStorage('profileId');
+  // const [userId] = useAsyncStorage('userId');
   const [isOpenList, setOpenList] = useState(false);
-  const { data, loading, refetch } = useQuery(GET_PROFILE_CAR, {
-    variables: { profileId: Number(profileId) },
-    skip: !profileId,
-  });
-  const { data: profiles, loading: loadingProfile } = useQuery(
-    GET_USER_PROFILES,
-    {
-      variables: { userId: Number(userId) },
-      skip: !userId,
-    },
-  );
-  const { data: requestStoData, loading: requestStoLoading } = useQuery(
-    GET_REQUEST_STO,
-    {
-      variables: { userId: Number(userId), profileId: Number(profileId) },
-      skip: !userId || !profileId,
-    },
-  );
-  const profile = profiles?.profiles.find(
-    (item: ProfileType) => item.id === profileId,
-  );
+  // const { data, loading, refetch } = useQuery(GET_PROFILE_CAR, {
+  //   variables: { profileId: Number(profileId) },
+  //   skip: !profileId,
+  // });
+  // const { data: profiles, loading: loadingProfile } = useQuery(
+  //   GET_USER_PROFILES,
+  //   {
+  //     variables: { userId: Number(userId) },
+  //     skip: !userId,
+  //   },
+  // );
+  // const { data: requestStoData, loading: requestStoLoading } = useQuery(
+  //   GET_REQUEST_STO,
+  //   {
+  //     variables: { userId: Number(userId), profileId: Number(profileId) },
+  //     skip: !userId || !profileId,
+  //   },
+  // );
+  // const profile = profiles?.profiles.find(
+  //   (item: ProfileType) => item.id === profileId,
+  // );
 
-  const [isOpenAddModal, setOpenAddModal] = useState(false);
+  // const [isOpenAddModal, setOpenAddModal] = useState(false);
 
-  const requestStoList = requestStoData?.requestSto || [];
+  // const requestStoList = requestStoData?.requestSto || [];
   const [
     updateProfileCar,
     { loading: profileCarLoading, data: profileCar },
   ] = useMutation(UPDATE_PROFILE_CAR);
 
-  const profileCars: ProfileCarType[] = data?.profileCars || [];
-  const activeProfileCar = profileCars.find((car) => Boolean(car.active));
-  const withoutActiveProfileCar = profileCars.filter((car) => !car.active);
-  const [isOpenDetail, setOpenDetail] = useState(false);
+  // const profileCars: ProfileCarType[] = data?.profileCars || [];
+  // const activeProfileCar = profileCars.find((car) => Boolean(car.active));
+  // const withoutActiveProfileCar = profileCars.filter((car) => !car.active);
+  // const [isOpenDetail, setOpenDetail] = useState(false);
   const routeNameRef = navigation.isFocused;
-  const [sliders, setSliders] = useState<any>([
-    {
-      id: 1,
-      title: 'Автомобиль',
-      subtitle: 'AUDI A6',
-      content: 'H 553 PO 178',
-    },
-    {
-      id: 2,
-      title: 'Автомобиль',
-      subtitle: 'AUDI A6',
-      content: 'H 553 PO 178',
-    },
-    {
-      id: 3,
-      addButton: true,
-    },
-  ]);
 
   // const notification = () =>
   //   Alert.alert(
@@ -152,15 +135,15 @@ const Main: FC<IProps> = () => {
     }
   }, [profileCar]);
 
-  const handleLeftActionClick = useCallback(() => {
-    navigation.navigate('User');
-  }, []);
+  // const handleLeftActionClick = useCallback(() => {
+  //   navigation.navigate('User');
+  // }, []);
 
-  const handleOpenModal = useCallback(() => {
-    if (activeProfileCar) {
-      setOpenModal(true);
-    }
-  }, [activeProfileCar]);
+  // const handleOpenModal = useCallback(() => {
+  //   if (activeProfileCar) {
+  //     setOpenModal(true);
+  //   }
+  // }, [activeProfileCar]);
 
   const handleCloseModal = useCallback(() => {
     setOpenModal(false);
@@ -171,135 +154,135 @@ const Main: FC<IProps> = () => {
     navigation.navigate('EntrySto');
   }, []);
 
-  const handleClickAddAuto = useCallback(() => {
-    navigation.navigate('AddAuto');
-  }, []);
+  // const handleClickAddAuto = useCallback(() => {
+  //   navigation.navigate('AddAuto');
+  // }, []);
 
   const handleClickHistory = useCallback(() => {
     handleCloseModal();
     navigation.navigate('HistoryMaintenance');
   }, []);
 
-  const handleChangeActiveCar = useCallback(
-    (id: ProfileCarType['id']) => {
-      return () => {
-        AsyncStorage.setItem('carId', id);
-        updateProfileCar({
-          variables: {
-            id,
-            input: {
-              active: 1,
-            },
-          },
-          refetchQueries: ['profileCars'],
-        });
-      };
-    },
-    [updateProfileCar, profileCar],
-  );
+  // const handleChangeActiveCar = useCallback(
+  //   (id: ProfileCarType['id']) => {
+  //     return () => {
+  //       AsyncStorage.setItem('carId', id);
+  //       updateProfileCar({
+  //         variables: {
+  //           id,
+  //           input: {
+  //             active: 1,
+  //           },
+  //         },
+  //         refetchQueries: ['profileCars'],
+  //       });
+  //     };
+  //   },
+  //   [updateProfileCar, profileCar],
+  // );
 
-  const renderAutoCard = useCallback(
-    ({ item }) => {
-      return <CarItem {...item.car} onPress={handleChangeActiveCar(item.id)} />;
-    },
-    [data, isOpenList],
-  );
+  // const renderAutoCard = useCallback(
+  //   ({ item }) => {
+  //     return <CarItem {...item.car} onPress={handleChangeActiveCar(item.id)} />;
+  //   },
+  //   [data, isOpenList],
+  // );
 
-  const handleClickAddSto = useCallback(() => {
-    navigation.navigate('EntrySto');
-  }, []);
+  // const handleClickAddSto = useCallback(() => {
+  //   navigation.navigate('EntrySto');
+  // }, []);
 
-  const renderRequestSto = useCallback(() => {
-    return requestStoList.map((requestSto: RequestStoType, index: number) => {
-      const first = index === 0;
-      return (
-        <View style={styles.requestStoCard} key={requestSto.id}>
-          <View style={styles.cardHeader}>
-            {first && (
-              <>
-                <Text style={styles.cardTitle}>Запись в СТО</Text>
-                <TouchableOpacity onPress={handleClickAddSto}>
-                  <Icon color={COLORS.darkOrange} size={20} name="plus" />
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-          <Card>
-            <View style={styles.cardHeader}>
-              <Text style={styles.fontBold}>
-                {requestSto?.address.address || 'Нет адреса'}
-              </Text>
-              <Text style={styles.subTitle}>
-                {requestSto?.date
-                  ? moment(requestSto?.date).format('hh:mm DD.MM.YYYY')
-                  : 'Нет рабочего времени'}
-              </Text>
-            </View>
-            <View style={styles.dataContent}>
-              <Text style={styles.title}>
-                {`${requestSto?.car.brand || 'Нет автомобиля'} ${
-                  requestSto?.car.model || ''
-                }`}
-              </Text>
-              <Text style={styles.subTitle}>
-                {requestSto?.car.complectation || 'Нет комплектации'}
-              </Text>
-            </View>
-            <Text>{requestSto?.workKind}</Text>
-          </Card>
-        </View>
-      );
-    });
-  }, [requestStoList, userId]);
+  // const renderRequestSto = useCallback(() => {
+  //   return requestStoList.map((requestSto: RequestStoType, index: number) => {
+  //     const first = index === 0;
+  //     return (
+  //       <View style={styles.requestStoCard} key={requestSto.id}>
+  //         <View style={styles.cardHeader}>
+  //           {first && (
+  //             <>
+  //               <Text style={styles.cardTitle}>Запись в СТО</Text>
+  //               <TouchableOpacity onPress={handleClickAddSto}>
+  //                 <Icon color={COLORS.darkOrange} size={20} name="plus" />
+  //               </TouchableOpacity>
+  //             </>
+  //           )}
+  //         </View>
+  //         <Card>
+  //           <View style={styles.cardHeader}>
+  //             <Text style={styles.fontBold}>
+  //               {requestSto?.address.address || 'Нет адреса'}
+  //             </Text>
+  //             <Text style={styles.subTitle}>
+  //               {requestSto?.date
+  //                 ? moment(requestSto?.date).format('hh:mm DD.MM.YYYY')
+  //                 : 'Нет рабочего времени'}
+  //             </Text>
+  //           </View>
+  //           <View style={styles.dataContent}>
+  //             <Text style={styles.title}>
+  //               {`${requestSto?.car.brand || 'Нет автомобиля'} ${
+  //                 requestSto?.car.model || ''
+  //               }`}
+  //             </Text>
+  //             <Text style={styles.subTitle}>
+  //               {requestSto?.car.complectation || 'Нет комплектации'}
+  //             </Text>
+  //           </View>
+  //           <Text>{requestSto?.workKind}</Text>
+  //         </Card>
+  //       </View>
+  //     );
+  //   });
+  // }, [requestStoList, userId]);
 
-  const renderBonusCard = useCallback(() => {
-    if (loadingProfile) {
-      return <Image style={styles.loadingRow} source={loadingCard} />;
-    }
-    return (
-      <View>
-        <Text style={styles.title}>{profile?.bonus} Азкоин</Text>
-        <Text style={styles.subTitle}>Сегодня +1 Азкоин</Text>
-        <Text style={[styles.title, { marginTop: 10 }]}>
-          Ваша скидка: {profile?.percents}%
-        </Text>
-      </View>
-    );
-  }, [activeProfileCar, userId]);
+  // const renderBonusCard = useCallback(() => {
+  //   if (loadingProfile) {
+  //     return <Image style={styles.loadingRow} source={loadingCard} />;
+  //   }
+  //   return (
+  //     <View>
+  //       <Text style={styles.title}>{profile?.bonus} Азкоин</Text>
+  //       <Text style={styles.subTitle}>Сегодня +1 Азкоин</Text>
+  //       <Text style={[styles.title, { marginTop: 10 }]}>
+  //         Ваша скидка: {profile?.percents}%
+  //       </Text>
+  //     </View>
+  //   );
+  // }, [activeProfileCar, userId]);
 
-  const renderActiveCard = useCallback(() => {
-    if (profileCarLoading) {
-      return <Image style={styles.loadingRow} source={loadingCard} />;
-    }
+  // const renderActiveCard = useCallback(() => {
+  //   if (profileCarLoading) {
+  //     return <Image style={styles.loadingRow} source={loadingCard} />;
+  //   }
 
-    return (
-      <View>
-        <Text style={styles.title}>
-          {`${activeProfileCar?.car.brand || 'Нет данных'} ${
-            activeProfileCar?.car.model || ''
-          }`}
-        </Text>
-        <Text style={styles.subTitle}>
-          {activeProfileCar?.car.complectation || 'Нет комплектации'}
-        </Text>
-      </View>
-    );
-  }, [activeProfileCar, userId]);
+  //   return (
+  //     <View>
+  //       <Text style={styles.title}>
+  //         {`${activeProfileCar?.car.brand || 'Нет данных'} ${
+  //           activeProfileCar?.car.model || ''
+  //         }`}
+  //       </Text>
+  //       <Text style={styles.subTitle}>
+  //         {activeProfileCar?.car.complectation || 'Нет комплектации'}
+  //       </Text>
+  //     </View>
+  //   );
+  // }, [activeProfileCar, userId]);
 
-  const handleChangeOpenList = useCallback(
-    (status: boolean) => {
-      return () => setOpenList(status);
-    },
-    [setOpenList, isOpenList],
-  );
+  // const handleChangeOpenList = useCallback(
+  //   (status: boolean) => {
+  //     return () => setOpenList(status);
+  //   },
+  //   [setOpenList, isOpenList],
+  // );
 
-  if (loading || requestStoLoading || !userId) {
-    return (
-      <View style={styles.containerLoading}>
-        <Loader size={50} />
-      </View>
-    );
-  }
+  // if (loading || requestStoLoading || !userId) {
+  //   return (
+  //     <View style={styles.containerLoading}>
+  //       <Loader size={50} />
+  //     </View>
+  //   );
+  // }
 
   const arrowIcon = isOpenList ? 'arrowdown' : 'arrowright';
 
@@ -334,15 +317,6 @@ const Main: FC<IProps> = () => {
           </View>
 
           <SliderCars />
-
-          <View style={styles.infoContainer}>
-            <Text style={styles.title}>Последнее посещение СТО:</Text>
-            <Text style={[styles.text, { marginBottom: 10 }]}>
-              24.06.2021 г.
-            </Text>
-            <Text style={styles.title}>Пробег:</Text>
-            <Text style={styles.text}>81242 км</Text>
-          </View>
 
           <View style={[styles.infoContainer, styles.infoContainerGray]}>
             <Text style={styles.title}>Наши рекомендации:</Text>

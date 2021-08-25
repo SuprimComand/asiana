@@ -8,7 +8,7 @@
  * @format
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { COLORS } from '../constants';
@@ -31,11 +31,13 @@ import pin_drop from '../assets/footer-icons/pin_drop.png';
 import portrait from '../assets/footer-icons/portrait.png';
 import whatshot from '../assets/footer-icons/whatshot.png';
 import { Notification } from '../../App';
+import moment from 'moment';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigation = () => {
   const [userId] = useAsyncStorage('userId');
+  const time = useRef(new Date());
 
   const { data, loading } = useQuery(GET_USER_PROFILES, {
     variables: { userId: Number(userId) },
@@ -46,15 +48,23 @@ const TabNavigation = () => {
     if (data && data.profiles?.length) {
       AsyncStorage.setItem('profileId', data.profiles[0].id);
     }
+
+    return () => {
+      AsyncStorage.setItem(
+        'closedTime',
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        moment(new Date(time.current)).format('hh:mm DD.MM.YYYY'),
+      );
+    };
   }, [data]);
 
-  if (loading) {
-    return (
-      <View style={styles.containerLoading}>
-        <Loader size={50} />
-      </View>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <View style={styles.containerLoading}>
+  //       <Loader size={50} />
+  //     </View>
+  //   );
+  // }
 
   return (
     <>

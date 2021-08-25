@@ -11,7 +11,7 @@ import {
   TextInput,
   Keyboard,
 } from 'react-native';
-import { API_URL, COLORS } from '../constants';
+import { API_URL, COLORS, token } from '../constants';
 import Button from '../components/Button';
 import { useNavigation } from '@react-navigation/native';
 import { AuthService } from '../services/AuthService';
@@ -41,10 +41,35 @@ const Login: FC<IProps> = () => {
 
   const disabled = phone.length < 10 || !isSelected;
 
+  const handleSubmitAuth = async () => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('phone', `8${phone}`);
+      const response = await fetch(
+        `${API_URL}/1/mobile/user/auth/?token=${token}`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
+      console.log(response);
+      const data = await response.json();
+      setLoading(false);
+      if (!data?.data) {
+        return;
+      }
+      await AsyncStorage.setItem('phone', phone);
+      await AsyncStorage.setItem('auth_id', data.data.auth_id);
+      return navigation.navigate('SmsCodeNotification', { phone });
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetch(
-      `${API_URL}/1/mobile/location/cities/?token=b4831f21df6202f5bacade4b7bbc3e5c`,
-    )
+    fetch(`${API_URL}/1/mobile/location/cities/?token=${token}`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.data) {
@@ -88,25 +113,25 @@ const Login: FC<IProps> = () => {
     setPhone(value || formatted);
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    if (disabled) {
-      return;
-    }
-    setLoading(true);
-    const status = await AuthService.login({ phone: `7${phone}` });
-    setTimeout(() => setLoading(false), 1000);
+  // const handleSubmit = useCallback(async () => {
+  //   if (disabled) {
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   const status = await AuthService.login({ phone: `7${phone}` });
+  //   setTimeout(() => setLoading(false), 1000);
 
-    if (status) {
-      Keyboard.dismiss();
-      setError(false);
-      setTimeout(() => {
-        AsyncStorage.setItem('phone', phone);
-        return navigation.navigate('SmsCodeNotification', { phone });
-      }, 100);
-    } else {
-      setError(true);
-    }
-  }, [phone, disabled]);
+  //   if (status) {
+  //     Keyboard.dismiss();
+  //     setError(false);
+  //     setTimeout(() => {
+  //       AsyncStorage.setItem('phone', phone);
+  //       return navigation.navigate('SmsCodeNotification', { phone });
+  //     }, 100);
+  //   } else {
+  //     setError(true);
+  //   }
+  // }, [phone, disabled]);
 
   const handleFocus = useCallback(
     (status: boolean) => {
@@ -163,7 +188,7 @@ const Login: FC<IProps> = () => {
                     handleChangeNumber(value, value2);
                   }
                 }}
-                onSubmitEditing={handleSubmit}
+                onSubmitEditing={handleSubmitAuth}
               />
               <Button
                 customStyles={[
@@ -176,7 +201,7 @@ const Login: FC<IProps> = () => {
                 loading={loading}
                 disabled={disabled || !isSelected}
                 label={loading ? '' : 'OK'}
-                onClick={handleSubmit}
+                onClick={handleSubmitAuth}
               />
             </View>
           </View>

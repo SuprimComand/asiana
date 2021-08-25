@@ -1,8 +1,8 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import HeaderProject from '../components/HeaderProject';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { COLORS } from '../constants';
+import { API_URL, COLORS, token } from '../constants';
 import FormField from '../components/FormField';
 import Button from '../components/Button';
 import { useNavigation } from '@react-navigation/native';
@@ -16,17 +16,23 @@ import ErrorBoundry from '../components/ErrorBoundry';
 import { NotifierRoot } from 'react-native-notifier';
 import TextInputMask from 'react-native-text-input-mask';
 import AsyncStorage from '@react-native-community/async-storage';
+import Dropdown from '../components/Dropdown';
+import { setLoading } from '../../actions';
+import { connect } from 'react-redux';
 
-interface IExternalProps {}
+interface IExternalProps {
+  setLoading: any;
+}
 
 interface IProps extends IExternalProps {}
 
-const AddAuto: FC<IProps> = () => {
+const AddAuto: FC<IProps> = ({ setLoading }) => {
   const navigation = useNavigation();
+  const [errorMessage, setErrorMessage] = useState('');
   // const [profileId] = useAsyncStorage('profileId');
   const [
     createCarRequest,
-    { data: createCar, loading: createCarLoading, error },
+    { data: createCar, loading: createCarLoading },
   ] = useMutation(CREATE_PROFILE_CAR, {
     refetchQueries: ['profileCars'],
   });
@@ -34,7 +40,14 @@ const AddAuto: FC<IProps> = () => {
   const notifier = useRef<any>(null);
   const [valueCar, setCarValue] = useState('');
   const [regionCar, setRegionCar] = useState('');
+  const [marks, setMarks] = useState([]);
+  const [activeMark, setActiveMark] = useState(null);
+  const [userData] = useAsyncStorage('userData');
+  const [activeModel, setActiveModel] = useState(null);
   const [sliders] = useAsyncStorage('sliders', [], true);
+  const [error, setError] = useState(null);
+  const [auth_id] = useAsyncStorage('auth_id');
+  const [models, setModels] = useState([]);
   const refReg = useRef<any>(null);
 
   // const handleChange = useCallback(
@@ -82,14 +95,68 @@ const AddAuto: FC<IProps> = () => {
     }
   }, [valueCar]);
 
+  useEffect(() => {
+    fetch(`${API_URL}/1/mobile/car/brands/?token=${token}`)
+      .then((r) => r.json())
+      .then((d) => setMarks(d.data.brands))
+      .catch((e) => console.log(JSON.stringify(e)));
+  }, []);
+  useEffect(() => {
+    if (!activeMark) {
+      return;
+    }
+    fetch(`${API_URL}/1/mobile/car/${activeMark}/models/?token=${token}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setModels(data.data.model);
+      })
+      .catch((e) => console.log(e));
+  }, [activeMark]);
+
+  const handleSaveAuto = () => {
+    if (!activeMark || !activeModel || !userData) {
+      return;
+    }
+    const user = JSON.parse(userData);
+    const f = new FormData();
+    f.append(
+      'car_number',
+      valueCar.replace(/\s/g, '') + ' ' + regionCar.replace(/\s/g, ''),
+    );
+    f.append('model_id', activeModel);
+    f.append('mark_id', activeMark);
+    f.append('user_id', user.id);
+
+    setLoading(true);
+
+    fetch(`${API_URL}/1/mobile/car/add_car/?token=${token}`, {
+      method: 'POST',
+      body: f,
+    })
+      .then((response) => response.json())
+      .then(async (d) => {
+        if (Array.isArray(d) && d[0] === 'empty user_id') {
+          return;
+        }
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+        Alert.alert('Успешно сохранено', '', [
+          { text: 'Ok', onPress: () => navigation.goBack() },
+        ]);
+      })
+      .catch((e) => {
+        setErrorMessage(e.message);
+      });
+  };
+
   const cleateAuto = async () => {
-    if (!valueCar || !regionCar) {
+    if (valueCar.length < 6 || regionCar.length < 3) {
+      setErrorMessage('Не все поля заполнены');
       return;
     }
     const newCar = {
       id: Date.now(),
-      title: 'Автомобиль #' + Date.now(),
-      subtitle: 'AUDI A' + Math.floor(Math.random() * 10),
+      title: 'Автомобиль',
+      // subtitle: 'AUDI A' + Math.floor(Math.random() * 10),
       content: valueCar + ' ' + regionCar,
     };
 
@@ -107,11 +174,11 @@ const AddAuto: FC<IProps> = () => {
     );
   }
 
-  if (error) {
-    return (
-      <ErrorBoundry title={`Ошибка добавления ${JSON.stringify(error)}`} />
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <ErrorBoundry title={`Ошибка добавления ${JSON.stringify(error)}`} />
+  //   );
+  // }
 
   return (
     <View style={styles.container}>
@@ -122,53 +189,82 @@ const AddAuto: FC<IProps> = () => {
         onPressLeftAction={onGoBack}
       />
       <View style={styles.content}>
-        <View style={{ flexDirection: 'row' }}>
-          <TextInputMask
-            style={{
-              borderWidth: 1,
-              height: 40,
-              borderRadius: 5,
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-              width: 100,
-              textAlign: 'center',
-            }}
-            // style={[styles.input, styles.inputField, customStyles, style]}
-            // value={String(value || '')}
-            onChangeText={setCarValue}
-            mask={'[A] [000] [AA]'}
-            placeholder="Номер"
-            value={valueCar}
-            autoFocus={valueCar.replace(/\s/, '').length < 6}
-          />
-          <TextInput
-            ref={refReg}
-            keyboardType="number-pad"
-            value={regionCar}
-            style={{
-              borderWidth: 1,
-              height: 40,
-              borderRadius: 5,
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              borderLeftWidth: 0,
-            }}
-            // style={[styles.input, styles.inputField, customStyles, style]}
-            // value={String(value || '')}
-            onChangeText={setRegionCar}
-            maxLength={3}
-            autoFocus={valueCar.replace(/\s/, '').length === 6}
-          />
-          <Button
-            label="ОК"
-            onClick={cleateAuto}
-            customStyles={{
-              width: 50,
-              borderRadius: 4,
-              height: 40,
-              marginLeft: 10,
-            }}
-          />
+        <View>
+          <View style={{ flexDirection: 'row' }}>
+            <TextInputMask
+              style={{
+                borderWidth: 1,
+                height: 40,
+                borderRadius: 5,
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+                width: 100,
+                textAlign: 'center',
+              }}
+              // style={[styles.input, styles.inputField, customStyles, style]}
+              // value={String(value || '')}
+              onChangeText={setCarValue}
+              mask={'[A] [000] [AA]'}
+              placeholder="Номер"
+              value={valueCar}
+              autoFocus={valueCar.replace(/\s/, '').length < 6}
+            />
+            <TextInput
+              ref={refReg}
+              keyboardType="number-pad"
+              value={regionCar}
+              style={{
+                borderWidth: 1,
+                height: 40,
+                borderRadius: 5,
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+                borderLeftWidth: 0,
+              }}
+              // style={[styles.input, styles.inputField, customStyles, style]}
+              // value={String(value || '')}
+              onChangeText={setRegionCar}
+              maxLength={3}
+              autoFocus={valueCar.replace(/\s/, '').length === 6}
+            />
+            {errorMessage ? (
+              <Text style={{ color: 'tomato', marginTop: 10 }}>
+                {errorMessage}
+              </Text>
+            ) : null}
+            <Button
+              label="ОК"
+              onClick={handleSaveAuto}
+              customStyles={{
+                width: 50,
+                borderRadius: 4,
+                height: 40,
+                marginLeft: 10,
+              }}
+            />
+          </View>
+          <View>
+            <Text style={{ marginTop: 10 }}>Марка</Text>
+            <Dropdown
+              onSelect={(i: any) => setActiveMark(i)}
+              selectedValue={activeMark}
+              list={marks.map((item: any) => ({
+                ...item,
+                label: item.name,
+                value: item.id,
+              }))}
+            />
+            <Text style={{ marginTop: 10 }}>Модель</Text>
+            <Dropdown
+              onSelect={(i: any) => setActiveModel(i)}
+              selectedValue={activeModel}
+              list={models.map((item: any) => ({
+                ...item,
+                label: item.name,
+                value: item.id,
+              }))}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -216,4 +312,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddAuto;
+const mapStateToProps = (state: any) => state;
+
+export default connect(mapStateToProps, { setLoading })(AddAuto);
