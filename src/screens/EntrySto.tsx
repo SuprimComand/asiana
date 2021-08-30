@@ -48,6 +48,7 @@ import { UPDATE_PROFILE_CAR } from '../graph/mutations/updateProfileCar';
 import SliderCars from '../components/SliderCars';
 import { connect } from 'react-redux';
 import { setLocation } from '../../actions';
+import moment from 'moment';
 // import { marginTop } from 'styled-system';
 
 interface IExternalProps {
@@ -72,6 +73,7 @@ const EntrySto: FC<IProps> = ({
   const [profileId] = useAsyncStorage('profileId');
   const [date, setDate] = useState<any>(new Date());
   const [workKind, setWorkKind] = useState('');
+  const [activeCar] = useAsyncStorage('activeCar');
   const [other] = useState(false);
   // const [enterTO, setTO] = useState(false);
   // const [oilChange, setOil] = useState(false);
@@ -97,42 +99,16 @@ const EntrySto: FC<IProps> = ({
   const addresses: AddressType[] = addressesData?.addresses || [];
   const [isOpenList, setOpenList] = useState(false);
   const carsArr = cars?.profileCars || [];
+  const [loadEntry, setLoadEntry] = useState(false);
   const [regionId] = useAsyncStorage('regionId');
-  const car =
-    carsArr.find((car: ProfileCarType) => car.active)?.car || ProfileCarMock;
   const notifier = useRef<any>(null);
   const withoutActiveProfileCar = carsArr.filter((car: any) => !car.active);
   const [locations, setLocations] = useState<any>([]);
+  const [userData] = useAsyncStorage('userData');
   // const [location, setLocation] = useState<any>(regionId || null);
   const [isOpenAny, setOpenAny] = useState(false);
   const [customService, setCustomService] = useState('');
-  // const [secondCustomService, setSecondCustomService] = useState('');
   const [addressesList, setAddresses] = useState<any>([]);
-  const [isOpenDetail, setOpenDetail] = useState(false);
-
-  // const [valueCar, setCarValue] = useState('');
-  // const refReg = useRef<any>(null);
-
-  // const [isOpenAddModal, setOpenAddModal] = useState(false);
-  const [sliders, setSliders] = useState<any>([
-    {
-      id: 1,
-      title: 'Автомобиль',
-      subtitle: 'AUDI A6',
-      content: 'H 553 PO 178',
-    },
-    {
-      id: 2,
-      title: 'Автомобиль',
-      subtitle: 'AUDI A6',
-      content: 'H 553 PO 178',
-    },
-    {
-      id: 3,
-      addButton: true,
-    },
-  ]);
-
   useEffect(() => {
     if (regionId !== location && regionId) {
       setLocation(regionId);
@@ -202,7 +178,8 @@ const EntrySto: FC<IProps> = ({
             return arr;
           }, []),
         );
-      });
+      })
+      .catch((err) => console.log(err, 'error locations'));
   }, []);
 
   useEffect(() => {
@@ -272,29 +249,70 @@ const EntrySto: FC<IProps> = ({
   };
 
   const handleSubmit = () => {
+    const user = JSON.parse(userData);
+    const activeCarRes = JSON.parse(activeCar);
+
     if (!address) {
       notifier.current?.showNotification({
         title: 'Не выбран адрес',
       });
     }
-    if (!car.id) {
+    if (!activeCarRes?.id) {
       notifier.current?.showNotification({
         title: 'Не выбран автомобиль',
       });
     }
-    createRequest({
-      variables: {
-        input: {
-          userId,
-          profileId,
-          addressId: address,
-          carId: car.id,
-          date,
-          workKind,
-        },
-      },
-      refetchQueries: ['requestSto'],
-    });
+
+    setLoadEntry(true);
+
+    const f = new FormData();
+    f.append('user_id', user?.id);
+    f.append('sto_id', address);
+    f.append('comment', comment);
+    f.append('car_id', activeCarRes?.id);
+    f.append(
+      'service_datetime',
+      moment(new Date(date)).format('YYYY-MM-DD HH:mm:ss'),
+    );
+
+    fetch(`${API_URL}/1/mobile/sto/add_service_record?token=${token}`)
+      .then((response) => {
+        if (Number(response.status) === 200) {
+          notifier.current?.showNotification({
+            title: 'Ваша заявка была отправлена!',
+          });
+        } else {
+          notifier.current?.showNotification({
+            title: 'Произошла ошибка попробуйте позже!',
+          });
+        }
+
+        setLoadEntry(false);
+
+        setTimeout(() => {
+          navigation.navigate('Main');
+        }, 1000);
+      })
+      .catch((_err) => {
+        setLoadEntry(false);
+        notifier.current?.showNotification({
+          title: 'Произошла ошибка попробуйте позже!',
+        });
+      });
+    // .then((data) => console.log(data));
+    // createRequest({
+    //   variables: {
+    //     input: {
+    //       userId,
+    //       profileId,
+    //       addressId: address,
+    //       carId: car.id,
+    //       date,
+    //       workKind,
+    //     },
+    //   },
+    //   refetchQueries: ['requestSto'],
+    // });
   };
 
   if (loading || loadingCreateRequest) {
@@ -525,8 +543,8 @@ const EntrySto: FC<IProps> = ({
         </ScrollView>
         <Button
           onClick={handleSubmit}
-          disabled={!updatedForm}
-          label="ЗАПИСАТЬСЯ"
+          disabled={!updatedForm || loadEntry}
+          label="ОТПРАВИТЬ ЗАЯВКУ"
         />
       </View>
     </View>

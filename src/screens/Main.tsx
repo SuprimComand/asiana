@@ -15,7 +15,7 @@ import {
 
 import TextInputMask from 'react-native-text-input-mask';
 import HeaderProject from '../components/HeaderProject';
-import logo from '../assets/asiana-logotype.png';
+import logo from '../assets/00122.jpg';
 import loadingCard from '../assets/loading-row.gif';
 import { COLORS } from '../constants';
 import { useNavigation } from '@react-navigation/native';

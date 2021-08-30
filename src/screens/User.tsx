@@ -149,7 +149,7 @@ const User: FC<IProps> = (props) => {
   }, [userData]);
 
   useEffect(() => {
-    fetch(`/1/mobile/location/cities/?token`)
+    fetch(`${API_URL}/1/mobile/location/cities/?token=${token}`)
       .then((response) => response.json())
       .then((data) => {
         if (!data.data) {
@@ -326,6 +326,7 @@ const User: FC<IProps> = (props) => {
                   onSubmitEditing={saveUserData}
                 />
                 <Button
+                  disabled
                   onClick={() => setDisabledPhone(!disabledPhone)}
                   customStyles={{
                     width: '15%',

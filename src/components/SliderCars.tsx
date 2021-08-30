@@ -1,6 +1,6 @@
 // eslint-disable react-native/no-inline-styles
 import AsyncStorage from '@react-native-community/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import { Box } from 'native-base';
 import React, { FC, useEffect, useState } from 'react';
@@ -19,8 +19,14 @@ import { useAsyncStorage } from '../hooks/asyncStorage';
 import Button from './Button';
 import Modal from './Modal';
 
-const SliderCars: FC<any> = ({ hideDetails, loading, setLoading }) => {
+const SliderCars: FC<any> = ({
+  hideDetails,
+  loading,
+  setLoading,
+  handleSelectAuto,
+}) => {
   const navigation = useNavigation();
+  const [activeCarDefault] = useAsyncStorage('activeCar');
   const [userData] = useAsyncStorage('userData');
   const [auth_id] = useAsyncStorage('auth_id');
   const [time] = useAsyncStorage('closedTime');
@@ -28,6 +34,11 @@ const SliderCars: FC<any> = ({ hideDetails, loading, setLoading }) => {
   // const [sliders] = useAsyncStorage('sliders', [], true);
   const [sliders, setCurrentSliders] = useState<any>([]);
   const [activeCar, setCar] = useState<any>(null);
+  let defaultActiveCar = null;
+
+  if (activeCarDefault) {
+    defaultActiveCar = JSON.parse(activeCarDefault);
+  }
 
   const getCars = () => {
     if (!userData) {
@@ -48,7 +59,8 @@ const SliderCars: FC<any> = ({ hideDetails, loading, setLoading }) => {
       .catch((err) => console.log(err, 'err'));
   };
 
-  useEffect(() => {
+  useFocusEffect(() => {
+    console.log('get cars');
     if (loading) {
       setLoading(false);
     }
@@ -59,7 +71,6 @@ const SliderCars: FC<any> = ({ hideDetails, loading, setLoading }) => {
     if (!userData) {
       return;
     }
-    console.log(idCar);
     const user = JSON.parse(userData);
     const f = new FormData();
     f.append('user_car_id', idCar);
@@ -118,6 +129,22 @@ const SliderCars: FC<any> = ({ hideDetails, loading, setLoading }) => {
           <View style={{ alignItems: 'center' }}>
             <Text>{activeCar?.model || activeCar?.title}</Text>
             {/* <Text>{activeCar?.subtitle}</Text> */}
+            {defaultActiveCar?.id !== activeCar?.id ? (
+              <Button
+                onClick={() => {
+                  handleSelectAuto && handleSelectAuto(activeCar);
+                  setOpenDetail(false);
+                }}
+                label="Выбрать автомобиль"
+                customStyles={{
+                  width: 240,
+                  borderRadius: 4,
+                  height: 35,
+                  marginTop: 10,
+                  backgroundColor: 'green',
+                }}
+              />
+            ) : null}
             <Button
               onClick={async () => {
                 handleDelete(activeCar?.id);
@@ -167,12 +194,19 @@ const SliderCars: FC<any> = ({ hideDetails, loading, setLoading }) => {
               shadow={2}
               rounded="lg">
               <TouchableOpacity
-                onPress={() => {
+                onPress={async () => {
                   setOpenDetail(item.id);
                   setCar(item);
+                  await AsyncStorage.setItem('activeCar', JSON.stringify(item));
                 }}
                 style={{ height: '100%' }}>
-                <Text>{item.model || item.title}</Text>
+                <Text
+                  style={{
+                    color:
+                      defaultActiveCar?.id === item.id ? 'orange' : 'black',
+                  }}>
+                  {item.model || item.title}
+                </Text>
                 <Text style={{ fontWeight: 'bold' }}>
                   Марка: {item.mark || 'Пока нет информации'}
                 </Text>
